@@ -1,0 +1,168 @@
+{
+  "elements": {
+    "ayahs": {
+      "id": {
+        "library_uri": "package:studyquran/core/database/tables/ayahs.dart",
+        "name": "ayahs"
+      },
+      "declaration": {
+        "source_uri": "package:studyquran/core/database/tables/ayahs.dart",
+        "offset": 65,
+        "name": "Ayahs"
+      },
+      "references": [],
+      "type": "table",
+      "columns": [
+        {
+          "sqlType": {
+            "builtin": "int"
+          },
+          "nullable": false,
+          "nameInSql": "global_ayah_index",
+          "nameInDart": "globalAyahIndex",
+          "declaration": {
+            "source_uri": "package:studyquran/core/database/tables/ayahs.dart",
+            "offset": 103,
+            "name": "globalAyahIndex"
+          },
+          "typeConverter": null,
+          "clientDefaultCode": null,
+          "defaultArgument": null,
+          "overriddenJsonName": null,
+          "referenceName": null,
+          "documentationComment": null,
+          "constraints": [],
+          "customConstraints": null
+        },
+        {
+          "sqlType": {
+            "builtin": "int"
+          },
+          "nullable": false,
+          "nameInSql": "surah_number",
+          "nameInDart": "surahNumber",
+          "declaration": {
+            "source_uri": "package:studyquran/core/database/tables/ayahs.dart",
+            "offset": 151,
+            "name": "surahNumber"
+          },
+          "typeConverter": null,
+          "clientDefaultCode": null,
+          "defaultArgument": null,
+          "overriddenJsonName": null,
+          "referenceName": null,
+          "documentationComment": null,
+          "constraints": [],
+          "customConstraints": null
+        },
+        {
+          "sqlType": {
+            "builtin": "int"
+          },
+          "nullable": false,
+          "nameInSql": "ayah_number",
+          "nameInDart": "ayahNumber",
+          "declaration": {
+            "source_uri": "package:studyquran/core/database/tables/ayahs.dart",
+            "offset": 195,
+            "name": "ayahNumber"
+          },
+          "typeConverter": null,
+          "clientDefaultCode": null,
+          "defaultArgument": null,
+          "overriddenJsonName": null,
+          "referenceName": null,
+          "documentationComment": null,
+          "constraints": [],
+          "customConstraints": null
+        },
+        {
+          "sqlType": {
+            "builtin": "string"
+          },
+          "nullable": false,
+          "nameInSql": "arabic_text_uthmani",
+          "nameInDart": "arabicTextUthmani",
+          "declaration": {
+            "source_uri": "package:studyquran/core/database/tables/ayahs.dart",
+            "offset": 239,
+            "name": "arabicTextUthmani"
+          },
+          "typeConverter": null,
+          "clientDefaultCode": null,
+          "defaultArgument": null,
+          "overriddenJsonName": null,
+          "referenceName": null,
+          "documentationComment": null,
+          "constraints": [],
+          "customConstraints": null
+        },
+        {
+          "sqlType": {
+            "builtin": "int"
+          },
+          "nullable": false,
+          "nameInSql": "juz",
+          "nameInDart": "juz",
+          "declaration": {
+            "source_uri": "package:studyquran/core/database/tables/ayahs.dart",
+            "offset": 286,
+            "name": "juz"
+          },
+          "typeConverter": null,
+          "clientDefaultCode": null,
+          "defaultArgument": null,
+          "overriddenJsonName": null,
+          "referenceName": null,
+          "documentationComment": null,
+          "constraints": [],
+          "customConstraints": null
+        },
+        {
+          "sqlType": {
+            "builtin": "int"
+          },
+          "nullable": false,
+          "nameInSql": "page",
+          "nameInDart": "page",
+          "declaration": {
+            "source_uri": "package:studyquran/core/database/tables/ayahs.dart",
+            "offset": 322,
+            "name": "page"
+          },
+          "typeConverter": null,
+          "clientDefaultCode": null,
+          "defaultArgument": null,
+          "overriddenJsonName": null,
+          "referenceName": null,
+          "documentationComment": null,
+          "constraints": [],
+          "customConstraints": null
+        }
+      ],
+      "existing_data_class": null,
+      "table_constraints": [
+        {
+          "type": "primary_key",
+          "columns": [
+            "global_ayah_index"
+          ]
+        }
+      ],
+      "custom_parent_class": null,
+      "interfaces_for_row_class": [],
+      "fixed_entity_info_name": null,
+      "base_dart_name": "Ayahs",
+      "row_class_name": "Ayah",
+      "companion_class_name": null,
+      "without_rowid": false,
+      "strict": false,
+      "write_default_constraints": true,
+      "custom_constraints": [],
+      "attached_indices": []
+    }
+  },
+  "imports": [
+    "package:drift/drift.dart"
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "elements": {},
+  "imports": [
+    "package:flutter/services.dart",
+    "package:drift/drift.dart",
+    "package:studyquran/core/database/app_database.dart",
+    "package:studyquran/core/database/daos/content_pack_dao.dart",
+    "package:studyquran/core/database/fts_setup.dart",
+    "package:studyquran/core/content_packs/models/pack_manifest.dart"
+  ]
+}

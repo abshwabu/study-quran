@@ -1,0 +1,16 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
+
+part of 'content_pack_dao.dart';
+
+// ignore_for_file: type=lint
+mixin _$ContentPackDaoMixin on DatabaseAccessor<AppDatabase> {
+  $ContentPacksTable get contentPacks => attachedDatabase.contentPacks;
+  ContentPackDaoManager get managers => ContentPackDaoManager(this);
+}
+
+class ContentPackDaoManager {
+  final _$ContentPackDaoMixin _db;
+  ContentPackDaoManager(this._db);
+  $$ContentPacksTableTableManager get contentPacks =>
+      $$ContentPacksTableTableManager(_db.attachedDatabase, _db.contentPacks);
+}

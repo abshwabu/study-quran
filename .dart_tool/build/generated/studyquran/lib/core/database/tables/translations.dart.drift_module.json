@@ -1,0 +1,268 @@
+{
+  "elements": {
+    "translations_meta": {
+      "id": {
+        "library_uri": "package:studyquran/core/database/tables/translations.dart",
+        "name": "translations_meta"
+      },
+      "declaration": {
+        "source_uri": "package:studyquran/core/database/tables/translations.dart",
+        "offset": 76,
+        "name": "TranslationsMeta"
+      },
+      "references": [],
+      "type": "table",
+      "columns": [
+        {
+          "sqlType": {
+            "builtin": "string"
+          },
+          "nullable": false,
+          "nameInSql": "translation_id",
+          "nameInDart": "translationId",
+          "declaration": {
+            "source_uri": "package:studyquran/core/database/tables/translations.dart",
+            "offset": 126,
+            "name": "translationId"
+          },
+          "typeConverter": null,
+          "clientDefaultCode": null,
+          "defaultArgument": null,
+          "overriddenJsonName": null,
+          "referenceName": null,
+          "documentationComment": null,
+          "constraints": [],
+          "customConstraints": null
+        },
+        {
+          "sqlType": {
+            "builtin": "string"
+          },
+          "nullable": false,
+          "nameInSql": "language",
+          "nameInDart": "language",
+          "declaration": {
+            "source_uri": "package:studyquran/core/database/tables/translations.dart",
+            "offset": 170,
+            "name": "language"
+          },
+          "typeConverter": null,
+          "clientDefaultCode": null,
+          "defaultArgument": null,
+          "overriddenJsonName": null,
+          "referenceName": null,
+          "documentationComment": null,
+          "constraints": [],
+          "customConstraints": null
+        },
+        {
+          "sqlType": {
+            "builtin": "string"
+          },
+          "nullable": false,
+          "nameInSql": "translator_name",
+          "nameInDart": "translatorName",
+          "declaration": {
+            "source_uri": "package:studyquran/core/database/tables/translations.dart",
+            "offset": 209,
+            "name": "translatorName"
+          },
+          "typeConverter": null,
+          "clientDefaultCode": null,
+          "defaultArgument": null,
+          "overriddenJsonName": null,
+          "referenceName": null,
+          "documentationComment": null,
+          "constraints": [],
+          "customConstraints": null
+        },
+        {
+          "sqlType": {
+            "builtin": "string"
+          },
+          "nullable": false,
+          "nameInSql": "source",
+          "nameInDart": "source",
+          "declaration": {
+            "source_uri": "package:studyquran/core/database/tables/translations.dart",
+            "offset": 254,
+            "name": "source"
+          },
+          "typeConverter": null,
+          "clientDefaultCode": null,
+          "defaultArgument": null,
+          "overriddenJsonName": null,
+          "referenceName": null,
+          "documentationComment": null,
+          "constraints": [],
+          "customConstraints": null
+        },
+        {
+          "sqlType": {
+            "builtin": "string"
+          },
+          "nullable": false,
+          "nameInSql": "license_note",
+          "nameInDart": "licenseNote",
+          "declaration": {
+            "source_uri": "package:studyquran/core/database/tables/translations.dart",
+            "offset": 291,
+            "name": "licenseNote"
+          },
+          "typeConverter": null,
+          "clientDefaultCode": null,
+          "defaultArgument": null,
+          "overriddenJsonName": null,
+          "referenceName": null,
+          "documentationComment": null,
+          "constraints": [],
+          "customConstraints": null
+        }
+      ],
+      "existing_data_class": null,
+      "table_constraints": [
+        {
+          "type": "primary_key",
+          "columns": [
+            "translation_id"
+          ]
+        }
+      ],
+      "custom_parent_class": null,
+      "interfaces_for_row_class": [],
+      "fixed_entity_info_name": null,
+      "base_dart_name": "TranslationsMeta",
+      "row_class_name": "TranslationMeta",
+      "companion_class_name": null,
+      "without_rowid": false,
+      "strict": false,
+      "write_default_constraints": true,
+      "custom_constraints": [],
+      "attached_indices": []
+    },
+    "ayah_translations": {
+      "id": {
+        "library_uri": "package:studyquran/core/database/tables/translations.dart",
+        "name": "ayah_translations"
+      },
+      "declaration": {
+        "source_uri": "package:studyquran/core/database/tables/translations.dart",
+        "offset": 421,
+        "name": "AyahTranslations"
+      },
+      "references": [],
+      "type": "table",
+      "columns": [
+        {
+          "sqlType": {
+            "builtin": "string"
+          },
+          "nullable": false,
+          "nameInSql": "translation_id",
+          "nameInDart": "translationId",
+          "declaration": {
+            "source_uri": "package:studyquran/core/database/tables/translations.dart",
+            "offset": 471,
+            "name": "translationId"
+          },
+          "typeConverter": null,
+          "clientDefaultCode": null,
+          "defaultArgument": null,
+          "overriddenJsonName": null,
+          "referenceName": null,
+          "documentationComment": null,
+          "constraints": [],
+          "customConstraints": null
+        },
+        {
+          "sqlType": {
+            "builtin": "int"
+          },
+          "nullable": false,
+          "nameInSql": "surah_number",
+          "nameInDart": "surahNumber",
+          "declaration": {
+            "source_uri": "package:studyquran/core/database/tables/translations.dart",
+            "offset": 514,
+            "name": "surahNumber"
+          },
+          "typeConverter": null,
+          "clientDefaultCode": null,
+          "defaultArgument": null,
+          "overriddenJsonName": null,
+          "referenceName": null,
+          "documentationComment": null,
+          "constraints": [],
+          "customConstraints": null
+        },
+        {
+          "sqlType": {
+            "builtin": "int"
+          },
+          "nullable": false,
+          "nameInSql": "ayah_number",
+          "nameInDart": "ayahNumber",
+          "declaration": {
+            "source_uri": "package:studyquran/core/database/tables/translations.dart",
+            "offset": 558,
+            "name": "ayahNumber"
+          },
+          "typeConverter": null,
+          "clientDefaultCode": null,
+          "defaultArgument": null,
+          "overriddenJsonName": null,
+          "referenceName": null,
+          "documentationComment": null,
+          "constraints": [],
+          "customConstraints": null
+        },
+        {
+          "sqlType": {
+            "builtin": "string"
+          },
+          "nullable": false,
+          "nameInSql": "text",
+          "nameInDart": "textContent",
+          "declaration": {
+            "source_uri": "package:studyquran/core/database/tables/translations.dart",
+            "offset": 602,
+            "name": "textContent"
+          },
+          "typeConverter": null,
+          "clientDefaultCode": null,
+          "defaultArgument": null,
+          "overriddenJsonName": null,
+          "referenceName": null,
+          "documentationComment": null,
+          "constraints": [],
+          "customConstraints": null
+        }
+      ],
+      "existing_data_class": null,
+      "table_constraints": [
+        {
+          "type": "primary_key",
+          "columns": [
+            "translation_id",
+            "surah_number",
+            "ayah_number"
+          ]
+        }
+      ],
+      "custom_parent_class": null,
+      "interfaces_for_row_class": [],
+      "fixed_entity_info_name": null,
+      "base_dart_name": "AyahTranslations",
+      "row_class_name": "AyahTranslation",
+      "companion_class_name": null,
+      "without_rowid": false,
+      "strict": false,
+      "write_default_constraints": true,
+      "custom_constraints": [],
+      "attached_indices": []
+    }
+  },
+  "imports": [
+    "package:drift/drift.dart"
+  ]
+}

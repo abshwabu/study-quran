@@ -1,0 +1,41 @@
+{
+  "elements": {
+    "SearchDao": {
+      "id": {
+        "library_uri": "package:studyquran/core/database/daos/search_dao.dart",
+        "name": "SearchDao"
+      },
+      "declaration": {
+        "source_uri": "package:studyquran/core/database/daos/search_dao.dart",
+        "offset": 395,
+        "name": "SearchDao"
+      },
+      "references": [],
+      "type": "dao",
+      "tables": [],
+      "views": [],
+      "includes": [],
+      "queries": [],
+      "dart_type": {
+        "elements": [
+          {
+            "lexeme": "SearchDao",
+            "import_uri": "package:studyquran/core/database/daos/search_dao.dart"
+          }
+        ]
+      },
+      "database": {
+        "elements": [
+          {
+            "lexeme": "AppDatabase",
+            "import_uri": "package:studyquran/core/database/app_database.dart"
+          }
+        ]
+      }
+    }
+  },
+  "imports": [
+    "package:drift/drift.dart",
+    "package:studyquran/core/database/app_database.dart"
+  ]
+}

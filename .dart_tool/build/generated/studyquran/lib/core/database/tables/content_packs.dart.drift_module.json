@@ -1,0 +1,219 @@
+{
+  "elements": {
+    "content_packs": {
+      "id": {
+        "library_uri": "package:studyquran/core/database/tables/content_packs.dart",
+        "name": "content_packs"
+      },
+      "declaration": {
+        "source_uri": "package:studyquran/core/database/tables/content_packs.dart",
+        "offset": 72,
+        "name": "ContentPacks"
+      },
+      "references": [],
+      "type": "table",
+      "columns": [
+        {
+          "sqlType": {
+            "builtin": "string"
+          },
+          "nullable": false,
+          "nameInSql": "pack_id",
+          "nameInDart": "packId",
+          "declaration": {
+            "source_uri": "package:studyquran/core/database/tables/content_packs.dart",
+            "offset": 118,
+            "name": "packId"
+          },
+          "typeConverter": null,
+          "clientDefaultCode": null,
+          "defaultArgument": null,
+          "overriddenJsonName": null,
+          "referenceName": null,
+          "documentationComment": null,
+          "constraints": [],
+          "customConstraints": null
+        },
+        {
+          "sqlType": {
+            "builtin": "string"
+          },
+          "nullable": false,
+          "nameInSql": "type",
+          "nameInDart": "type",
+          "declaration": {
+            "source_uri": "package:studyquran/core/database/tables/content_packs.dart",
+            "offset": 155,
+            "name": "type"
+          },
+          "typeConverter": null,
+          "clientDefaultCode": null,
+          "defaultArgument": null,
+          "overriddenJsonName": null,
+          "referenceName": null,
+          "documentationComment": null,
+          "constraints": [],
+          "customConstraints": null
+        },
+        {
+          "sqlType": {
+            "builtin": "string"
+          },
+          "nullable": false,
+          "nameInSql": "name",
+          "nameInDart": "name",
+          "declaration": {
+            "source_uri": "package:studyquran/core/database/tables/content_packs.dart",
+            "offset": 232,
+            "name": "name"
+          },
+          "typeConverter": null,
+          "clientDefaultCode": null,
+          "defaultArgument": null,
+          "overriddenJsonName": null,
+          "referenceName": null,
+          "documentationComment": null,
+          "constraints": [],
+          "customConstraints": null
+        },
+        {
+          "sqlType": {
+            "builtin": "string"
+          },
+          "nullable": false,
+          "nameInSql": "version",
+          "nameInDart": "version",
+          "declaration": {
+            "source_uri": "package:studyquran/core/database/tables/content_packs.dart",
+            "offset": 267,
+            "name": "version"
+          },
+          "typeConverter": null,
+          "clientDefaultCode": null,
+          "defaultArgument": null,
+          "overriddenJsonName": null,
+          "referenceName": null,
+          "documentationComment": null,
+          "constraints": [],
+          "customConstraints": null
+        },
+        {
+          "sqlType": {
+            "builtin": "bool"
+          },
+          "nullable": false,
+          "nameInSql": "downloaded",
+          "nameInDart": "downloaded",
+          "declaration": {
+            "source_uri": "package:studyquran/core/database/tables/content_packs.dart",
+            "offset": 305,
+            "name": "downloaded"
+          },
+          "typeConverter": null,
+          "clientDefaultCode": null,
+          "defaultArgument": {
+            "elements": [
+              "const ",
+              {
+                "lexeme": "Constant",
+                "import_uri": "package:drift/src/runtime/query_builder/query_builder.dart"
+              },
+              "(false)"
+            ]
+          },
+          "overriddenJsonName": null,
+          "referenceName": null,
+          "documentationComment": null,
+          "constraints": [],
+          "customConstraints": null
+        },
+        {
+          "sqlType": {
+            "builtin": "string"
+          },
+          "nullable": false,
+          "nameInSql": "download_url",
+          "nameInDart": "downloadUrl",
+          "declaration": {
+            "source_uri": "package:studyquran/core/database/tables/content_packs.dart",
+            "offset": 384,
+            "name": "downloadUrl"
+          },
+          "typeConverter": null,
+          "clientDefaultCode": null,
+          "defaultArgument": null,
+          "overriddenJsonName": null,
+          "referenceName": null,
+          "documentationComment": null,
+          "constraints": [],
+          "customConstraints": null
+        },
+        {
+          "sqlType": {
+            "builtin": "int"
+          },
+          "nullable": false,
+          "nameInSql": "size_bytes",
+          "nameInDart": "sizeBytes",
+          "declaration": {
+            "source_uri": "package:studyquran/core/database/tables/content_packs.dart",
+            "offset": 425,
+            "name": "sizeBytes"
+          },
+          "typeConverter": null,
+          "clientDefaultCode": null,
+          "defaultArgument": null,
+          "overriddenJsonName": null,
+          "referenceName": null,
+          "documentationComment": null,
+          "constraints": [],
+          "customConstraints": null
+        },
+        {
+          "sqlType": {
+            "builtin": "string"
+          },
+          "nullable": false,
+          "nameInSql": "license_note",
+          "nameInDart": "licenseNote",
+          "declaration": {
+            "source_uri": "package:studyquran/core/database/tables/content_packs.dart",
+            "offset": 468,
+            "name": "licenseNote"
+          },
+          "typeConverter": null,
+          "clientDefaultCode": null,
+          "defaultArgument": null,
+          "overriddenJsonName": null,
+          "referenceName": null,
+          "documentationComment": null,
+          "constraints": [],
+          "customConstraints": null
+        }
+      ],
+      "existing_data_class": null,
+      "table_constraints": [
+        {
+          "type": "primary_key",
+          "columns": [
+            "pack_id"
+          ]
+        }
+      ],
+      "custom_parent_class": null,
+      "interfaces_for_row_class": [],
+      "fixed_entity_info_name": null,
+      "base_dart_name": "ContentPacks",
+      "row_class_name": "ContentPack",
+      "companion_class_name": null,
+      "without_rowid": false,
+      "strict": false,
+      "write_default_constraints": true,
+      "custom_constraints": [],
+      "attached_indices": []
+    }
+  },
+  "imports": [
+    "package:drift/drift.dart"
+  ]
+}

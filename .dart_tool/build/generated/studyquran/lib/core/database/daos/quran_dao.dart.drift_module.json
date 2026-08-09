@@ -1,0 +1,95 @@
+{
+  "elements": {
+    "QuranDao": {
+      "id": {
+        "library_uri": "package:studyquran/core/database/daos/quran_dao.dart",
+        "name": "QuranDao"
+      },
+      "declaration": {
+        "source_uri": "package:studyquran/core/database/daos/quran_dao.dart",
+        "offset": 546,
+        "name": "QuranDao"
+      },
+      "references": [
+        {
+          "library_uri": "package:studyquran/core/database/tables/surahs.dart",
+          "name": "surahs"
+        },
+        {
+          "library_uri": "package:studyquran/core/database/tables/ayahs.dart",
+          "name": "ayahs"
+        },
+        {
+          "library_uri": "package:studyquran/core/database/tables/translations.dart",
+          "name": "translations_meta"
+        },
+        {
+          "library_uri": "package:studyquran/core/database/tables/translations.dart",
+          "name": "ayah_translations"
+        },
+        {
+          "library_uri": "package:studyquran/core/database/tables/words_roots.dart",
+          "name": "words"
+        },
+        {
+          "library_uri": "package:studyquran/core/database/tables/words_roots.dart",
+          "name": "roots"
+        }
+      ],
+      "type": "dao",
+      "tables": [
+        {
+          "library_uri": "package:studyquran/core/database/tables/surahs.dart",
+          "name": "surahs"
+        },
+        {
+          "library_uri": "package:studyquran/core/database/tables/ayahs.dart",
+          "name": "ayahs"
+        },
+        {
+          "library_uri": "package:studyquran/core/database/tables/translations.dart",
+          "name": "translations_meta"
+        },
+        {
+          "library_uri": "package:studyquran/core/database/tables/translations.dart",
+          "name": "ayah_translations"
+        },
+        {
+          "library_uri": "package:studyquran/core/database/tables/words_roots.dart",
+          "name": "words"
+        },
+        {
+          "library_uri": "package:studyquran/core/database/tables/words_roots.dart",
+          "name": "roots"
+        }
+      ],
+      "views": [],
+      "includes": [],
+      "queries": [],
+      "dart_type": {
+        "elements": [
+          {
+            "lexeme": "QuranDao",
+            "import_uri": "package:studyquran/core/database/daos/quran_dao.dart"
+          }
+        ]
+      },
+      "database": {
+        "elements": [
+          {
+            "lexeme": "AppDatabase",
+            "import_uri": "package:studyquran/core/database/app_database.dart"
+          }
+        ]
+      }
+    }
+  },
+  "imports": [
+    "package:drift/drift.dart",
+    "package:studyquran/core/database/app_database.dart",
+    "package:studyquran/core/database/tables/surahs.dart",
+    "package:studyquran/core/database/tables/ayahs.dart",
+    "package:studyquran/core/database/tables/translations.dart",
+    "package:studyquran/core/database/tables/words_roots.dart"
+  ]
+}

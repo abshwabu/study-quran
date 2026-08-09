@@ -1,0 +1,168 @@
+{
+  "elements": {
+    "surahs": {
+      "id": {
+        "library_uri": "package:studyquran/core/database/tables/surahs.dart",
+        "name": "surahs"
+      },
+      "declaration": {
+        "source_uri": "package:studyquran/core/database/tables/surahs.dart",
+        "offset": 66,
+        "name": "Surahs"
+      },
+      "references": [],
+      "type": "table",
+      "columns": [
+        {
+          "sqlType": {
+            "builtin": "int"
+          },
+          "nullable": false,
+          "nameInSql": "number",
+          "nameInDart": "number",
+          "declaration": {
+            "source_uri": "package:studyquran/core/database/tables/surahs.dart",
+            "offset": 105,
+            "name": "number"
+          },
+          "typeConverter": null,
+          "clientDefaultCode": null,
+          "defaultArgument": null,
+          "overriddenJsonName": null,
+          "referenceName": null,
+          "documentationComment": null,
+          "constraints": [],
+          "customConstraints": null
+        },
+        {
+          "sqlType": {
+            "builtin": "string"
+          },
+          "nullable": false,
+          "nameInSql": "name_arabic",
+          "nameInDart": "nameArabic",
+          "declaration": {
+            "source_uri": "package:studyquran/core/database/tables/surahs.dart",
+            "offset": 145,
+            "name": "nameArabic"
+          },
+          "typeConverter": null,
+          "clientDefaultCode": null,
+          "defaultArgument": null,
+          "overriddenJsonName": null,
+          "referenceName": null,
+          "documentationComment": null,
+          "constraints": [],
+          "customConstraints": null
+        },
+        {
+          "sqlType": {
+            "builtin": "string"
+          },
+          "nullable": false,
+          "nameInSql": "name_translit",
+          "nameInDart": "nameTranslit",
+          "declaration": {
+            "source_uri": "package:studyquran/core/database/tables/surahs.dart",
+            "offset": 186,
+            "name": "nameTranslit"
+          },
+          "typeConverter": null,
+          "clientDefaultCode": null,
+          "defaultArgument": null,
+          "overriddenJsonName": null,
+          "referenceName": null,
+          "documentationComment": null,
+          "constraints": [],
+          "customConstraints": null
+        },
+        {
+          "sqlType": {
+            "builtin": "string"
+          },
+          "nullable": false,
+          "nameInSql": "name_translation",
+          "nameInDart": "nameTranslation",
+          "declaration": {
+            "source_uri": "package:studyquran/core/database/tables/surahs.dart",
+            "offset": 229,
+            "name": "nameTranslation"
+          },
+          "typeConverter": null,
+          "clientDefaultCode": null,
+          "defaultArgument": null,
+          "overriddenJsonName": null,
+          "referenceName": null,
+          "documentationComment": null,
+          "constraints": [],
+          "customConstraints": null
+        },
+        {
+          "sqlType": {
+            "builtin": "string"
+          },
+          "nullable": false,
+          "nameInSql": "revelation_place",
+          "nameInDart": "revelationPlace",
+          "declaration": {
+            "source_uri": "package:studyquran/core/database/tables/surahs.dart",
+            "offset": 275,
+            "name": "revelationPlace"
+          },
+          "typeConverter": null,
+          "clientDefaultCode": null,
+          "defaultArgument": null,
+          "overriddenJsonName": null,
+          "referenceName": null,
+          "documentationComment": null,
+          "constraints": [],
+          "customConstraints": null
+        },
+        {
+          "sqlType": {
+            "builtin": "int"
+          },
+          "nullable": false,
+          "nameInSql": "ayah_count",
+          "nameInDart": "ayahCount",
+          "declaration": {
+            "source_uri": "package:studyquran/core/database/tables/surahs.dart",
+            "offset": 320,
+            "name": "ayahCount"
+          },
+          "typeConverter": null,
+          "clientDefaultCode": null,
+          "defaultArgument": null,
+          "overriddenJsonName": null,
+          "referenceName": null,
+          "documentationComment": null,
+          "constraints": [],
+          "customConstraints": null
+        }
+      ],
+      "existing_data_class": null,
+      "table_constraints": [
+        {
+          "type": "primary_key",
+          "columns": [
+            "number"
+          ]
+        }
+      ],
+      "custom_parent_class": null,
+      "interfaces_for_row_class": [],
+      "fixed_entity_info_name": null,
+      "base_dart_name": "Surahs",
+      "row_class_name": "Surah",
+      "companion_class_name": null,
+      "without_rowid": false,
+      "strict": false,
+      "write_default_constraints": true,
+      "custom_constraints": [],
+      "attached_indices": []
+    }
+  },
+  "imports": [
+    "package:drift/drift.dart"
+  ]
+}

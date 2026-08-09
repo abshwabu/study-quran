@@ -1,0 +1,39 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
+
+part of 'quran_dao.dart';
+
+// ignore_for_file: type=lint
+mixin _$QuranDaoMixin on DatabaseAccessor<AppDatabase> {
+  $SurahsTable get surahs => attachedDatabase.surahs;
+  $AyahsTable get ayahs => attachedDatabase.ayahs;
+  $TranslationsMetaTable get translationsMeta =>
+      attachedDatabase.translationsMeta;
+  $AyahTranslationsTable get ayahTranslations =>
+      attachedDatabase.ayahTranslations;
+  $RootsTable get roots => attachedDatabase.roots;
+  $WordsTable get words => attachedDatabase.words;
+  QuranDaoManager get managers => QuranDaoManager(this);
+}
+
+class QuranDaoManager {
+  final _$QuranDaoMixin _db;
+  QuranDaoManager(this._db);
+  $$SurahsTableTableManager get surahs =>
+      $$SurahsTableTableManager(_db.attachedDatabase, _db.surahs);
+  $$AyahsTableTableManager get ayahs =>
+      $$AyahsTableTableManager(_db.attachedDatabase, _db.ayahs);
+  $$TranslationsMetaTableTableManager get translationsMeta =>
+      $$TranslationsMetaTableTableManager(
+        _db.attachedDatabase,
+        _db.translationsMeta,
+      );
+  $$AyahTranslationsTableTableManager get ayahTranslations =>
+      $$AyahTranslationsTableTableManager(
+        _db.attachedDatabase,
+        _db.ayahTranslations,
+      );
+  $$RootsTableTableManager get roots =>
+      $$RootsTableTableManager(_db.attachedDatabase, _db.roots);
+  $$WordsTableTableManager get words =>
+      $$WordsTableTableManager(_db.attachedDatabase, _db.words);
+}

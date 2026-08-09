@@ -1,0 +1,60 @@
+{
+  "manifest_version": "1.0",
+  "generated_at": "2026-08-09T00:00:00Z",
+  "packs": [
+    {
+      "pack_id": "en.saheeh",
+      "type": "translation",
+      "name": "Saheeh International (English)",
+      "version": "1.0.0",
+      "download_url": "https://cdn.quran.com/translations/en.saheeh.json",
+      "size_bytes": 1200000,
+      "license_note": "Public redistribution permitted with attribution"
+    },
+    {
+      "pack_id": "en.clearquran",
+      "type": "translation",
+      "name": "The Clear Quran (Mustafa Khattab)",
+      "version": "1.0.0",
+      "download_url": "https://cdn.quran.com/translations/en.clearquran.json",
+      "size_bytes": 1350000,
+      "license_note": "Non-commercial permissions verified"
+    },
+    {
+      "pack_id": "ar.muyassar",
+      "type": "tafsir",
+      "name": "Tafsir Al-Muyassar (Arabic)",
+      "version": "1.0.0",
+      "download_url": "https://cdn.quran.com/tafsir/ar.muyassar.json",
+      "size_bytes": 4500000,
+      "license_note": "Public domain"
+    },
+    {
+      "pack_id": "en.ibnkathir",
+      "type": "tafsir",
+      "name": "Tafsir Ibn Kathir (English)",
+      "version": "1.0.0",
+      "download_url": "https://cdn.quran.com/tafsir/en.ibnkathir.json",
+      "size_bytes": 12000000,
+      "license_note": "Free non-commercial research use"
+    },
+    {
+      "pack_id": "audio.alafasy",
+      "type": "audio",
+      "name": "Mishary Rashid Alafasy (128kbps)",
+      "version": "1.0.0",
+      "download_url": "https://everyayah.com/data/Alafasy_128kbps/",
+      "size_bytes": 650000000,
+      "license_note": "EveryAyah.com public archive"
+    },
+    {
+      "pack_id": "morphology.corpus",
+      "type": "morphology",
+      "name": "Quranic Grammar & Root Index",
+      "version": "1.0.0",
+      "download_url": "https://corpus.quran.com/data/morphology.json",
+      "size_bytes": 3200000,
+      "license_note": "Creative Commons Attribution 3.0"
+    }
+  ]
+}

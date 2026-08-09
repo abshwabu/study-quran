@@ -1,0 +1,1 @@
+{"valid_import":true,"imports":[{"uri":"package:drift/drift.dart","transitive":false}],"elements":[{"kind":"table","name":"translations_meta","dart_name":"TranslationsMeta"},{"kind":"table","name":"ayah_translations","dart_name":"AyahTranslations"}]}

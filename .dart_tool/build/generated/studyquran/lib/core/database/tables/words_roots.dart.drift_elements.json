@@ -1,0 +1,1 @@
+{"valid_import":true,"imports":[{"uri":"package:drift/drift.dart","transitive":false}],"elements":[{"kind":"table","name":"roots","dart_name":"Roots"},{"kind":"table","name":"words","dart_name":"Words"}]}
