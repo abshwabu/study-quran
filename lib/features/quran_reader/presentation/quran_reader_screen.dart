@@ -11,6 +11,8 @@ import 'widgets/jump_to_dialog.dart';
 import 'widgets/reader_settings_modal.dart';
 import 'widgets/database_loading_overlay.dart';
 import '../../tafsir/presentation/tafsir_library_screen.dart';
+import '../../search/presentation/search_screen.dart';
+
 
 
 class QuranReaderScreen extends ConsumerStatefulWidget {
@@ -126,8 +128,22 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen> {
         ),
         actions: [
           IconButton(
+
+            icon: const Icon(Icons.search),
+
+            tooltip: 'Search Quran & Concordance',
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (ctx) => const SearchScreen(),
+                ),
+              );
+            },
+          ),
+          IconButton(
             icon: const Icon(Icons.library_books),
             tooltip: 'Tafsir Library',
+
             onPressed: () {
               Navigator.of(context).push(
                 MaterialPageRoute(

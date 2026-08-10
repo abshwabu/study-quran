@@ -264,19 +264,7 @@ def main():
         ('morphology.corpus', 'morphology', 'Quranic Grammar & Roots', '1.0.0', 0, 'https://corpus.quran.com/data/morphology.json', 3200000, 'CC BY-NC 3.0')
     ])
 
-    # Populate sample roots
-    cursor.executemany('''
-        INSERT INTO roots (root_id, root_arabic, root_translit)
-        VALUES (?, ?, ?)
-    ''', [
-        (1, 'ر ح م', 'r-h-m'),
-        (2, 'ح م د', 'h-m-d'),
-        (3, 'م ل ك', 'm-l-k'),
-        (4, 'ع ب د', 'a-b-d'),
-        (5, 'ه د ي', 'h-d-y'),
-        (6, 'ق ر ء', 'q-r-a'),
-        (7, 'ك ت ب', 'k-t-b')
-    ])
+
 
     print("Fetching complete Quran dataset (6236 ayahs) from alquran.cloud...")
     req_ar = urllib.request.Request('https://api.alquran.cloud/v1/quran/quran-uthmani', headers={'User-Agent': 'Mozilla/5.0'})
@@ -389,16 +377,71 @@ def main():
         VALUES (?, ?, ?, ?, ?)
     ''', tafsir_content_rows)
 
-    # Insert sample word segmentations for Surah 1 Ayah 1
+    # Populate sample roots
+    cursor.executemany('''
+        INSERT INTO roots (root_id, root_arabic, root_translit)
+        VALUES (?, ?, ?)
+    ''', [
+        (1, 'ر ح م', 'r-h-m'),
+        (2, 'ح م د', 'h-m-d'),
+        (3, 'م ل ك', 'm-l-k'),
+        (4, 'ع ب د', 'a-b-d'),
+        (5, 'ه د ي', 'h-d-y'),
+        (6, 'ق ر ء', 'q-r-a'),
+        (7, 'ك ت ب', 'k-t-b'),
+        (8, 'ع ل م', 'a-l-m'),
+        (9, 'ا ل ه', 'a-l-h')
+    ])
+
+    # Insert word segmentations for Surah 1 and Surah 2
     cursor.executemany('''
         INSERT INTO words (surah_number, ayah_number, position, arabic_text, transliteration, root_id)
         VALUES (?, ?, ?, ?, ?, ?)
     ''', [
         (1, 1, 1, "بِسْمِ", "Bi-smi", 7),
-        (1, 1, 2, "ٱللَّهِ", "Allah", None),
+        (1, 1, 2, "ٱللَّهِ", "Allah", 9),
         (1, 1, 3, "ٱلرَّحْمَٰنِ", "Ar-Rahman", 1),
-        (1, 1, 4, "ٱلرَّحِيمِ", "Ar-Raheem", 1)
+        (1, 1, 4, "ٱلرَّحِيمِ", "Ar-Raheem", 1),
+        (1, 2, 1, "ٱلْحَمْدُ", "Al-hamdu", 2),
+        (1, 2, 2, "لِلَّهِ", "li-llahi", 9),
+        (1, 2, 3, "رَبِّ", "Rabbi", 1),
+        (1, 2, 4, "ٱلْعَالَمِينَ", "al-alamin", 8),
+        (1, 3, 1, "ٱلرَّحْمَٰنِ", "Ar-Rahman", 1),
+        (1, 3, 2, "ٱلرَّحِيمِ", "Ar-Raheem", 1),
+        (1, 4, 1, "مَالِكِ", "Maliki", 3),
+        (1, 4, 2, "يَوْمِ", "yawmi", None),
+        (1, 4, 3, "ٱلدِّينِ", "ad-deen", None),
+        (1, 5, 1, "إِيَّاكَ", "Iyyaka", None),
+        (1, 5, 2, "نَعْبُدُ", "na'budu", 4),
+        (1, 5, 3, "وَإِيَّاكَ", "wa-iyyaka", None),
+        (1, 5, 4, "نَسْتَعِينُ", "nasta'in", 4),
+        (1, 6, 1, "ٱهْدِنَا", "Ihdina", 5),
+        (1, 6, 2, "ٱلصِّرَاطَ", "as-sirata", None),
+        (1, 6, 3, "ٱلْمُسْتَقِيمَ", "al-mustaqim", 5),
+        (1, 7, 1, "صِرَاطَ", "Sirata", None),
+        (1, 7, 2, "ٱلَّذِينَ", "alladhina", None),
+        (1, 7, 3, "أَنْعَمْتَ", "an'amta", None),
+        (1, 7, 4, "عَلَيْهِمْ", "alayhim", None),
+        (1, 7, 5, "غَيْرِ", "ghayri", None),
+        (1, 7, 6, "ٱلْمَغْضُوبِ", "al-maghdubi", None),
+        (1, 7, 7, "عَلَيْهِمْ", "alayhim", None),
+        (1, 7, 8, "وَلَا", "wa-la", None),
+        (1, 7, 9, "ٱلضَّالِّينَ", "ad-dallin", None),
+        (2, 1, 1, "الم", "Alif-Lam-Mim", None),
+        (2, 2, 1, "ذَٰلِكَ", "Dhalika", None),
+        (2, 2, 2, "ٱلْكِتَابُ", "al-kitabu", 7),
+        (2, 2, 3, "لَا", "la", None),
+        (2, 2, 4, "رَيْبَ", "rayba", None),
+        (2, 2, 5, "فِيهِ", "fihi", None),
+        (2, 2, 6, "هُدًى", "hudan", 5),
+        (2, 2, 7, "لِّلْمُتَّقِينَ", "lil-muttaqin", None),
+        (2, 3, 1, "ٱلَّذِينَ", "alladhina", None),
+        (2, 3, 2, "يُؤْمِنُونَ", "yu'minuna", None),
+        (2, 3, 3, "بِٱلْغَيْبِ", "bil-ghaybi", None),
+        (2, 3, 4, "وَيُقِيمُونَ", "wa-yuqimuna", None),
+        (2, 3, 5, "ٱلصَّلَاةَ", "as-salata", None)
     ])
+
 
     cursor.execute("PRAGMA user_version = 1;")
     conn.commit()
