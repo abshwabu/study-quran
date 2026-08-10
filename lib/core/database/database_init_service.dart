@@ -40,18 +40,31 @@ class DatabaseInitStatus {
 }
 
 class DatabaseInitService {
-  /// Fast database preparer.
-  /// Copies bundled complete 7.1MB core_bundle.db directly to app storage if missing or outdated (< 3MB).
+  /// Prepares the local SQLite database file from bundled core_bundle.db asset.
+  /// Automatically updates database if missing, corrupted, or size mismatch occurs.
   static Future<File> prepareDatabaseFile({
     required Function(double progress, String statusMessage) onProgress,
   }) async {
     final dbFolder = await getApplicationDocumentsDirectory();
     final file = File(p.join(dbFolder.path, 'quran_app.db'));
 
-    // Check if file doesn't exist, is empty, or is an old placeholder (< 3MB)
-    if (!await file.exists() || await file.length() < 3 * 1024 * 1024) {
-      onProgress(0.3, 'Copying complete 6,236-verse Quran database...');
-      final blob = await rootBundle.load('assets/quran/core_bundle.db');
+    onProgress(0.2, 'Verifying local Quran & Tafsir database...');
+    final blob = await rootBundle.load('assets/quran/core_bundle.db');
+    final assetBytes = blob.lengthInBytes;
+
+    bool needsCopy = false;
+    if (!await file.exists() || await file.length() == 0) {
+      needsCopy = true;
+    } else {
+      final currentSize = await file.length();
+      // If disk database size is different from bundled asset size (e.g. upgraded schema/data), overwrite
+      if (currentSize != assetBytes) {
+        needsCopy = true;
+      }
+    }
+
+    if (needsCopy) {
+      onProgress(0.4, 'Updating database asset to storage...');
       final bytes = blob.buffer.asUint8List(blob.offsetInBytes, blob.lengthInBytes);
       await file.writeAsBytes(bytes, flush: true);
     }

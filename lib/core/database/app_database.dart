@@ -55,6 +55,26 @@ class AppDatabase extends _$AppDatabase {
       },
       beforeOpen: (details) async {
         await customStatement('PRAGMA foreign_keys = ON;');
+        await customStatement('''
+          CREATE TABLE IF NOT EXISTS tafsirs_meta (
+            tafsir_id TEXT PRIMARY KEY,
+            name TEXT NOT NULL,
+            author TEXT NOT NULL,
+            language TEXT NOT NULL,
+            source TEXT NOT NULL,
+            license_note TEXT NOT NULL
+          );
+        ''');
+        await customStatement('''
+          CREATE TABLE IF NOT EXISTS tafsir_content (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            tafsir_id TEXT NOT NULL,
+            surah_number INTEGER NOT NULL,
+            start_ayah INTEGER NOT NULL,
+            end_ayah INTEGER NOT NULL,
+            text TEXT NOT NULL
+          );
+        ''');
       },
     );
   }
