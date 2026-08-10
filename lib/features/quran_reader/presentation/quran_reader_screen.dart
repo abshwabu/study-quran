@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../core/database/providers.dart';
+import 'package:studyquran/core/database/providers.dart';
+import 'package:studyquran/core/database/app_database.dart';
+import '../domain/reader_preferences.dart';
+import '../providers/reader_providers.dart';
+import 'views/verse_by_verse_view.dart';
+import 'views/continuous_scroll_view.dart';
+import 'widgets/surah_drawer.dart';
+import 'widgets/jump_to_dialog.dart';
+import 'widgets/reader_settings_modal.dart';
+import 'widgets/database_loading_overlay.dart';
 
-/// Temporary Debug/Verification Screen for Prompt 01 Foundation Verification.
-/// UI will be enhanced into full Quran Reader experience in Prompt 02.
 class QuranReaderScreen extends ConsumerStatefulWidget {
   const QuranReaderScreen({super.key});
 
@@ -12,241 +19,245 @@ class QuranReaderScreen extends ConsumerStatefulWidget {
 }
 
 class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen> {
-  final TextEditingController _searchController = TextEditingController(text: 'Merciful');
-  String _activeSearchQuery = 'Merciful';
-  int _selectedSurahNumber = 1;
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  final ScrollController _scrollController = ScrollController();
+
+  late int _currentSurahNumber;
+  int _currentAyahNumber = 1;
+
+  @override
+  void initState() {
+    super.initState();
+    final prefs = ref.read(readerPreferencesProvider);
+    _currentSurahNumber = prefs.lastReadSurah;
+    _currentAyahNumber = prefs.lastReadAyah;
+  }
 
   @override
   void dispose() {
-    _searchController.dispose();
+    _scrollController.dispose();
     super.dispose();
+  }
+
+  void _onSurahSelected(Surah surah) {
+    setState(() {
+      _currentSurahNumber = surah.number;
+      _currentAyahNumber = 1;
+    });
+    ref.read(readerPreferencesProvider.notifier).saveLastReadPosition(surah.number, 1);
+    if (_scrollController.hasClients) {
+      _scrollController.jumpTo(0);
+    }
+  }
+
+  void _jumpToAyah(int surahNumber, int ayahNumber) {
+    setState(() {
+      _currentSurahNumber = surahNumber;
+      _currentAyahNumber = ayahNumber;
+    });
+    ref.read(readerPreferencesProvider.notifier).saveLastReadPosition(surahNumber, ayahNumber);
+  }
+
+  void _navigateToSurah(int direction) {
+    final nextSurah = (_currentSurahNumber + direction).clamp(1, 114);
+    if (nextSurah != _currentSurahNumber) {
+      setState(() {
+        _currentSurahNumber = nextSurah;
+        _currentAyahNumber = 1;
+      });
+      ref.read(readerPreferencesProvider.notifier).saveLastReadPosition(nextSurah, 1);
+      if (_scrollController.hasClients) {
+        _scrollController.jumpTo(0);
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final surahsAsync = ref.watch(surahsProvider);
-    final ayahsAsync = ref.watch(surahDetailProvider(_selectedSurahNumber));
-    final searchResultsAsync = ref.watch(translationSearchProvider(_activeSearchQuery));
-    final packsAsync = ref.watch(availableContentPacksProvider);
+    final initStatus = ref.watch(databaseInitProvider);
 
-    return DefaultTabController(
-      length: 3,
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Quran Research App — Prompt 01 Debug'),
-          bottom: const TabBar(
-            tabs: [
-              Tab(icon: Icon(Icons.book), text: 'Surah 1 Reader'),
-              Tab(icon: Icon(Icons.search), text: 'FTS5 Search'),
-              Tab(icon: Icon(Icons.extension), text: 'Content Packs'),
+    if (!initStatus.isReady) {
+      return const DatabaseLoadingOverlay();
+    }
+
+    final prefs = ref.watch(readerPreferencesProvider);
+    final surahsAsync = ref.watch(surahsProvider);
+    final ayahsAsync = ref.watch(surahDetailProvider(_currentSurahNumber));
+
+    return Scaffold(
+      key: _scaffoldKey,
+      drawer: SurahDrawer(
+        selectedSurahNumber: _currentSurahNumber,
+        onSurahSelected: _onSurahSelected,
+      ),
+      appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.menu),
+          tooltip: 'Surah Index',
+          onPressed: () => _scaffoldKey.currentState?.openDrawer(),
+        ),
+        title: surahsAsync.when(
+          loading: () => const Text('Loading...'),
+          error: (_, __) => Text('Surah $_currentSurahNumber'),
+          data: (surahs) {
+            final activeSurah = surahs.firstWhere(
+              (s) => s.number == _currentSurahNumber,
+              orElse: () => surahs.first,
+            );
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  '${activeSurah.number}. ${activeSurah.nameTranslit}',
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  '${activeSurah.nameTranslation} • ${activeSurah.ayahCount} Ayahs',
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurfaceVariant),
+                ),
+              ],
+            );
+          },
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.explore_outlined),
+            tooltip: 'Jump to Ayah',
+            onPressed: () => JumpToDialog.show(
+              context,
+              initialSurah: _currentSurahNumber,
+              initialAyah: _currentAyahNumber,
+              onJump: _jumpToAyah,
+            ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.tune),
+            tooltip: 'Reader Preferences',
+            onPressed: () => ReaderSettingsModal.show(context),
+          ),
+        ],
+      ),
+      body: ayahsAsync.when(
+        loading: () => const Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(height: 16),
+              Text('Loading Quran Database...', style: TextStyle(color: Colors.grey)),
             ],
           ),
         ),
-        body: TabBarView(
-          children: [
-            // --- Tab 1: Surah 1 Reader Test ---
-            surahsAsync.when(
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (err, stack) => Center(child: Text('Error loading surahs: $err')),
-              data: (surahsList) {
-                return Column(
+        error: (err, stack) => Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.error_outline, size: 48, color: Colors.red),
+                const SizedBox(height: 16),
+                Text(
+                  'Failed to load Quran text:\n$err',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontSize: 14),
+                ),
+                const SizedBox(height: 16),
+                ElevatedButton.icon(
+                  onPressed: () {
+                    ref.invalidate(surahsProvider);
+                    ref.invalidate(surahDetailProvider(_currentSurahNumber));
+                  },
+                  icon: const Icon(Icons.refresh),
+                  label: const Text('Retry Loading'),
+                ),
+              ],
+            ),
+          ),
+        ),
+        data: (ayahsList) {
+          if (ayahsList.isEmpty) {
+            return const Center(child: Text('No ayahs available for this Surah.'));
+          }
+
+          final activeSurahMeta = surahsAsync.value?.firstWhere(
+                (s) => s.number == _currentSurahNumber,
+                orElse: () => Surah(
+                  number: _currentSurahNumber,
+                  nameArabic: '',
+                  nameTranslit: 'Surah $_currentSurahNumber',
+                  nameTranslation: '',
+                  revelationPlace: 'makkah',
+                  ayahCount: ayahsList.length,
+                ),
+              ) ??
+              Surah(
+                number: _currentSurahNumber,
+                nameArabic: '',
+                nameTranslit: 'Surah $_currentSurahNumber',
+                nameTranslation: '',
+                revelationPlace: 'makkah',
+                ayahCount: ayahsList.length,
+              );
+
+          return Column(
+            children: [
+              Expanded(
+                child: prefs.readingMode == ReadingMode.verseByVerse
+                    ? VerseByVerseView(
+                        ayahs: ayahsList,
+                        surahMeta: activeSurahMeta,
+                        prefs: prefs,
+                        scrollController: _scrollController,
+                        onAyahVisible: (ayahNum) {
+                          _currentAyahNumber = ayahNum;
+                        },
+                      )
+                    : ContinuousScrollView(
+                        ayahs: ayahsList,
+                        surahMeta: activeSurahMeta,
+                        prefs: prefs,
+                        scrollController: _scrollController,
+                      ),
+              ),
+
+              // Surah Footer Navigation
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      color: Colors.teal.shade50,
-                      child: Row(
-                        children: [
-                          const Text('Select Surah: ', style: TextStyle(fontWeight: FontWeight.bold)),
-                          DropdownButton<int>(
-                            value: _selectedSurahNumber,
-                            items: surahsList.map((s) {
-                              return DropdownMenuItem<int>(
-                                value: s.number,
-                                child: Text('${s.number}. ${s.nameTranslit} (${s.nameArabic})'),
-                              );
-                            }).toList(),
-                            onChanged: (val) {
-                              if (val != null) {
-                                setState(() {
-                                  _selectedSurahNumber = val;
-                                });
-                              }
-                            },
-                          ),
-                        ],
+                    Flexible(
+                      child: TextButton.icon(
+                        onPressed: _currentSurahNumber > 1 ? () => _navigateToSurah(-1) : null,
+                        icon: const Icon(Icons.arrow_back, size: 18),
+                        label: const Text('Prev', overflow: TextOverflow.ellipsis),
                       ),
                     ),
-                    Expanded(
-                      child: ayahsAsync.when(
-                        loading: () => const Center(child: CircularProgressIndicator()),
-                        error: (err, stack) => Center(child: Text('Error loading ayahs: $err')),
-                        data: (ayahsList) {
-                          if (ayahsList.isEmpty) {
-                            return const Center(child: Text('No ayahs found.'));
-                          }
-                          return ListView.separated(
-                            padding: const EdgeInsets.all(16),
-                            itemCount: ayahsList.length,
-                            separatorBuilder: (_, __) => const Divider(),
-                            itemBuilder: (context, index) {
-                              final item = ayahsList[index];
-                              return Card(
-                                elevation: 2,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(12),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                                    children: [
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Chip(label: Text('Verse ${item.ayah.surahNumber}:${item.ayah.ayahNumber}')),
-                                          Text('Juz ${item.ayah.juz} • Page ${item.ayah.page}',
-                                              style: TextStyle(color: Colors.grey.shade600, fontSize: 12)),
-                                        ],
-                                      ),
-                                      const SizedBox(height: 8),
-                                      Text(
-                                        item.ayah.arabicTextUthmani,
-                                        textAlign: TextAlign.right,
-                                        style: const TextStyle(
-                                          fontSize: 24,
-                                          fontFamily: 'Amiri',
-                                          height: 1.8,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 8),
-                                      Text(
-                                        item.translationText ?? 'No translation available',
-                                        style: const TextStyle(fontSize: 15, fontStyle: FontStyle.italic),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              );
-                            },
-                          );
-                        },
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 6),
+                      child: Text(
+                        '$_currentSurahNumber / 114',
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                      ),
+                    ),
+                    Flexible(
+                      child: TextButton.icon(
+                        onPressed: _currentSurahNumber < 114 ? () => _navigateToSurah(1) : null,
+                        icon: const Icon(Icons.arrow_forward, size: 18),
+                        label: const Text('Next', overflow: TextOverflow.ellipsis),
                       ),
                     ),
                   ],
-                );
-              },
-            ),
-
-            // --- Tab 2: FTS5 Full-Text Search Test ---
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: TextField(
-                          controller: _searchController,
-                          decoration: const InputDecoration(
-                            labelText: 'FTS5 Translation Search Query',
-                            border: OutlineInputBorder(),
-                            prefixIcon: Icon(Icons.search),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      ElevatedButton(
-                        onPressed: () {
-                          setState(() {
-                            _activeSearchQuery = _searchController.text;
-                          });
-                        },
-                        child: const Text('Search'),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  Expanded(
-                    child: searchResultsAsync.when(
-                      loading: () => const Center(child: CircularProgressIndicator()),
-                      error: (err, stack) => Center(child: Text('Search Error: $err')),
-                      data: (results) {
-                        if (results.isEmpty) {
-                          return const Center(child: Text('No FTS5 search matches found.'));
-                        }
-                        return ListView.builder(
-                          itemCount: results.length,
-                          itemBuilder: (context, index) {
-                            final res = results[index];
-                            return ListTile(
-                              leading: CircleAvatar(child: Text('${res.surahNumber}:${res.ayahNumber}')),
-                              title: Text('Surah ${res.surahNumber}, Ayah ${res.ayahNumber}'),
-                              subtitle: Text(res.textSnippet),
-                            );
-                          },
-                        );
-                      },
-                    ),
-                  ),
-                ],
+                ),
               ),
-            ),
-
-            // --- Tab 3: Content Pack Repository Test ---
-            packsAsync.when(
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (err, stack) => Center(child: Text('Error loading packs: $err')),
-              data: (packs) {
-                if (packs.isEmpty) {
-                  return const Center(child: Text('No content packs found in manifest.'));
-                }
-                return ListView.builder(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: packs.length,
-                  itemBuilder: (context, index) {
-                    final pack = packs[index];
-                    final isDefaultBundled = pack.packId == 'en.saheeh';
-                    return Card(
-                      child: ListTile(
-                        leading: Icon(
-                          pack.type == 'translation'
-                              ? Icons.translate
-                              : pack.type == 'tafsir'
-                                  ? Icons.menu_book
-                                  : pack.type == 'audio'
-                                      ? Icons.audiotrack
-                                      : Icons.account_tree,
-                          color: Colors.teal,
-                        ),
-                        title: Text(pack.name),
-                        subtitle: Text('Type: ${pack.type} • Version: ${pack.version}\nLicense: ${pack.licenseNote}'),
-                        trailing: Chip(
-                          backgroundColor: isDefaultBundled ? Colors.green.shade100 : Colors.grey.shade200,
-                          label: Text(
-                            isDefaultBundled ? 'Downloaded' : 'Available',
-                            style: TextStyle(
-                              color: isDefaultBundled ? Colors.green.shade800 : Colors.black87,
-
-                              fontSize: 12,
-                            ),
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                );
-              },
-            ),
-          ],
-        ),
+            ],
+          );
+        },
       ),
     );
   }
 }
-
-// PROMPT HOOKS FOR FUTURE BUILD STEPS:
-// Prompt 02: Replace QuranReaderScreen debug layout with smooth infinite reader, tajweed colorizer, translation toggle
-// Prompt 03: Inject Tafsir comparison side-by-side view into Ayah card
-// Prompt 04: Connect SearchDao to advanced root-word search interface
-// Prompt 05: Render interactive Word-by-Word morphology popups on word tap
-// Prompt 06: Hook Asbab al-Nuzul and Thematic Index navigation
-// Prompt 07: Add Bookmark/Note action buttons per Ayah
-// Prompt 08: Integrate Gemini AI Assistant drawer & prompt generator
-// Prompt 09: Complete background download manager in ContentPackRepository for data packs

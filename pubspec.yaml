@@ -40,6 +40,9 @@ dependencies:
   flutter_secure_storage: ^9.2.2
   dio: ^5.7.0
 
+  shared_preferences: ^2.3.2
+  google_fonts: ^6.2.1
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -52,6 +55,8 @@ flutter:
   assets:
     - assets/quran/core_bundle.db
     - assets/quran/mock_manifest.json
+    - assets/fonts/
+
 
 
   # An image asset can refer to one or more resolution-specific "variants", see

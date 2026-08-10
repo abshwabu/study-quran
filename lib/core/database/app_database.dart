@@ -38,14 +38,18 @@ class AppDatabase extends _$AppDatabase {
   MigrationStrategy get migration {
     return MigrationStrategy(
       onCreate: (m) async {
-        await m.createAll();
-        await FtsSetup.createCoreFtsTables(executor);
+        try {
+          await m.createAll();
+          await FtsSetup.createCoreFtsTables(executor);
+        } catch (e) {
+          // Pre-populated core_bundle.db already contains schema tables
+        }
       },
       onUpgrade: (m, from, to) async {
         // Step-by-step migrations hook for Prompts 02 - 09
       },
       beforeOpen: (details) async {
-        await FtsSetup.createCoreFtsTables(executor);
+        await customStatement('PRAGMA foreign_keys = ON;');
       },
     );
   }

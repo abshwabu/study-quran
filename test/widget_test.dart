@@ -10,6 +10,7 @@ void main() {
       ),
     );
 
-    expect(find.text('Quran Research App — Prompt 01 Debug'), findsOneWidget);
+    // Verify initial splash & progress screen renders
+    expect(find.text('Quran Research App'), findsOneWidget);
   });
 }

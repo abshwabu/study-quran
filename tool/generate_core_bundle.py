@@ -133,7 +133,6 @@ def main():
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
 
-    # Create tables per Drift schema
     cursor.executescript('''
         CREATE TABLE surahs (
             number INTEGER PRIMARY KEY,
@@ -248,144 +247,62 @@ def main():
         (7, 'ك ت ب', 'k-t-b')
     ])
 
-    # Fetch full Quran data or generate core dataset (Surah 1 + Surah 112-114 + key verses for full Quran structure)
-    # Let's populate Ayahs & Translations from an open API or sample set
-    print("Fetching sample Quran dataset for core_bundle.db...")
+    print("Fetching complete Quran dataset (6236 ayahs) from alquran.cloud...")
+    req_ar = urllib.request.Request('https://api.alquran.cloud/v1/quran/quran-uthmani', headers={'User-Agent': 'Mozilla/5.0'})
+    res_ar = urllib.request.urlopen(req_ar)
+    data_ar = json.loads(res_ar.read().decode('utf-8'))['data']['surahs']
 
-    try:
-        req = urllib.request.urlopen("https://api.quran.com/api/v4/quran/verses/uthmani")
-        verses_json = json.loads(req.read().decode('utf-8'))['verses']
+    req_en = urllib.request.Request('https://api.alquran.cloud/v1/quran/en.sahih', headers={'User-Agent': 'Mozilla/5.0'})
+    res_en = urllib.request.urlopen(req_en)
+    data_en = json.loads(res_en.read().decode('utf-8'))['data']['surahs']
+
+    global_idx = 1
+    ayah_rows = []
+    trans_rows = []
+    fts_arabic_rows = []
+    fts_trans_rows = []
+
+    for s_idx in range(len(data_ar)):
+        surah_ar = data_ar[s_idx]
+        surah_en = data_en[s_idx]
+        surah_num = surah_ar['number']
         
-        req_trans = urllib.request.urlopen("https://api.quran.com/api/v4/quran/translations/131") # 131 is Saheeh International on Quran.com
-        trans_json = json.loads(req_trans.read().decode('utf-8'))['translations']
+        for a_idx in range(len(surah_ar['ayahs'])):
+            a_ar = surah_ar['ayahs'][a_idx]
+            a_en = surah_en['ayahs'][a_idx]
+            
+            ayah_num = a_ar['numberInSurah']
+            ar_text = a_ar['text']
+            tr_text = a_en['text']
+            juz_num = a_ar.get('juz', 1)
+            page_num = a_ar.get('page', 1)
 
-        # map verse_key e.g. "1:1" to text
-        uthmani_map = {v['verse_key']: v['text_uthmani'] for v in verses_json}
-        trans_map = {t['verse_key']: t['text'] for t in trans_json}
+            ayah_rows.append((global_idx, surah_num, ayah_num, ar_text, juz_num, page_num))
+            trans_rows.append(('en.saheeh', surah_num, ayah_num, tr_text))
+            fts_arabic_rows.append((surah_num, ayah_num, ar_text))
+            fts_trans_rows.append(('en.saheeh', surah_num, ayah_num, tr_text))
+            global_idx += 1
 
-        global_idx = 1
-        juz_calc = 1
-        page_calc = 1
+    cursor.executemany('''
+        INSERT INTO ayahs (global_ayah_index, surah_number, ayah_number, arabic_text_uthmani, juz, page)
+        VALUES (?, ?, ?, ?, ?, ?)
+    ''', ayah_rows)
 
-        ayah_rows = []
-        trans_rows = []
-        fts_arabic_rows = []
-        fts_trans_rows = []
+    cursor.executemany('''
+        INSERT INTO ayah_translations (translation_id, surah_number, ayah_number, text)
+        VALUES (?, ?, ?, ?)
+    ''', trans_rows)
 
-        for surah_num, name_ar, name_tr, name_en, rev, count in SURAHS_DATA:
-            for ayah_num in range(1, count + 1):
-                vk = f"{surah_num}:{ayah_num}"
-                ar_text = uthmani_map.get(vk, f"آية {ayah_num} من سورة {name_ar}")
-                tr_text = trans_map.get(vk, f"Verse {ayah_num} of Surah {name_tr}.")
+    cursor.executemany('''
+        INSERT INTO arabic_ayahs_fts (surah_number, ayah_number, arabic_text_uthmani)
+        VALUES (?, ?, ?)
+    ''', fts_arabic_rows)
 
-                # Simple page/juz calculation estimate if exact not fetched
-                if global_idx > 5000:
-                    juz_calc = 30
-                elif global_idx > 4000:
-                    juz_calc = 25
-                elif global_idx > 3000:
-                    juz_calc = 20
-                elif global_idx > 2000:
-                    juz_calc = 15
-                elif global_idx > 1000:
-                    juz_calc = 8
-                else:
-                    juz_calc = (global_idx // 200) + 1
+    cursor.executemany('''
+        INSERT INTO translation_fts (translation_id, surah_number, ayah_number, text)
+        VALUES (?, ?, ?, ?)
 
-                page_calc = (global_idx // 11) + 1
-                if page_calc > 604:
-                    page_calc = 604
-
-                ayah_rows.append((global_idx, surah_num, ayah_num, ar_text, juz_calc, page_calc))
-                trans_rows.append(('en.saheeh', surah_num, ayah_num, tr_text))
-                fts_arabic_rows.append((surah_num, ayah_num, ar_text))
-                fts_trans_rows.append(('en.saheeh', surah_num, ayah_num, tr_text))
-
-                global_idx += 1
-
-        cursor.executemany('''
-            INSERT INTO ayahs (global_ayah_index, surah_number, ayah_number, arabic_text_uthmani, juz, page)
-            VALUES (?, ?, ?, ?, ?, ?)
-        ''', ayah_rows)
-
-        cursor.executemany('''
-            INSERT INTO ayah_translations (translation_id, surah_number, ayah_number, text)
-            VALUES (?, ?, ?, ?)
-        ''', trans_rows)
-
-        cursor.executemany('''
-            INSERT INTO arabic_ayahs_fts (surah_number, ayah_number, arabic_text_uthmani)
-            VALUES (?, ?, ?)
-        ''', fts_arabic_rows)
-
-        cursor.executemany('''
-            INSERT INTO translation_fts (translation_id, surah_number, ayah_number, text)
-            VALUES (?, ?, ?)
-        ''', fts_trans_rows)
-
-        print(f"Successfully inserted {len(ayah_rows)} verses into core_bundle.db!")
-
-    except Exception as e:
-        print(f"API fetch failed ({e}), generating standard Quran core dataset offline...")
-
-        # Fallback local dataset for Al-Fatihah, Al-Ikhlas, Al-Falaq, An-Nas, Al-Baqarah start, etc.
-        sample_ayat = [
-            # Surah 1
-            (1, 1, 1, "بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ", 1, 1, "In the name of Allah, the Entirely Merciful, the Especially Merciful."),
-            (2, 1, 2, "ٱلْحَمْدُ لِلَّهِ رَبِّ ٱلْعَٰلَمِينَ", 1, 1, "[All] praise is [due] to Allah, Lord of the worlds -"),
-            (3, 1, 3, "ٱلرَّحْمَٰنِ ٱلرَّحِيمِ", 1, 1, "The Entirely Merciful, the Especially Merciful,"),
-            (4, 1, 4, "مَٰلِكِ يَوْمِ ٱلدِّينِ", 1, 1, "Sovereign of the Day of Recompense."),
-            (5, 1, 5, "إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ", 1, 1, "It is You we worship and You we ask for help."),
-            (6, 1, 6, "ٱهْدِنَا ٱلصِّرَٰطَ ٱلْمُسْتَقِيمَ", 1, 1, "Guide us to the straight path -"),
-            (7, 1, 7, "صِرَٰطَ ٱلَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ ٱلْمَغْضُوبِ عَلَيْهِمْ وَلَا ٱلضَّآلِّينَ", 1, 1, "The path of those upon whom You have bestowed favor, not of those who have evoked [Your] anger or of those who are astray."),
-
-            # Surah 2 (sample start)
-            (8, 2, 1, "الم", 1, 2, "Alif, Lam, Meem."),
-            (9, 2, 2, "ذَٰلِكَ ٱلْكِتَٰبُ لَا رَيْبَ ۛ فِيهِ ۛ هُدًى لِّلْمُتَّقِينَ", 1, 2, "This is the Book about which there is no doubt, a guidance for those conscious of Allah -"),
-            (10, 2, 3, "ٱلَّذِينَ يُؤْمِنُونَ بِٱلْغَيْبِ وَيُقِيمُونَ ٱلصَّلَوٰةَ وَمِمَّا رَزَقْنَٰهُمْ يُنفِقُونَ", 1, 2, "Who believe in the unseen, establish prayer, and spend out of what We have provided for them,"),
-
-            # Surah 112
-            (11, 112, 1, "قُلْ هُوَ ٱللَّهُ أَحَدٌ", 30, 604, "Say, \"He is Allah, [who is] One,"),
-            (12, 112, 2, "ٱللَّهُ ٱلصَّمَدُ", 30, 604, "Allah, the Eternal Refuge."),
-            (13, 112, 3, "لَمْ يَلِدْ وَلَمْ يُولَدْ", 30, 604, "He neither begets nor is born,"),
-            (14, 112, 4, "وَلَمْ يَكُن لَّهُۥ كُفُوًا أَحَدٌ", 30, 604, "Nor is there to Him any equivalent.\""),
-
-            # Surah 113
-            (15, 113, 1, "قُلْ أَعُوذُ بِرَبِّ ٱلْفَلَقِ", 30, 604, "Say, \"I seek refuge in the Lord of daybreak"),
-            (16, 113, 2, "مِن شَرِّ مَا خَلَقَ", 30, 604, "From the evil of that which He created"),
-            (17, 113, 3, "وَمِن شَرِّ غَاسِقٍ إِذَا وَقَبَ", 30, 604, "And from the evil of darkness when it settles"),
-            (18, 113, 4, "وَمِن شَرِّ ٱلنَّفَّٰثَٰتِ فِي ٱلْعُقَدِ", 30, 604, "And from the evil of the blowers in knots"),
-            (19, 113, 5, "وَمِن شَرِّ حَاسِدٍ إِذَا حَسَدَ", 30, 604, "And from the evil of an envier when he envies.\""),
-
-            # Surah 114
-            (20, 114, 1, "قُلْ أَعُوذُ بِرَبِّ ٱلنَّاسِ", 30, 604, "Say, \"I seek refuge in the Lord of mankind,"),
-            (21, 114, 2, "مَلِكِ ٱلنَّاسِ", 30, 604, "The Sovereign of mankind,"),
-            (22, 114, 3, "إِلَٰهِ ٱلنَّاسِ", 30, 604, "The God of mankind,"),
-            (23, 114, 4, "مِن شَرِّ ٱلْوَسْوَاسِ ٱلْخَنَّاسِ", 30, 604, "From the evil of the retreating whisperer -"),
-            (24, 114, 5, "ٱلَّذِي يُوَسْوِسُ فِي صُدُورِ ٱلنَّاسِ", 30, 604, "Who whispers into the breasts of mankind -"),
-            (25, 114, 6, "مِنَ ٱلْجِنَّةِ وَٱلنَّاسِ", 30, 604, "From among the jinn and mankind.\"")
-        ]
-
-        # Fill remaining surahs with placeholders if offline
-        global_idx = 1
-        for s_idx, (s_num, n_ar, n_tr, n_en, rev, count) in enumerate(SURAHS_DATA):
-            for a_num in range(1, count + 1):
-                # check if in sample_ayat
-                found = [sa for sa in sample_ayat if sa[1] == s_num and sa[2] == a_num]
-                if found:
-                    g_idx, s_n, a_n, ar_t, juz_c, pg_c, tr_t = found[0]
-                else:
-                    g_idx = global_idx
-                    ar_t = f"آية {a_num} من سورة {n_ar}"
-                    tr_t = f"Verse {a_num} of Surah {n_tr}."
-                    juz_c = 1
-                    pg_c = 1
-
-                cursor.execute("INSERT OR REPLACE INTO ayahs VALUES (?, ?, ?, ?, ?, ?)", (g_idx, s_num, a_num, ar_t, juz_c, pg_c))
-                cursor.execute("INSERT OR REPLACE INTO ayah_translations VALUES ('en.saheeh', ?, ?, ?)", (s_num, a_num, tr_t))
-                cursor.execute("INSERT INTO arabic_ayahs_fts VALUES (?, ?, ?)", (s_num, a_num, ar_t))
-                cursor.execute("INSERT INTO translation_fts VALUES ('en.saheeh', ?, ?, ?)", (s_num, a_num, tr_t))
-                global_idx += 1
+    ''', fts_trans_rows)
 
     # Insert sample word segmentations for Surah 1 Ayah 1
     cursor.executemany('''
@@ -398,9 +315,11 @@ def main():
         (1, 1, 4, "ٱلرَّحِيمِ", "Ar-Raheem", 1)
     ])
 
+    cursor.execute("PRAGMA user_version = 1;")
     conn.commit()
     conn.close()
-    print("core_bundle.db successfully created at:", DB_PATH)
+
+    print(f"Successfully generated core_bundle.db with {len(ayah_rows)} real Quran verses!")
 
     # Generate mock_manifest.json
     mock_manifest = {
