@@ -157,54 +157,56 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
 
                       if (historyItems.isEmpty) {
                         return Center(
-                          child: Padding(
-                            padding: const EdgeInsets.all(32),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(Icons.search, size: 64, color: Colors.grey.shade400),
-                                const SizedBox(height: 16),
-                                const Text(
-                                  'Search Free-Text & Root Concordance',
-                                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                                ),
-                                const SizedBox(height: 8),
-                                const Text(
-                                  'Search terms across Arabic text or installed translations. Try exact phrase search like "in the name" or root queries.',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(color: Colors.grey),
-                                ),
-                                const SizedBox(height: 20),
-                                Wrap(
-                                  spacing: 8,
-                                  runSpacing: 8,
-                                  alignment: WrapAlignment.center,
-                                  children: [
-                                    ActionChip(
-                                      avatar: const Icon(Icons.auto_awesome, size: 16),
-                                      label: const Text('Root: ر ح م (Mercy)'),
-                                      onPressed: () {
-                                        Navigator.of(context).push(
-                                          MaterialPageRoute(
-                                            builder: (ctx) => const RootConcordanceScreen(rootArabic: 'ر ح م'),
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                    ActionChip(
-                                      avatar: const Icon(Icons.auto_awesome, size: 16),
-                                      label: const Text('Root: ك ت ب (Book)'),
-                                      onPressed: () {
-                                        Navigator.of(context).push(
-                                          MaterialPageRoute(
-                                            builder: (ctx) => const RootConcordanceScreen(rootArabic: 'ك ت ب'),
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                  ],
-                                ),
-                              ],
+                          child: SingleChildScrollView(
+                            child: Padding(
+                              padding: const EdgeInsets.all(32),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.search, size: 64, color: Colors.grey.shade400),
+                                  const SizedBox(height: 16),
+                                  const Text(
+                                    'Search Free-Text & Root Concordance',
+                                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  const Text(
+                                    'Search terms across Arabic text or installed translations. Try exact phrase search like "in the name" or root queries.',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(color: Colors.grey),
+                                  ),
+                                  const SizedBox(height: 20),
+                                  Wrap(
+                                    spacing: 8,
+                                    runSpacing: 8,
+                                    alignment: WrapAlignment.center,
+                                    children: [
+                                      ActionChip(
+                                        avatar: const Icon(Icons.auto_awesome, size: 16),
+                                        label: const Text('Root: ر ح م (Mercy)'),
+                                        onPressed: () {
+                                          Navigator.of(context).push(
+                                            MaterialPageRoute(
+                                              builder: (ctx) => const RootConcordanceScreen(rootArabic: 'ر ح م'),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                      ActionChip(
+                                        avatar: const Icon(Icons.auto_awesome, size: 16),
+                                        label: const Text('Root: ك ت ب (Book)'),
+                                        onPressed: () {
+                                          Navigator.of(context).push(
+                                            MaterialPageRoute(
+                                              builder: (ctx) => const RootConcordanceScreen(rootArabic: 'ك ت ب'),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         );
@@ -419,7 +421,6 @@ class _SearchFilterModal extends ConsumerWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text('Search Filters & Scope', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-
                 IconButton(icon: const Icon(Icons.close), onPressed: () => Navigator.pop(context)),
               ],
             ),
