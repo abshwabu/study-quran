@@ -4,9 +4,11 @@ import 'tables/ayahs.dart';
 import 'tables/translations.dart';
 import 'tables/words_roots.dart';
 import 'tables/content_packs.dart';
+import 'tables/tafsir.dart';
 import 'daos/quran_dao.dart';
 import 'daos/search_dao.dart';
 import 'daos/content_pack_dao.dart';
+import 'daos/tafsir_dao.dart';
 import 'fts_setup.dart';
 import 'connection.dart';
 
@@ -21,11 +23,14 @@ part 'app_database.g.dart';
     Words,
     Roots,
     ContentPacks,
+    TafsirsMeta,
+    TafsirContent,
   ],
   daos: [
     QuranDao,
     SearchDao,
     ContentPackDao,
+    TafsirDao,
   ],
 )
 class AppDatabase extends _$AppDatabase {

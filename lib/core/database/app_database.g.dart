@@ -2811,6 +2811,828 @@ class ContentPacksCompanion extends UpdateCompanion<ContentPack> {
   }
 }
 
+class $TafsirsMetaTable extends TafsirsMeta
+    with TableInfo<$TafsirsMetaTable, TafsirMeta> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $TafsirsMetaTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _tafsirIdMeta = const VerificationMeta(
+    'tafsirId',
+  );
+  @override
+  late final GeneratedColumn<String> tafsirId = GeneratedColumn<String>(
+    'tafsir_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _authorMeta = const VerificationMeta('author');
+  @override
+  late final GeneratedColumn<String> author = GeneratedColumn<String>(
+    'author',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _languageMeta = const VerificationMeta(
+    'language',
+  );
+  @override
+  late final GeneratedColumn<String> language = GeneratedColumn<String>(
+    'language',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _sourceMeta = const VerificationMeta('source');
+  @override
+  late final GeneratedColumn<String> source = GeneratedColumn<String>(
+    'source',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _licenseNoteMeta = const VerificationMeta(
+    'licenseNote',
+  );
+  @override
+  late final GeneratedColumn<String> licenseNote = GeneratedColumn<String>(
+    'license_note',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    tafsirId,
+    name,
+    author,
+    language,
+    source,
+    licenseNote,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'tafsirs_meta';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<TafsirMeta> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('tafsir_id')) {
+      context.handle(
+        _tafsirIdMeta,
+        tafsirId.isAcceptableOrUnknown(data['tafsir_id']!, _tafsirIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_tafsirIdMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('author')) {
+      context.handle(
+        _authorMeta,
+        author.isAcceptableOrUnknown(data['author']!, _authorMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_authorMeta);
+    }
+    if (data.containsKey('language')) {
+      context.handle(
+        _languageMeta,
+        language.isAcceptableOrUnknown(data['language']!, _languageMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_languageMeta);
+    }
+    if (data.containsKey('source')) {
+      context.handle(
+        _sourceMeta,
+        source.isAcceptableOrUnknown(data['source']!, _sourceMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_sourceMeta);
+    }
+    if (data.containsKey('license_note')) {
+      context.handle(
+        _licenseNoteMeta,
+        licenseNote.isAcceptableOrUnknown(
+          data['license_note']!,
+          _licenseNoteMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_licenseNoteMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {tafsirId};
+  @override
+  TafsirMeta map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return TafsirMeta(
+      tafsirId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}tafsir_id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      author: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}author'],
+      )!,
+      language: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}language'],
+      )!,
+      source: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}source'],
+      )!,
+      licenseNote: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}license_note'],
+      )!,
+    );
+  }
+
+  @override
+  $TafsirsMetaTable createAlias(String alias) {
+    return $TafsirsMetaTable(attachedDatabase, alias);
+  }
+}
+
+class TafsirMeta extends DataClass implements Insertable<TafsirMeta> {
+  final String tafsirId;
+  final String name;
+  final String author;
+  final String language;
+  final String source;
+  final String licenseNote;
+  const TafsirMeta({
+    required this.tafsirId,
+    required this.name,
+    required this.author,
+    required this.language,
+    required this.source,
+    required this.licenseNote,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['tafsir_id'] = Variable<String>(tafsirId);
+    map['name'] = Variable<String>(name);
+    map['author'] = Variable<String>(author);
+    map['language'] = Variable<String>(language);
+    map['source'] = Variable<String>(source);
+    map['license_note'] = Variable<String>(licenseNote);
+    return map;
+  }
+
+  TafsirsMetaCompanion toCompanion(bool nullToAbsent) {
+    return TafsirsMetaCompanion(
+      tafsirId: Value(tafsirId),
+      name: Value(name),
+      author: Value(author),
+      language: Value(language),
+      source: Value(source),
+      licenseNote: Value(licenseNote),
+    );
+  }
+
+  factory TafsirMeta.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return TafsirMeta(
+      tafsirId: serializer.fromJson<String>(json['tafsirId']),
+      name: serializer.fromJson<String>(json['name']),
+      author: serializer.fromJson<String>(json['author']),
+      language: serializer.fromJson<String>(json['language']),
+      source: serializer.fromJson<String>(json['source']),
+      licenseNote: serializer.fromJson<String>(json['licenseNote']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'tafsirId': serializer.toJson<String>(tafsirId),
+      'name': serializer.toJson<String>(name),
+      'author': serializer.toJson<String>(author),
+      'language': serializer.toJson<String>(language),
+      'source': serializer.toJson<String>(source),
+      'licenseNote': serializer.toJson<String>(licenseNote),
+    };
+  }
+
+  TafsirMeta copyWith({
+    String? tafsirId,
+    String? name,
+    String? author,
+    String? language,
+    String? source,
+    String? licenseNote,
+  }) => TafsirMeta(
+    tafsirId: tafsirId ?? this.tafsirId,
+    name: name ?? this.name,
+    author: author ?? this.author,
+    language: language ?? this.language,
+    source: source ?? this.source,
+    licenseNote: licenseNote ?? this.licenseNote,
+  );
+  TafsirMeta copyWithCompanion(TafsirsMetaCompanion data) {
+    return TafsirMeta(
+      tafsirId: data.tafsirId.present ? data.tafsirId.value : this.tafsirId,
+      name: data.name.present ? data.name.value : this.name,
+      author: data.author.present ? data.author.value : this.author,
+      language: data.language.present ? data.language.value : this.language,
+      source: data.source.present ? data.source.value : this.source,
+      licenseNote: data.licenseNote.present
+          ? data.licenseNote.value
+          : this.licenseNote,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('TafsirMeta(')
+          ..write('tafsirId: $tafsirId, ')
+          ..write('name: $name, ')
+          ..write('author: $author, ')
+          ..write('language: $language, ')
+          ..write('source: $source, ')
+          ..write('licenseNote: $licenseNote')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(tafsirId, name, author, language, source, licenseNote);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is TafsirMeta &&
+          other.tafsirId == this.tafsirId &&
+          other.name == this.name &&
+          other.author == this.author &&
+          other.language == this.language &&
+          other.source == this.source &&
+          other.licenseNote == this.licenseNote);
+}
+
+class TafsirsMetaCompanion extends UpdateCompanion<TafsirMeta> {
+  final Value<String> tafsirId;
+  final Value<String> name;
+  final Value<String> author;
+  final Value<String> language;
+  final Value<String> source;
+  final Value<String> licenseNote;
+  final Value<int> rowid;
+  const TafsirsMetaCompanion({
+    this.tafsirId = const Value.absent(),
+    this.name = const Value.absent(),
+    this.author = const Value.absent(),
+    this.language = const Value.absent(),
+    this.source = const Value.absent(),
+    this.licenseNote = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  TafsirsMetaCompanion.insert({
+    required String tafsirId,
+    required String name,
+    required String author,
+    required String language,
+    required String source,
+    required String licenseNote,
+    this.rowid = const Value.absent(),
+  }) : tafsirId = Value(tafsirId),
+       name = Value(name),
+       author = Value(author),
+       language = Value(language),
+       source = Value(source),
+       licenseNote = Value(licenseNote);
+  static Insertable<TafsirMeta> custom({
+    Expression<String>? tafsirId,
+    Expression<String>? name,
+    Expression<String>? author,
+    Expression<String>? language,
+    Expression<String>? source,
+    Expression<String>? licenseNote,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (tafsirId != null) 'tafsir_id': tafsirId,
+      if (name != null) 'name': name,
+      if (author != null) 'author': author,
+      if (language != null) 'language': language,
+      if (source != null) 'source': source,
+      if (licenseNote != null) 'license_note': licenseNote,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  TafsirsMetaCompanion copyWith({
+    Value<String>? tafsirId,
+    Value<String>? name,
+    Value<String>? author,
+    Value<String>? language,
+    Value<String>? source,
+    Value<String>? licenseNote,
+    Value<int>? rowid,
+  }) {
+    return TafsirsMetaCompanion(
+      tafsirId: tafsirId ?? this.tafsirId,
+      name: name ?? this.name,
+      author: author ?? this.author,
+      language: language ?? this.language,
+      source: source ?? this.source,
+      licenseNote: licenseNote ?? this.licenseNote,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (tafsirId.present) {
+      map['tafsir_id'] = Variable<String>(tafsirId.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (author.present) {
+      map['author'] = Variable<String>(author.value);
+    }
+    if (language.present) {
+      map['language'] = Variable<String>(language.value);
+    }
+    if (source.present) {
+      map['source'] = Variable<String>(source.value);
+    }
+    if (licenseNote.present) {
+      map['license_note'] = Variable<String>(licenseNote.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('TafsirsMetaCompanion(')
+          ..write('tafsirId: $tafsirId, ')
+          ..write('name: $name, ')
+          ..write('author: $author, ')
+          ..write('language: $language, ')
+          ..write('source: $source, ')
+          ..write('licenseNote: $licenseNote, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $TafsirContentTable extends TafsirContent
+    with TableInfo<$TafsirContentTable, TafsirContentData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $TafsirContentTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _tafsirIdMeta = const VerificationMeta(
+    'tafsirId',
+  );
+  @override
+  late final GeneratedColumn<String> tafsirId = GeneratedColumn<String>(
+    'tafsir_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _surahNumberMeta = const VerificationMeta(
+    'surahNumber',
+  );
+  @override
+  late final GeneratedColumn<int> surahNumber = GeneratedColumn<int>(
+    'surah_number',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _startAyahMeta = const VerificationMeta(
+    'startAyah',
+  );
+  @override
+  late final GeneratedColumn<int> startAyah = GeneratedColumn<int>(
+    'start_ayah',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _endAyahMeta = const VerificationMeta(
+    'endAyah',
+  );
+  @override
+  late final GeneratedColumn<int> endAyah = GeneratedColumn<int>(
+    'end_ayah',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _textContentMeta = const VerificationMeta(
+    'textContent',
+  );
+  @override
+  late final GeneratedColumn<String> textContent = GeneratedColumn<String>(
+    'text',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    tafsirId,
+    surahNumber,
+    startAyah,
+    endAyah,
+    textContent,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'tafsir_content';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<TafsirContentData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('tafsir_id')) {
+      context.handle(
+        _tafsirIdMeta,
+        tafsirId.isAcceptableOrUnknown(data['tafsir_id']!, _tafsirIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_tafsirIdMeta);
+    }
+    if (data.containsKey('surah_number')) {
+      context.handle(
+        _surahNumberMeta,
+        surahNumber.isAcceptableOrUnknown(
+          data['surah_number']!,
+          _surahNumberMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_surahNumberMeta);
+    }
+    if (data.containsKey('start_ayah')) {
+      context.handle(
+        _startAyahMeta,
+        startAyah.isAcceptableOrUnknown(data['start_ayah']!, _startAyahMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_startAyahMeta);
+    }
+    if (data.containsKey('end_ayah')) {
+      context.handle(
+        _endAyahMeta,
+        endAyah.isAcceptableOrUnknown(data['end_ayah']!, _endAyahMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_endAyahMeta);
+    }
+    if (data.containsKey('text')) {
+      context.handle(
+        _textContentMeta,
+        textContent.isAcceptableOrUnknown(data['text']!, _textContentMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_textContentMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  TafsirContentData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return TafsirContentData(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      tafsirId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}tafsir_id'],
+      )!,
+      surahNumber: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}surah_number'],
+      )!,
+      startAyah: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}start_ayah'],
+      )!,
+      endAyah: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}end_ayah'],
+      )!,
+      textContent: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}text'],
+      )!,
+    );
+  }
+
+  @override
+  $TafsirContentTable createAlias(String alias) {
+    return $TafsirContentTable(attachedDatabase, alias);
+  }
+}
+
+class TafsirContentData extends DataClass
+    implements Insertable<TafsirContentData> {
+  final int id;
+  final String tafsirId;
+  final int surahNumber;
+  final int startAyah;
+  final int endAyah;
+  final String textContent;
+  const TafsirContentData({
+    required this.id,
+    required this.tafsirId,
+    required this.surahNumber,
+    required this.startAyah,
+    required this.endAyah,
+    required this.textContent,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['tafsir_id'] = Variable<String>(tafsirId);
+    map['surah_number'] = Variable<int>(surahNumber);
+    map['start_ayah'] = Variable<int>(startAyah);
+    map['end_ayah'] = Variable<int>(endAyah);
+    map['text'] = Variable<String>(textContent);
+    return map;
+  }
+
+  TafsirContentCompanion toCompanion(bool nullToAbsent) {
+    return TafsirContentCompanion(
+      id: Value(id),
+      tafsirId: Value(tafsirId),
+      surahNumber: Value(surahNumber),
+      startAyah: Value(startAyah),
+      endAyah: Value(endAyah),
+      textContent: Value(textContent),
+    );
+  }
+
+  factory TafsirContentData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return TafsirContentData(
+      id: serializer.fromJson<int>(json['id']),
+      tafsirId: serializer.fromJson<String>(json['tafsirId']),
+      surahNumber: serializer.fromJson<int>(json['surahNumber']),
+      startAyah: serializer.fromJson<int>(json['startAyah']),
+      endAyah: serializer.fromJson<int>(json['endAyah']),
+      textContent: serializer.fromJson<String>(json['textContent']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'tafsirId': serializer.toJson<String>(tafsirId),
+      'surahNumber': serializer.toJson<int>(surahNumber),
+      'startAyah': serializer.toJson<int>(startAyah),
+      'endAyah': serializer.toJson<int>(endAyah),
+      'textContent': serializer.toJson<String>(textContent),
+    };
+  }
+
+  TafsirContentData copyWith({
+    int? id,
+    String? tafsirId,
+    int? surahNumber,
+    int? startAyah,
+    int? endAyah,
+    String? textContent,
+  }) => TafsirContentData(
+    id: id ?? this.id,
+    tafsirId: tafsirId ?? this.tafsirId,
+    surahNumber: surahNumber ?? this.surahNumber,
+    startAyah: startAyah ?? this.startAyah,
+    endAyah: endAyah ?? this.endAyah,
+    textContent: textContent ?? this.textContent,
+  );
+  TafsirContentData copyWithCompanion(TafsirContentCompanion data) {
+    return TafsirContentData(
+      id: data.id.present ? data.id.value : this.id,
+      tafsirId: data.tafsirId.present ? data.tafsirId.value : this.tafsirId,
+      surahNumber: data.surahNumber.present
+          ? data.surahNumber.value
+          : this.surahNumber,
+      startAyah: data.startAyah.present ? data.startAyah.value : this.startAyah,
+      endAyah: data.endAyah.present ? data.endAyah.value : this.endAyah,
+      textContent: data.textContent.present
+          ? data.textContent.value
+          : this.textContent,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('TafsirContentData(')
+          ..write('id: $id, ')
+          ..write('tafsirId: $tafsirId, ')
+          ..write('surahNumber: $surahNumber, ')
+          ..write('startAyah: $startAyah, ')
+          ..write('endAyah: $endAyah, ')
+          ..write('textContent: $textContent')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, tafsirId, surahNumber, startAyah, endAyah, textContent);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is TafsirContentData &&
+          other.id == this.id &&
+          other.tafsirId == this.tafsirId &&
+          other.surahNumber == this.surahNumber &&
+          other.startAyah == this.startAyah &&
+          other.endAyah == this.endAyah &&
+          other.textContent == this.textContent);
+}
+
+class TafsirContentCompanion extends UpdateCompanion<TafsirContentData> {
+  final Value<int> id;
+  final Value<String> tafsirId;
+  final Value<int> surahNumber;
+  final Value<int> startAyah;
+  final Value<int> endAyah;
+  final Value<String> textContent;
+  const TafsirContentCompanion({
+    this.id = const Value.absent(),
+    this.tafsirId = const Value.absent(),
+    this.surahNumber = const Value.absent(),
+    this.startAyah = const Value.absent(),
+    this.endAyah = const Value.absent(),
+    this.textContent = const Value.absent(),
+  });
+  TafsirContentCompanion.insert({
+    this.id = const Value.absent(),
+    required String tafsirId,
+    required int surahNumber,
+    required int startAyah,
+    required int endAyah,
+    required String textContent,
+  }) : tafsirId = Value(tafsirId),
+       surahNumber = Value(surahNumber),
+       startAyah = Value(startAyah),
+       endAyah = Value(endAyah),
+       textContent = Value(textContent);
+  static Insertable<TafsirContentData> custom({
+    Expression<int>? id,
+    Expression<String>? tafsirId,
+    Expression<int>? surahNumber,
+    Expression<int>? startAyah,
+    Expression<int>? endAyah,
+    Expression<String>? textContent,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (tafsirId != null) 'tafsir_id': tafsirId,
+      if (surahNumber != null) 'surah_number': surahNumber,
+      if (startAyah != null) 'start_ayah': startAyah,
+      if (endAyah != null) 'end_ayah': endAyah,
+      if (textContent != null) 'text': textContent,
+    });
+  }
+
+  TafsirContentCompanion copyWith({
+    Value<int>? id,
+    Value<String>? tafsirId,
+    Value<int>? surahNumber,
+    Value<int>? startAyah,
+    Value<int>? endAyah,
+    Value<String>? textContent,
+  }) {
+    return TafsirContentCompanion(
+      id: id ?? this.id,
+      tafsirId: tafsirId ?? this.tafsirId,
+      surahNumber: surahNumber ?? this.surahNumber,
+      startAyah: startAyah ?? this.startAyah,
+      endAyah: endAyah ?? this.endAyah,
+      textContent: textContent ?? this.textContent,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (tafsirId.present) {
+      map['tafsir_id'] = Variable<String>(tafsirId.value);
+    }
+    if (surahNumber.present) {
+      map['surah_number'] = Variable<int>(surahNumber.value);
+    }
+    if (startAyah.present) {
+      map['start_ayah'] = Variable<int>(startAyah.value);
+    }
+    if (endAyah.present) {
+      map['end_ayah'] = Variable<int>(endAyah.value);
+    }
+    if (textContent.present) {
+      map['text'] = Variable<String>(textContent.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('TafsirContentCompanion(')
+          ..write('id: $id, ')
+          ..write('tafsirId: $tafsirId, ')
+          ..write('surahNumber: $surahNumber, ')
+          ..write('startAyah: $startAyah, ')
+          ..write('endAyah: $endAyah, ')
+          ..write('textContent: $textContent')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -2825,11 +3647,14 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $RootsTable roots = $RootsTable(this);
   late final $WordsTable words = $WordsTable(this);
   late final $ContentPacksTable contentPacks = $ContentPacksTable(this);
+  late final $TafsirsMetaTable tafsirsMeta = $TafsirsMetaTable(this);
+  late final $TafsirContentTable tafsirContent = $TafsirContentTable(this);
   late final QuranDao quranDao = QuranDao(this as AppDatabase);
   late final SearchDao searchDao = SearchDao(this as AppDatabase);
   late final ContentPackDao contentPackDao = ContentPackDao(
     this as AppDatabase,
   );
+  late final TafsirDao tafsirDao = TafsirDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -2842,6 +3667,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     roots,
     words,
     contentPacks,
+    tafsirsMeta,
+    tafsirContent,
   ];
 }
 
@@ -4551,6 +5378,448 @@ typedef $$ContentPacksTableProcessedTableManager =
       ContentPack,
       PrefetchHooks Function()
     >;
+typedef $$TafsirsMetaTableCreateCompanionBuilder =
+    TafsirsMetaCompanion Function({
+      required String tafsirId,
+      required String name,
+      required String author,
+      required String language,
+      required String source,
+      required String licenseNote,
+      Value<int> rowid,
+    });
+typedef $$TafsirsMetaTableUpdateCompanionBuilder =
+    TafsirsMetaCompanion Function({
+      Value<String> tafsirId,
+      Value<String> name,
+      Value<String> author,
+      Value<String> language,
+      Value<String> source,
+      Value<String> licenseNote,
+      Value<int> rowid,
+    });
+
+class $$TafsirsMetaTableFilterComposer
+    extends Composer<_$AppDatabase, $TafsirsMetaTable> {
+  $$TafsirsMetaTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get tafsirId => $composableBuilder(
+    column: $table.tafsirId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get author => $composableBuilder(
+    column: $table.author,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get language => $composableBuilder(
+    column: $table.language,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get source => $composableBuilder(
+    column: $table.source,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get licenseNote => $composableBuilder(
+    column: $table.licenseNote,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$TafsirsMetaTableOrderingComposer
+    extends Composer<_$AppDatabase, $TafsirsMetaTable> {
+  $$TafsirsMetaTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get tafsirId => $composableBuilder(
+    column: $table.tafsirId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get author => $composableBuilder(
+    column: $table.author,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get language => $composableBuilder(
+    column: $table.language,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get source => $composableBuilder(
+    column: $table.source,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get licenseNote => $composableBuilder(
+    column: $table.licenseNote,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$TafsirsMetaTableAnnotationComposer
+    extends Composer<_$AppDatabase, $TafsirsMetaTable> {
+  $$TafsirsMetaTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get tafsirId =>
+      $composableBuilder(column: $table.tafsirId, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get author =>
+      $composableBuilder(column: $table.author, builder: (column) => column);
+
+  GeneratedColumn<String> get language =>
+      $composableBuilder(column: $table.language, builder: (column) => column);
+
+  GeneratedColumn<String> get source =>
+      $composableBuilder(column: $table.source, builder: (column) => column);
+
+  GeneratedColumn<String> get licenseNote => $composableBuilder(
+    column: $table.licenseNote,
+    builder: (column) => column,
+  );
+}
+
+class $$TafsirsMetaTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $TafsirsMetaTable,
+          TafsirMeta,
+          $$TafsirsMetaTableFilterComposer,
+          $$TafsirsMetaTableOrderingComposer,
+          $$TafsirsMetaTableAnnotationComposer,
+          $$TafsirsMetaTableCreateCompanionBuilder,
+          $$TafsirsMetaTableUpdateCompanionBuilder,
+          (
+            TafsirMeta,
+            BaseReferences<_$AppDatabase, $TafsirsMetaTable, TafsirMeta>,
+          ),
+          TafsirMeta,
+          PrefetchHooks Function()
+        > {
+  $$TafsirsMetaTableTableManager(_$AppDatabase db, $TafsirsMetaTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$TafsirsMetaTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$TafsirsMetaTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$TafsirsMetaTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> tafsirId = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<String> author = const Value.absent(),
+                Value<String> language = const Value.absent(),
+                Value<String> source = const Value.absent(),
+                Value<String> licenseNote = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => TafsirsMetaCompanion(
+                tafsirId: tafsirId,
+                name: name,
+                author: author,
+                language: language,
+                source: source,
+                licenseNote: licenseNote,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String tafsirId,
+                required String name,
+                required String author,
+                required String language,
+                required String source,
+                required String licenseNote,
+                Value<int> rowid = const Value.absent(),
+              }) => TafsirsMetaCompanion.insert(
+                tafsirId: tafsirId,
+                name: name,
+                author: author,
+                language: language,
+                source: source,
+                licenseNote: licenseNote,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$TafsirsMetaTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $TafsirsMetaTable,
+      TafsirMeta,
+      $$TafsirsMetaTableFilterComposer,
+      $$TafsirsMetaTableOrderingComposer,
+      $$TafsirsMetaTableAnnotationComposer,
+      $$TafsirsMetaTableCreateCompanionBuilder,
+      $$TafsirsMetaTableUpdateCompanionBuilder,
+      (
+        TafsirMeta,
+        BaseReferences<_$AppDatabase, $TafsirsMetaTable, TafsirMeta>,
+      ),
+      TafsirMeta,
+      PrefetchHooks Function()
+    >;
+typedef $$TafsirContentTableCreateCompanionBuilder =
+    TafsirContentCompanion Function({
+      Value<int> id,
+      required String tafsirId,
+      required int surahNumber,
+      required int startAyah,
+      required int endAyah,
+      required String textContent,
+    });
+typedef $$TafsirContentTableUpdateCompanionBuilder =
+    TafsirContentCompanion Function({
+      Value<int> id,
+      Value<String> tafsirId,
+      Value<int> surahNumber,
+      Value<int> startAyah,
+      Value<int> endAyah,
+      Value<String> textContent,
+    });
+
+class $$TafsirContentTableFilterComposer
+    extends Composer<_$AppDatabase, $TafsirContentTable> {
+  $$TafsirContentTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get tafsirId => $composableBuilder(
+    column: $table.tafsirId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get surahNumber => $composableBuilder(
+    column: $table.surahNumber,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get startAyah => $composableBuilder(
+    column: $table.startAyah,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get endAyah => $composableBuilder(
+    column: $table.endAyah,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get textContent => $composableBuilder(
+    column: $table.textContent,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$TafsirContentTableOrderingComposer
+    extends Composer<_$AppDatabase, $TafsirContentTable> {
+  $$TafsirContentTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get tafsirId => $composableBuilder(
+    column: $table.tafsirId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get surahNumber => $composableBuilder(
+    column: $table.surahNumber,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get startAyah => $composableBuilder(
+    column: $table.startAyah,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get endAyah => $composableBuilder(
+    column: $table.endAyah,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get textContent => $composableBuilder(
+    column: $table.textContent,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$TafsirContentTableAnnotationComposer
+    extends Composer<_$AppDatabase, $TafsirContentTable> {
+  $$TafsirContentTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get tafsirId =>
+      $composableBuilder(column: $table.tafsirId, builder: (column) => column);
+
+  GeneratedColumn<int> get surahNumber => $composableBuilder(
+    column: $table.surahNumber,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get startAyah =>
+      $composableBuilder(column: $table.startAyah, builder: (column) => column);
+
+  GeneratedColumn<int> get endAyah =>
+      $composableBuilder(column: $table.endAyah, builder: (column) => column);
+
+  GeneratedColumn<String> get textContent => $composableBuilder(
+    column: $table.textContent,
+    builder: (column) => column,
+  );
+}
+
+class $$TafsirContentTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $TafsirContentTable,
+          TafsirContentData,
+          $$TafsirContentTableFilterComposer,
+          $$TafsirContentTableOrderingComposer,
+          $$TafsirContentTableAnnotationComposer,
+          $$TafsirContentTableCreateCompanionBuilder,
+          $$TafsirContentTableUpdateCompanionBuilder,
+          (
+            TafsirContentData,
+            BaseReferences<
+              _$AppDatabase,
+              $TafsirContentTable,
+              TafsirContentData
+            >,
+          ),
+          TafsirContentData,
+          PrefetchHooks Function()
+        > {
+  $$TafsirContentTableTableManager(_$AppDatabase db, $TafsirContentTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$TafsirContentTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$TafsirContentTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$TafsirContentTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> tafsirId = const Value.absent(),
+                Value<int> surahNumber = const Value.absent(),
+                Value<int> startAyah = const Value.absent(),
+                Value<int> endAyah = const Value.absent(),
+                Value<String> textContent = const Value.absent(),
+              }) => TafsirContentCompanion(
+                id: id,
+                tafsirId: tafsirId,
+                surahNumber: surahNumber,
+                startAyah: startAyah,
+                endAyah: endAyah,
+                textContent: textContent,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String tafsirId,
+                required int surahNumber,
+                required int startAyah,
+                required int endAyah,
+                required String textContent,
+              }) => TafsirContentCompanion.insert(
+                id: id,
+                tafsirId: tafsirId,
+                surahNumber: surahNumber,
+                startAyah: startAyah,
+                endAyah: endAyah,
+                textContent: textContent,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$TafsirContentTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $TafsirContentTable,
+      TafsirContentData,
+      $$TafsirContentTableFilterComposer,
+      $$TafsirContentTableOrderingComposer,
+      $$TafsirContentTableAnnotationComposer,
+      $$TafsirContentTableCreateCompanionBuilder,
+      $$TafsirContentTableUpdateCompanionBuilder,
+      (
+        TafsirContentData,
+        BaseReferences<_$AppDatabase, $TafsirContentTable, TafsirContentData>,
+      ),
+      TafsirContentData,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -4569,4 +5838,8 @@ class $AppDatabaseManager {
       $$WordsTableTableManager(_db, _db.words);
   $$ContentPacksTableTableManager get contentPacks =>
       $$ContentPacksTableTableManager(_db, _db.contentPacks);
+  $$TafsirsMetaTableTableManager get tafsirsMeta =>
+      $$TafsirsMetaTableTableManager(_db, _db.tafsirsMeta);
+  $$TafsirContentTableTableManager get tafsirContent =>
+      $$TafsirContentTableTableManager(_db, _db.tafsirContent);
 }

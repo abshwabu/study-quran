@@ -10,6 +10,8 @@ import 'widgets/surah_drawer.dart';
 import 'widgets/jump_to_dialog.dart';
 import 'widgets/reader_settings_modal.dart';
 import 'widgets/database_loading_overlay.dart';
+import '../../tafsir/presentation/tafsir_library_screen.dart';
+
 
 class QuranReaderScreen extends ConsumerStatefulWidget {
   const QuranReaderScreen({super.key});
@@ -124,6 +126,17 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen> {
         ),
         actions: [
           IconButton(
+            icon: const Icon(Icons.library_books),
+            tooltip: 'Tafsir Library',
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (ctx) => const TafsirLibraryScreen(),
+                ),
+              );
+            },
+          ),
+          IconButton(
             icon: const Icon(Icons.explore_outlined),
             tooltip: 'Jump to Ayah',
             onPressed: () => JumpToDialog.show(
@@ -138,6 +151,7 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen> {
             tooltip: 'Reader Preferences',
             onPressed: () => ReaderSettingsModal.show(context),
           ),
+
         ],
       ),
       body: ayahsAsync.when(

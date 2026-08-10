@@ -27,7 +27,16 @@
       "version": "1.0.0",
       "download_url": "https://cdn.quran.com/tafsir/ar.muyassar.json",
       "size_bytes": 4500000,
-      "license_note": "Public domain"
+      "license_note": "Public domain (Bundled)"
+    },
+    {
+      "pack_id": "en.jalalayn",
+      "type": "tafsir",
+      "name": "Tafsir al-Jalalayn (English)",
+      "version": "1.0.0",
+      "download_url": "https://cdn.quran.com/tafsir/en.jalalayn.json",
+      "size_bytes": 3800000,
+      "license_note": "Public domain (Bundled)"
     },
     {
       "pack_id": "en.ibnkathir",
@@ -37,6 +46,15 @@
       "download_url": "https://cdn.quran.com/tafsir/en.ibnkathir.json",
       "size_bytes": 12000000,
       "license_note": "Free non-commercial research use"
+    },
+    {
+      "pack_id": "ar.tabari",
+      "type": "tafsir",
+      "name": "Tafsir Tabari (Arabic)",
+      "version": "1.0.0",
+      "download_url": "https://cdn.quran.com/tafsir/ar.tabari.json",
+      "size_bytes": 18000000,
+      "license_note": "Classical domain"
     },
     {
       "pack_id": "audio.alafasy",

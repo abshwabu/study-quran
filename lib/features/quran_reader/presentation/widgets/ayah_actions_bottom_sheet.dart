@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:studyquran/core/database/daos/quran_dao.dart';
 import 'package:studyquran/core/database/app_database.dart';
+import '../../../tafsir/presentation/single_tafsir_screen.dart';
+import '../../../tafsir/presentation/tafsir_comparison_screen.dart';
 
 class AyahActionsBottomSheet extends StatelessWidget {
   final AyahWithTranslation ayahData;
@@ -65,7 +67,7 @@ ${ayahData.ayah.arabicTextUthmani}
           const Divider(),
           const SizedBox(height: 8),
 
-          // 1. Copy Action (Fully Built)
+          // 1. Copy Action
           ListTile(
             leading: const CircleAvatar(
               backgroundColor: Color(0xFFE8F5E9),
@@ -76,7 +78,49 @@ ${ayahData.ayah.arabicTextUthmani}
             onTap: () => _copyAyahToClipboard(context),
           ),
 
-          // 2. Play Audio Action (Hook for Prompt 09)
+          // 2. View Tafsir Action (Single Tafsir View)
+          ListTile(
+            leading: CircleAvatar(
+              backgroundColor: Colors.purple.shade50,
+              child: Icon(Icons.menu_book, color: Colors.purple.shade700),
+            ),
+            title: const Text('View Tafsir Commentary'),
+            subtitle: const Text('Read classical Tafsir for this ayah offline'),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (ctx) => SingleTafsirScreen(
+                    surahNumber: ayahData.ayah.surahNumber,
+                    ayahNumber: ayahData.ayah.ayahNumber,
+                  ),
+                ),
+              );
+            },
+          ),
+
+          // 3. Compare Tafsirs Action (Multi-Tafsir Comparison)
+          ListTile(
+            leading: CircleAvatar(
+              backgroundColor: Colors.teal.shade50,
+              child: Icon(Icons.compare_arrows, color: Colors.teal.shade700),
+            ),
+            title: const Text('Compare Multiple Tafsirs'),
+            subtitle: const Text('View 2+ Tafsirs side-by-side or stacked'),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (ctx) => TafsirComparisonScreen(
+                    surahNumber: ayahData.ayah.surahNumber,
+                    ayahNumber: ayahData.ayah.ayahNumber,
+                  ),
+                ),
+              );
+            },
+          ),
+
+          // 4. Play Audio Action (Hook for Prompt 09)
           ListTile(
             leading: CircleAvatar(
               backgroundColor: Colors.blue.shade50,
@@ -95,26 +139,7 @@ ${ayahData.ayah.arabicTextUthmani}
             },
           ),
 
-          // 3. View Tafsir Action (Hook for Prompt 03)
-          ListTile(
-            leading: CircleAvatar(
-              backgroundColor: Colors.purple.shade50,
-              child: Icon(Icons.menu_book, color: Colors.purple.shade700),
-            ),
-            title: const Text('View Tafsir'),
-            subtitle: const Text('Tafsir Library & Comparison (Prompt 03 hook)'),
-            onTap: () {
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Tafsir comparison view will be wired in Prompt 03'),
-                  duration: Duration(seconds: 2),
-                ),
-              );
-            },
-          ),
-
-          // 4. Bookmark & Notes Action (Hook for Prompt 07)
+          // 5. Bookmark & Notes Action (Hook for Prompt 07)
           ListTile(
             leading: CircleAvatar(
               backgroundColor: Colors.amber.shade50,
