@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/database/providers.dart';
 import '../providers/tafsir_providers.dart';
 
+import '../../content_packs/presentation/content_pack_manager_screen.dart';
+
 class TafsirLibraryScreen extends ConsumerWidget {
   const TafsirLibraryScreen({super.key});
 
@@ -15,7 +17,21 @@ class TafsirLibraryScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Tafsir Library'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.download),
+            tooltip: 'Content Pack Downloader',
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (ctx) => const ContentPackManagerScreen(),
+                ),
+              );
+            },
+          ),
+        ],
       ),
+
       body: metaAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (err, stack) => Center(child: Text('Error loading Tafsirs: $err')),

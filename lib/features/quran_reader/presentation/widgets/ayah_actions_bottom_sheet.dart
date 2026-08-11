@@ -10,6 +10,8 @@ import '../../../thematic/presentation/widgets/cross_references_bottom_sheet.dar
 import '../../../thematic/presentation/widgets/asbab_al_nuzul_bottom_sheet.dart';
 import '../../../workspace/providers/workspace_providers.dart';
 import '../../../ai_assistant/presentation/widgets/ai_explain_ayah_modal.dart';
+import '../../../audio/domain/audio_player_service.dart';
+
 
 
 class AyahActionsBottomSheet extends ConsumerWidget {
@@ -276,24 +278,29 @@ ${ayahData.ayah.arabicTextUthmani}
               ),
 
 
-              // 7. Play Audio Action (Hook for Prompt 09)
+              // 8. Play Audio Recitation
               ListTile(
                 leading: CircleAvatar(
-                  backgroundColor: Colors.blue.shade50,
-                  child: Icon(Icons.play_arrow, color: Colors.blue.shade700),
+                  backgroundColor: Colors.teal.shade50,
+                  child: Icon(Icons.play_arrow, color: Colors.teal.shade700),
                 ),
                 title: const Text('Play Recitation'),
-                subtitle: const Text('Offline Audio Recitation (Prompt 09 hook)'),
+                subtitle: const Text('Play verse audio recitation (Mishary Alafasy)'),
                 onTap: () {
                   Navigator.pop(context);
+                  AudioPlayerService.playAyah(
+                    surahNumber: ayahData.ayah.surahNumber,
+                    ayahNumber: ayahData.ayah.ayahNumber,
+                  );
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Audio recitation feature will be wired in Prompt 09'),
-                      duration: Duration(seconds: 2),
+                    SnackBar(
+                      content: Text('Playing Surah ${surahMeta.nameTranslit} (${ayahData.ayah.surahNumber}:${ayahData.ayah.ayahNumber})...'),
+                      duration: const Duration(seconds: 2),
                     ),
                   );
                 },
               ),
+
             ],
           ),
         ),

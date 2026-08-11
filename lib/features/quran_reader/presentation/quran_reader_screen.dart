@@ -18,6 +18,8 @@ import '../../morphology/presentation/root_browser_screen.dart';
 import '../../thematic/presentation/topic_browser_screen.dart';
 import '../../workspace/presentation/workspace_screen.dart';
 import '../../ai_assistant/presentation/ai_settings_screen.dart';
+import '../../content_packs/presentation/content_pack_manager_screen.dart';
+
 
 
 
@@ -127,7 +129,19 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen> {
                 },
               ),
               IconButton(
+                icon: const Icon(Icons.download),
+                tooltip: 'Content Pack Downloader',
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (ctx) => const ContentPackManagerScreen(),
+                    ),
+                  );
+                },
+              ),
+              IconButton(
                 icon: const Icon(Icons.auto_awesome),
+
                 tooltip: 'AI Research Assistant',
                 onPressed: () {
                   Navigator.of(context).push(

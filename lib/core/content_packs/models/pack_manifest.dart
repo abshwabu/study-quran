@@ -6,6 +6,7 @@ class PackManifestItem {
   final String downloadUrl;
   final int sizeBytes;
   final String licenseNote;
+  final bool isDownloaded;
 
   PackManifestItem({
     required this.packId,
@@ -15,7 +16,9 @@ class PackManifestItem {
     required this.downloadUrl,
     required this.sizeBytes,
     required this.licenseNote,
+    this.isDownloaded = false,
   });
+
 
   factory PackManifestItem.fromJson(Map<String, dynamic> json) {
     return PackManifestItem(
