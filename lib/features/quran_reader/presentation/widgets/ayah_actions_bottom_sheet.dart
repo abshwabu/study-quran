@@ -4,6 +4,8 @@ import 'package:studyquran/core/database/daos/quran_dao.dart';
 import 'package:studyquran/core/database/app_database.dart';
 import '../../../tafsir/presentation/single_tafsir_screen.dart';
 import '../../../tafsir/presentation/tafsir_comparison_screen.dart';
+import '../../../thematic/presentation/widgets/cross_references_bottom_sheet.dart';
+import '../../../thematic/presentation/widgets/asbab_al_nuzul_bottom_sheet.dart';
 
 class AyahActionsBottomSheet extends StatelessWidget {
   final AyahWithTranslation ayahData;
@@ -126,7 +128,43 @@ ${ayahData.ayah.arabicTextUthmani}
                 },
               ),
 
-              // 4. Play Audio Action (Hook for Prompt 09)
+              // 4. Cross References & Related Verses
+              ListTile(
+                leading: CircleAvatar(
+                  backgroundColor: Colors.indigo.shade50,
+                  child: Icon(Icons.link, color: Colors.indigo.shade700),
+                ),
+                title: const Text('Related Verses & Cross-References'),
+                subtitle: const Text('Thematic links, parallel phrasing, and abrogation notes'),
+                onTap: () {
+                  Navigator.pop(context);
+                  CrossReferencesBottomSheet.show(
+                    context,
+                    surahNumber: ayahData.ayah.surahNumber,
+                    ayahNumber: ayahData.ayah.ayahNumber,
+                  );
+                },
+              ),
+
+              // 5. Asbab al-Nuzul (Occasion of Revelation)
+              ListTile(
+                leading: CircleAvatar(
+                  backgroundColor: Colors.amber.shade50,
+                  child: Icon(Icons.history_edu, color: Colors.amber.shade800),
+                ),
+                title: const Text('Asbab al-Nuzul (Revelation Context)'),
+                subtitle: const Text('Historical occasion of revelation attributed by scholars'),
+                onTap: () {
+                  Navigator.pop(context);
+                  AsbabAlNuzulBottomSheet.show(
+                    context,
+                    surahNumber: ayahData.ayah.surahNumber,
+                    ayahNumber: ayahData.ayah.ayahNumber,
+                  );
+                },
+              ),
+
+              // 6. Play Audio Action (Hook for Prompt 09)
               ListTile(
                 leading: CircleAvatar(
                   backgroundColor: Colors.blue.shade50,
@@ -145,11 +183,11 @@ ${ayahData.ayah.arabicTextUthmani}
                 },
               ),
 
-              // 5. Bookmark & Notes Action (Hook for Prompt 07)
+              // 7. Bookmark & Notes Action (Hook for Prompt 07)
               ListTile(
                 leading: CircleAvatar(
-                  backgroundColor: Colors.amber.shade50,
-                  child: Icon(Icons.bookmark_border, color: Colors.amber.shade800),
+                  backgroundColor: Colors.orange.shade50,
+                  child: Icon(Icons.bookmark_border, color: Colors.orange.shade800),
                 ),
                 title: const Text('Bookmark / Add Note'),
                 subtitle: const Text('Research Workspace & Tags (Prompt 07 hook)'),

@@ -5,6 +5,8 @@ import 'database_init_service.dart';
 import 'daos/quran_dao.dart';
 import 'daos/search_dao.dart';
 import 'daos/content_pack_dao.dart';
+import 'daos/thematic_dao.dart';
+
 import '../content_packs/repositories/content_pack_repository.dart';
 import '../content_packs/models/pack_manifest.dart';
 
@@ -90,6 +92,11 @@ final searchDaoProvider = Provider<SearchDao>((ref) {
 final contentPackDaoProvider = Provider<ContentPackDao>((ref) {
   return ref.watch(databaseProvider).contentPackDao;
 });
+
+final thematicDaoProvider = Provider<ThematicDao>((ref) {
+  return ref.watch(databaseProvider).thematicDao;
+});
+
 
 final contentPackRepositoryProvider = Provider<ContentPackRepository>((ref) {
   return ContentPackRepositoryImpl(

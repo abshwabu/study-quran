@@ -3899,6 +3899,1485 @@ class TafsirContentCompanion extends UpdateCompanion<TafsirContentData> {
   }
 }
 
+class $TopicsTable extends Topics with TableInfo<$TopicsTable, Topic> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $TopicsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _topicIdMeta = const VerificationMeta(
+    'topicId',
+  );
+  @override
+  late final GeneratedColumn<String> topicId = GeneratedColumn<String>(
+    'topic_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _parentTopicIdMeta = const VerificationMeta(
+    'parentTopicId',
+  );
+  @override
+  late final GeneratedColumn<String> parentTopicId = GeneratedColumn<String>(
+    'parent_topic_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _categoryMeta = const VerificationMeta(
+    'category',
+  );
+  @override
+  late final GeneratedColumn<String> category = GeneratedColumn<String>(
+    'category',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('General'),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    topicId,
+    name,
+    parentTopicId,
+    category,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'topics';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<Topic> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('topic_id')) {
+      context.handle(
+        _topicIdMeta,
+        topicId.isAcceptableOrUnknown(data['topic_id']!, _topicIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_topicIdMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('parent_topic_id')) {
+      context.handle(
+        _parentTopicIdMeta,
+        parentTopicId.isAcceptableOrUnknown(
+          data['parent_topic_id']!,
+          _parentTopicIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('category')) {
+      context.handle(
+        _categoryMeta,
+        category.isAcceptableOrUnknown(data['category']!, _categoryMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {topicId};
+  @override
+  Topic map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Topic(
+      topicId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}topic_id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      parentTopicId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}parent_topic_id'],
+      ),
+      category: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}category'],
+      )!,
+    );
+  }
+
+  @override
+  $TopicsTable createAlias(String alias) {
+    return $TopicsTable(attachedDatabase, alias);
+  }
+}
+
+class Topic extends DataClass implements Insertable<Topic> {
+  final String topicId;
+  final String name;
+  final String? parentTopicId;
+  final String category;
+  const Topic({
+    required this.topicId,
+    required this.name,
+    this.parentTopicId,
+    required this.category,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['topic_id'] = Variable<String>(topicId);
+    map['name'] = Variable<String>(name);
+    if (!nullToAbsent || parentTopicId != null) {
+      map['parent_topic_id'] = Variable<String>(parentTopicId);
+    }
+    map['category'] = Variable<String>(category);
+    return map;
+  }
+
+  TopicsCompanion toCompanion(bool nullToAbsent) {
+    return TopicsCompanion(
+      topicId: Value(topicId),
+      name: Value(name),
+      parentTopicId: parentTopicId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(parentTopicId),
+      category: Value(category),
+    );
+  }
+
+  factory Topic.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Topic(
+      topicId: serializer.fromJson<String>(json['topicId']),
+      name: serializer.fromJson<String>(json['name']),
+      parentTopicId: serializer.fromJson<String?>(json['parentTopicId']),
+      category: serializer.fromJson<String>(json['category']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'topicId': serializer.toJson<String>(topicId),
+      'name': serializer.toJson<String>(name),
+      'parentTopicId': serializer.toJson<String?>(parentTopicId),
+      'category': serializer.toJson<String>(category),
+    };
+  }
+
+  Topic copyWith({
+    String? topicId,
+    String? name,
+    Value<String?> parentTopicId = const Value.absent(),
+    String? category,
+  }) => Topic(
+    topicId: topicId ?? this.topicId,
+    name: name ?? this.name,
+    parentTopicId: parentTopicId.present
+        ? parentTopicId.value
+        : this.parentTopicId,
+    category: category ?? this.category,
+  );
+  Topic copyWithCompanion(TopicsCompanion data) {
+    return Topic(
+      topicId: data.topicId.present ? data.topicId.value : this.topicId,
+      name: data.name.present ? data.name.value : this.name,
+      parentTopicId: data.parentTopicId.present
+          ? data.parentTopicId.value
+          : this.parentTopicId,
+      category: data.category.present ? data.category.value : this.category,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Topic(')
+          ..write('topicId: $topicId, ')
+          ..write('name: $name, ')
+          ..write('parentTopicId: $parentTopicId, ')
+          ..write('category: $category')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(topicId, name, parentTopicId, category);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Topic &&
+          other.topicId == this.topicId &&
+          other.name == this.name &&
+          other.parentTopicId == this.parentTopicId &&
+          other.category == this.category);
+}
+
+class TopicsCompanion extends UpdateCompanion<Topic> {
+  final Value<String> topicId;
+  final Value<String> name;
+  final Value<String?> parentTopicId;
+  final Value<String> category;
+  final Value<int> rowid;
+  const TopicsCompanion({
+    this.topicId = const Value.absent(),
+    this.name = const Value.absent(),
+    this.parentTopicId = const Value.absent(),
+    this.category = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  TopicsCompanion.insert({
+    required String topicId,
+    required String name,
+    this.parentTopicId = const Value.absent(),
+    this.category = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : topicId = Value(topicId),
+       name = Value(name);
+  static Insertable<Topic> custom({
+    Expression<String>? topicId,
+    Expression<String>? name,
+    Expression<String>? parentTopicId,
+    Expression<String>? category,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (topicId != null) 'topic_id': topicId,
+      if (name != null) 'name': name,
+      if (parentTopicId != null) 'parent_topic_id': parentTopicId,
+      if (category != null) 'category': category,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  TopicsCompanion copyWith({
+    Value<String>? topicId,
+    Value<String>? name,
+    Value<String?>? parentTopicId,
+    Value<String>? category,
+    Value<int>? rowid,
+  }) {
+    return TopicsCompanion(
+      topicId: topicId ?? this.topicId,
+      name: name ?? this.name,
+      parentTopicId: parentTopicId ?? this.parentTopicId,
+      category: category ?? this.category,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (topicId.present) {
+      map['topic_id'] = Variable<String>(topicId.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (parentTopicId.present) {
+      map['parent_topic_id'] = Variable<String>(parentTopicId.value);
+    }
+    if (category.present) {
+      map['category'] = Variable<String>(category.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('TopicsCompanion(')
+          ..write('topicId: $topicId, ')
+          ..write('name: $name, ')
+          ..write('parentTopicId: $parentTopicId, ')
+          ..write('category: $category, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $TopicAyahsTable extends TopicAyahs
+    with TableInfo<$TopicAyahsTable, TopicAyah> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $TopicAyahsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _topicIdMeta = const VerificationMeta(
+    'topicId',
+  );
+  @override
+  late final GeneratedColumn<String> topicId = GeneratedColumn<String>(
+    'topic_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'REFERENCES topics(topic_id)',
+  );
+  static const VerificationMeta _surahNumberMeta = const VerificationMeta(
+    'surahNumber',
+  );
+  @override
+  late final GeneratedColumn<int> surahNumber = GeneratedColumn<int>(
+    'surah_number',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _ayahNumberMeta = const VerificationMeta(
+    'ayahNumber',
+  );
+  @override
+  late final GeneratedColumn<int> ayahNumber = GeneratedColumn<int>(
+    'ayah_number',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [topicId, surahNumber, ayahNumber];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'topic_ayahs';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<TopicAyah> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('topic_id')) {
+      context.handle(
+        _topicIdMeta,
+        topicId.isAcceptableOrUnknown(data['topic_id']!, _topicIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_topicIdMeta);
+    }
+    if (data.containsKey('surah_number')) {
+      context.handle(
+        _surahNumberMeta,
+        surahNumber.isAcceptableOrUnknown(
+          data['surah_number']!,
+          _surahNumberMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_surahNumberMeta);
+    }
+    if (data.containsKey('ayah_number')) {
+      context.handle(
+        _ayahNumberMeta,
+        ayahNumber.isAcceptableOrUnknown(data['ayah_number']!, _ayahNumberMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_ayahNumberMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {topicId, surahNumber, ayahNumber};
+  @override
+  TopicAyah map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return TopicAyah(
+      topicId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}topic_id'],
+      )!,
+      surahNumber: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}surah_number'],
+      )!,
+      ayahNumber: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}ayah_number'],
+      )!,
+    );
+  }
+
+  @override
+  $TopicAyahsTable createAlias(String alias) {
+    return $TopicAyahsTable(attachedDatabase, alias);
+  }
+}
+
+class TopicAyah extends DataClass implements Insertable<TopicAyah> {
+  final String topicId;
+  final int surahNumber;
+  final int ayahNumber;
+  const TopicAyah({
+    required this.topicId,
+    required this.surahNumber,
+    required this.ayahNumber,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['topic_id'] = Variable<String>(topicId);
+    map['surah_number'] = Variable<int>(surahNumber);
+    map['ayah_number'] = Variable<int>(ayahNumber);
+    return map;
+  }
+
+  TopicAyahsCompanion toCompanion(bool nullToAbsent) {
+    return TopicAyahsCompanion(
+      topicId: Value(topicId),
+      surahNumber: Value(surahNumber),
+      ayahNumber: Value(ayahNumber),
+    );
+  }
+
+  factory TopicAyah.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return TopicAyah(
+      topicId: serializer.fromJson<String>(json['topicId']),
+      surahNumber: serializer.fromJson<int>(json['surahNumber']),
+      ayahNumber: serializer.fromJson<int>(json['ayahNumber']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'topicId': serializer.toJson<String>(topicId),
+      'surahNumber': serializer.toJson<int>(surahNumber),
+      'ayahNumber': serializer.toJson<int>(ayahNumber),
+    };
+  }
+
+  TopicAyah copyWith({String? topicId, int? surahNumber, int? ayahNumber}) =>
+      TopicAyah(
+        topicId: topicId ?? this.topicId,
+        surahNumber: surahNumber ?? this.surahNumber,
+        ayahNumber: ayahNumber ?? this.ayahNumber,
+      );
+  TopicAyah copyWithCompanion(TopicAyahsCompanion data) {
+    return TopicAyah(
+      topicId: data.topicId.present ? data.topicId.value : this.topicId,
+      surahNumber: data.surahNumber.present
+          ? data.surahNumber.value
+          : this.surahNumber,
+      ayahNumber: data.ayahNumber.present
+          ? data.ayahNumber.value
+          : this.ayahNumber,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('TopicAyah(')
+          ..write('topicId: $topicId, ')
+          ..write('surahNumber: $surahNumber, ')
+          ..write('ayahNumber: $ayahNumber')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(topicId, surahNumber, ayahNumber);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is TopicAyah &&
+          other.topicId == this.topicId &&
+          other.surahNumber == this.surahNumber &&
+          other.ayahNumber == this.ayahNumber);
+}
+
+class TopicAyahsCompanion extends UpdateCompanion<TopicAyah> {
+  final Value<String> topicId;
+  final Value<int> surahNumber;
+  final Value<int> ayahNumber;
+  final Value<int> rowid;
+  const TopicAyahsCompanion({
+    this.topicId = const Value.absent(),
+    this.surahNumber = const Value.absent(),
+    this.ayahNumber = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  TopicAyahsCompanion.insert({
+    required String topicId,
+    required int surahNumber,
+    required int ayahNumber,
+    this.rowid = const Value.absent(),
+  }) : topicId = Value(topicId),
+       surahNumber = Value(surahNumber),
+       ayahNumber = Value(ayahNumber);
+  static Insertable<TopicAyah> custom({
+    Expression<String>? topicId,
+    Expression<int>? surahNumber,
+    Expression<int>? ayahNumber,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (topicId != null) 'topic_id': topicId,
+      if (surahNumber != null) 'surah_number': surahNumber,
+      if (ayahNumber != null) 'ayah_number': ayahNumber,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  TopicAyahsCompanion copyWith({
+    Value<String>? topicId,
+    Value<int>? surahNumber,
+    Value<int>? ayahNumber,
+    Value<int>? rowid,
+  }) {
+    return TopicAyahsCompanion(
+      topicId: topicId ?? this.topicId,
+      surahNumber: surahNumber ?? this.surahNumber,
+      ayahNumber: ayahNumber ?? this.ayahNumber,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (topicId.present) {
+      map['topic_id'] = Variable<String>(topicId.value);
+    }
+    if (surahNumber.present) {
+      map['surah_number'] = Variable<int>(surahNumber.value);
+    }
+    if (ayahNumber.present) {
+      map['ayah_number'] = Variable<int>(ayahNumber.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('TopicAyahsCompanion(')
+          ..write('topicId: $topicId, ')
+          ..write('surahNumber: $surahNumber, ')
+          ..write('ayahNumber: $ayahNumber, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $CrossReferencesTable extends CrossReferences
+    with TableInfo<$CrossReferencesTable, CrossReference> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CrossReferencesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _sourceSurahMeta = const VerificationMeta(
+    'sourceSurah',
+  );
+  @override
+  late final GeneratedColumn<int> sourceSurah = GeneratedColumn<int>(
+    'source_surah',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _sourceAyahMeta = const VerificationMeta(
+    'sourceAyah',
+  );
+  @override
+  late final GeneratedColumn<int> sourceAyah = GeneratedColumn<int>(
+    'source_ayah',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _targetSurahMeta = const VerificationMeta(
+    'targetSurah',
+  );
+  @override
+  late final GeneratedColumn<int> targetSurah = GeneratedColumn<int>(
+    'target_surah',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _targetAyahMeta = const VerificationMeta(
+    'targetAyah',
+  );
+  @override
+  late final GeneratedColumn<int> targetAyah = GeneratedColumn<int>(
+    'target_ayah',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _relationshipTypeMeta = const VerificationMeta(
+    'relationshipType',
+  );
+  @override
+  late final GeneratedColumn<String> relationshipType = GeneratedColumn<String>(
+    'relationship_type',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _notesMeta = const VerificationMeta('notes');
+  @override
+  late final GeneratedColumn<String> notes = GeneratedColumn<String>(
+    'notes',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    sourceSurah,
+    sourceAyah,
+    targetSurah,
+    targetAyah,
+    relationshipType,
+    notes,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'cross_references';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<CrossReference> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('source_surah')) {
+      context.handle(
+        _sourceSurahMeta,
+        sourceSurah.isAcceptableOrUnknown(
+          data['source_surah']!,
+          _sourceSurahMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_sourceSurahMeta);
+    }
+    if (data.containsKey('source_ayah')) {
+      context.handle(
+        _sourceAyahMeta,
+        sourceAyah.isAcceptableOrUnknown(data['source_ayah']!, _sourceAyahMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_sourceAyahMeta);
+    }
+    if (data.containsKey('target_surah')) {
+      context.handle(
+        _targetSurahMeta,
+        targetSurah.isAcceptableOrUnknown(
+          data['target_surah']!,
+          _targetSurahMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_targetSurahMeta);
+    }
+    if (data.containsKey('target_ayah')) {
+      context.handle(
+        _targetAyahMeta,
+        targetAyah.isAcceptableOrUnknown(data['target_ayah']!, _targetAyahMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_targetAyahMeta);
+    }
+    if (data.containsKey('relationship_type')) {
+      context.handle(
+        _relationshipTypeMeta,
+        relationshipType.isAcceptableOrUnknown(
+          data['relationship_type']!,
+          _relationshipTypeMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_relationshipTypeMeta);
+    }
+    if (data.containsKey('notes')) {
+      context.handle(
+        _notesMeta,
+        notes.isAcceptableOrUnknown(data['notes']!, _notesMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  CrossReference map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return CrossReference(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      sourceSurah: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}source_surah'],
+      )!,
+      sourceAyah: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}source_ayah'],
+      )!,
+      targetSurah: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}target_surah'],
+      )!,
+      targetAyah: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}target_ayah'],
+      )!,
+      relationshipType: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}relationship_type'],
+      )!,
+      notes: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}notes'],
+      )!,
+    );
+  }
+
+  @override
+  $CrossReferencesTable createAlias(String alias) {
+    return $CrossReferencesTable(attachedDatabase, alias);
+  }
+}
+
+class CrossReference extends DataClass implements Insertable<CrossReference> {
+  final int id;
+  final int sourceSurah;
+  final int sourceAyah;
+  final int targetSurah;
+  final int targetAyah;
+  final String relationshipType;
+  final String notes;
+  const CrossReference({
+    required this.id,
+    required this.sourceSurah,
+    required this.sourceAyah,
+    required this.targetSurah,
+    required this.targetAyah,
+    required this.relationshipType,
+    required this.notes,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['source_surah'] = Variable<int>(sourceSurah);
+    map['source_ayah'] = Variable<int>(sourceAyah);
+    map['target_surah'] = Variable<int>(targetSurah);
+    map['target_ayah'] = Variable<int>(targetAyah);
+    map['relationship_type'] = Variable<String>(relationshipType);
+    map['notes'] = Variable<String>(notes);
+    return map;
+  }
+
+  CrossReferencesCompanion toCompanion(bool nullToAbsent) {
+    return CrossReferencesCompanion(
+      id: Value(id),
+      sourceSurah: Value(sourceSurah),
+      sourceAyah: Value(sourceAyah),
+      targetSurah: Value(targetSurah),
+      targetAyah: Value(targetAyah),
+      relationshipType: Value(relationshipType),
+      notes: Value(notes),
+    );
+  }
+
+  factory CrossReference.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return CrossReference(
+      id: serializer.fromJson<int>(json['id']),
+      sourceSurah: serializer.fromJson<int>(json['sourceSurah']),
+      sourceAyah: serializer.fromJson<int>(json['sourceAyah']),
+      targetSurah: serializer.fromJson<int>(json['targetSurah']),
+      targetAyah: serializer.fromJson<int>(json['targetAyah']),
+      relationshipType: serializer.fromJson<String>(json['relationshipType']),
+      notes: serializer.fromJson<String>(json['notes']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'sourceSurah': serializer.toJson<int>(sourceSurah),
+      'sourceAyah': serializer.toJson<int>(sourceAyah),
+      'targetSurah': serializer.toJson<int>(targetSurah),
+      'targetAyah': serializer.toJson<int>(targetAyah),
+      'relationshipType': serializer.toJson<String>(relationshipType),
+      'notes': serializer.toJson<String>(notes),
+    };
+  }
+
+  CrossReference copyWith({
+    int? id,
+    int? sourceSurah,
+    int? sourceAyah,
+    int? targetSurah,
+    int? targetAyah,
+    String? relationshipType,
+    String? notes,
+  }) => CrossReference(
+    id: id ?? this.id,
+    sourceSurah: sourceSurah ?? this.sourceSurah,
+    sourceAyah: sourceAyah ?? this.sourceAyah,
+    targetSurah: targetSurah ?? this.targetSurah,
+    targetAyah: targetAyah ?? this.targetAyah,
+    relationshipType: relationshipType ?? this.relationshipType,
+    notes: notes ?? this.notes,
+  );
+  CrossReference copyWithCompanion(CrossReferencesCompanion data) {
+    return CrossReference(
+      id: data.id.present ? data.id.value : this.id,
+      sourceSurah: data.sourceSurah.present
+          ? data.sourceSurah.value
+          : this.sourceSurah,
+      sourceAyah: data.sourceAyah.present
+          ? data.sourceAyah.value
+          : this.sourceAyah,
+      targetSurah: data.targetSurah.present
+          ? data.targetSurah.value
+          : this.targetSurah,
+      targetAyah: data.targetAyah.present
+          ? data.targetAyah.value
+          : this.targetAyah,
+      relationshipType: data.relationshipType.present
+          ? data.relationshipType.value
+          : this.relationshipType,
+      notes: data.notes.present ? data.notes.value : this.notes,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CrossReference(')
+          ..write('id: $id, ')
+          ..write('sourceSurah: $sourceSurah, ')
+          ..write('sourceAyah: $sourceAyah, ')
+          ..write('targetSurah: $targetSurah, ')
+          ..write('targetAyah: $targetAyah, ')
+          ..write('relationshipType: $relationshipType, ')
+          ..write('notes: $notes')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    sourceSurah,
+    sourceAyah,
+    targetSurah,
+    targetAyah,
+    relationshipType,
+    notes,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is CrossReference &&
+          other.id == this.id &&
+          other.sourceSurah == this.sourceSurah &&
+          other.sourceAyah == this.sourceAyah &&
+          other.targetSurah == this.targetSurah &&
+          other.targetAyah == this.targetAyah &&
+          other.relationshipType == this.relationshipType &&
+          other.notes == this.notes);
+}
+
+class CrossReferencesCompanion extends UpdateCompanion<CrossReference> {
+  final Value<int> id;
+  final Value<int> sourceSurah;
+  final Value<int> sourceAyah;
+  final Value<int> targetSurah;
+  final Value<int> targetAyah;
+  final Value<String> relationshipType;
+  final Value<String> notes;
+  const CrossReferencesCompanion({
+    this.id = const Value.absent(),
+    this.sourceSurah = const Value.absent(),
+    this.sourceAyah = const Value.absent(),
+    this.targetSurah = const Value.absent(),
+    this.targetAyah = const Value.absent(),
+    this.relationshipType = const Value.absent(),
+    this.notes = const Value.absent(),
+  });
+  CrossReferencesCompanion.insert({
+    this.id = const Value.absent(),
+    required int sourceSurah,
+    required int sourceAyah,
+    required int targetSurah,
+    required int targetAyah,
+    required String relationshipType,
+    this.notes = const Value.absent(),
+  }) : sourceSurah = Value(sourceSurah),
+       sourceAyah = Value(sourceAyah),
+       targetSurah = Value(targetSurah),
+       targetAyah = Value(targetAyah),
+       relationshipType = Value(relationshipType);
+  static Insertable<CrossReference> custom({
+    Expression<int>? id,
+    Expression<int>? sourceSurah,
+    Expression<int>? sourceAyah,
+    Expression<int>? targetSurah,
+    Expression<int>? targetAyah,
+    Expression<String>? relationshipType,
+    Expression<String>? notes,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (sourceSurah != null) 'source_surah': sourceSurah,
+      if (sourceAyah != null) 'source_ayah': sourceAyah,
+      if (targetSurah != null) 'target_surah': targetSurah,
+      if (targetAyah != null) 'target_ayah': targetAyah,
+      if (relationshipType != null) 'relationship_type': relationshipType,
+      if (notes != null) 'notes': notes,
+    });
+  }
+
+  CrossReferencesCompanion copyWith({
+    Value<int>? id,
+    Value<int>? sourceSurah,
+    Value<int>? sourceAyah,
+    Value<int>? targetSurah,
+    Value<int>? targetAyah,
+    Value<String>? relationshipType,
+    Value<String>? notes,
+  }) {
+    return CrossReferencesCompanion(
+      id: id ?? this.id,
+      sourceSurah: sourceSurah ?? this.sourceSurah,
+      sourceAyah: sourceAyah ?? this.sourceAyah,
+      targetSurah: targetSurah ?? this.targetSurah,
+      targetAyah: targetAyah ?? this.targetAyah,
+      relationshipType: relationshipType ?? this.relationshipType,
+      notes: notes ?? this.notes,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (sourceSurah.present) {
+      map['source_surah'] = Variable<int>(sourceSurah.value);
+    }
+    if (sourceAyah.present) {
+      map['source_ayah'] = Variable<int>(sourceAyah.value);
+    }
+    if (targetSurah.present) {
+      map['target_surah'] = Variable<int>(targetSurah.value);
+    }
+    if (targetAyah.present) {
+      map['target_ayah'] = Variable<int>(targetAyah.value);
+    }
+    if (relationshipType.present) {
+      map['relationship_type'] = Variable<String>(relationshipType.value);
+    }
+    if (notes.present) {
+      map['notes'] = Variable<String>(notes.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CrossReferencesCompanion(')
+          ..write('id: $id, ')
+          ..write('sourceSurah: $sourceSurah, ')
+          ..write('sourceAyah: $sourceAyah, ')
+          ..write('targetSurah: $targetSurah, ')
+          ..write('targetAyah: $targetAyah, ')
+          ..write('relationshipType: $relationshipType, ')
+          ..write('notes: $notes')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $AsbabAlNuzulTable extends AsbabAlNuzul
+    with TableInfo<$AsbabAlNuzulTable, AsbabAlNuzulEntry> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $AsbabAlNuzulTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _surahNumberMeta = const VerificationMeta(
+    'surahNumber',
+  );
+  @override
+  late final GeneratedColumn<int> surahNumber = GeneratedColumn<int>(
+    'surah_number',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _startAyahMeta = const VerificationMeta(
+    'startAyah',
+  );
+  @override
+  late final GeneratedColumn<int> startAyah = GeneratedColumn<int>(
+    'start_ayah',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _endAyahMeta = const VerificationMeta(
+    'endAyah',
+  );
+  @override
+  late final GeneratedColumn<int> endAyah = GeneratedColumn<int>(
+    'end_ayah',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _textContentMeta = const VerificationMeta(
+    'textContent',
+  );
+  @override
+  late final GeneratedColumn<String> textContent = GeneratedColumn<String>(
+    'text_content',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _sourceNoteMeta = const VerificationMeta(
+    'sourceNote',
+  );
+  @override
+  late final GeneratedColumn<String> sourceNote = GeneratedColumn<String>(
+    'source_note',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    surahNumber,
+    startAyah,
+    endAyah,
+    textContent,
+    sourceNote,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'asbab_al_nuzul';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<AsbabAlNuzulEntry> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('surah_number')) {
+      context.handle(
+        _surahNumberMeta,
+        surahNumber.isAcceptableOrUnknown(
+          data['surah_number']!,
+          _surahNumberMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_surahNumberMeta);
+    }
+    if (data.containsKey('start_ayah')) {
+      context.handle(
+        _startAyahMeta,
+        startAyah.isAcceptableOrUnknown(data['start_ayah']!, _startAyahMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_startAyahMeta);
+    }
+    if (data.containsKey('end_ayah')) {
+      context.handle(
+        _endAyahMeta,
+        endAyah.isAcceptableOrUnknown(data['end_ayah']!, _endAyahMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_endAyahMeta);
+    }
+    if (data.containsKey('text_content')) {
+      context.handle(
+        _textContentMeta,
+        textContent.isAcceptableOrUnknown(
+          data['text_content']!,
+          _textContentMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_textContentMeta);
+    }
+    if (data.containsKey('source_note')) {
+      context.handle(
+        _sourceNoteMeta,
+        sourceNote.isAcceptableOrUnknown(data['source_note']!, _sourceNoteMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_sourceNoteMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  AsbabAlNuzulEntry map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return AsbabAlNuzulEntry(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      surahNumber: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}surah_number'],
+      )!,
+      startAyah: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}start_ayah'],
+      )!,
+      endAyah: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}end_ayah'],
+      )!,
+      textContent: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}text_content'],
+      )!,
+      sourceNote: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}source_note'],
+      )!,
+    );
+  }
+
+  @override
+  $AsbabAlNuzulTable createAlias(String alias) {
+    return $AsbabAlNuzulTable(attachedDatabase, alias);
+  }
+}
+
+class AsbabAlNuzulEntry extends DataClass
+    implements Insertable<AsbabAlNuzulEntry> {
+  final int id;
+  final int surahNumber;
+  final int startAyah;
+  final int endAyah;
+  final String textContent;
+  final String sourceNote;
+  const AsbabAlNuzulEntry({
+    required this.id,
+    required this.surahNumber,
+    required this.startAyah,
+    required this.endAyah,
+    required this.textContent,
+    required this.sourceNote,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['surah_number'] = Variable<int>(surahNumber);
+    map['start_ayah'] = Variable<int>(startAyah);
+    map['end_ayah'] = Variable<int>(endAyah);
+    map['text_content'] = Variable<String>(textContent);
+    map['source_note'] = Variable<String>(sourceNote);
+    return map;
+  }
+
+  AsbabAlNuzulCompanion toCompanion(bool nullToAbsent) {
+    return AsbabAlNuzulCompanion(
+      id: Value(id),
+      surahNumber: Value(surahNumber),
+      startAyah: Value(startAyah),
+      endAyah: Value(endAyah),
+      textContent: Value(textContent),
+      sourceNote: Value(sourceNote),
+    );
+  }
+
+  factory AsbabAlNuzulEntry.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return AsbabAlNuzulEntry(
+      id: serializer.fromJson<int>(json['id']),
+      surahNumber: serializer.fromJson<int>(json['surahNumber']),
+      startAyah: serializer.fromJson<int>(json['startAyah']),
+      endAyah: serializer.fromJson<int>(json['endAyah']),
+      textContent: serializer.fromJson<String>(json['textContent']),
+      sourceNote: serializer.fromJson<String>(json['sourceNote']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'surahNumber': serializer.toJson<int>(surahNumber),
+      'startAyah': serializer.toJson<int>(startAyah),
+      'endAyah': serializer.toJson<int>(endAyah),
+      'textContent': serializer.toJson<String>(textContent),
+      'sourceNote': serializer.toJson<String>(sourceNote),
+    };
+  }
+
+  AsbabAlNuzulEntry copyWith({
+    int? id,
+    int? surahNumber,
+    int? startAyah,
+    int? endAyah,
+    String? textContent,
+    String? sourceNote,
+  }) => AsbabAlNuzulEntry(
+    id: id ?? this.id,
+    surahNumber: surahNumber ?? this.surahNumber,
+    startAyah: startAyah ?? this.startAyah,
+    endAyah: endAyah ?? this.endAyah,
+    textContent: textContent ?? this.textContent,
+    sourceNote: sourceNote ?? this.sourceNote,
+  );
+  AsbabAlNuzulEntry copyWithCompanion(AsbabAlNuzulCompanion data) {
+    return AsbabAlNuzulEntry(
+      id: data.id.present ? data.id.value : this.id,
+      surahNumber: data.surahNumber.present
+          ? data.surahNumber.value
+          : this.surahNumber,
+      startAyah: data.startAyah.present ? data.startAyah.value : this.startAyah,
+      endAyah: data.endAyah.present ? data.endAyah.value : this.endAyah,
+      textContent: data.textContent.present
+          ? data.textContent.value
+          : this.textContent,
+      sourceNote: data.sourceNote.present
+          ? data.sourceNote.value
+          : this.sourceNote,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AsbabAlNuzulEntry(')
+          ..write('id: $id, ')
+          ..write('surahNumber: $surahNumber, ')
+          ..write('startAyah: $startAyah, ')
+          ..write('endAyah: $endAyah, ')
+          ..write('textContent: $textContent, ')
+          ..write('sourceNote: $sourceNote')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, surahNumber, startAyah, endAyah, textContent, sourceNote);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is AsbabAlNuzulEntry &&
+          other.id == this.id &&
+          other.surahNumber == this.surahNumber &&
+          other.startAyah == this.startAyah &&
+          other.endAyah == this.endAyah &&
+          other.textContent == this.textContent &&
+          other.sourceNote == this.sourceNote);
+}
+
+class AsbabAlNuzulCompanion extends UpdateCompanion<AsbabAlNuzulEntry> {
+  final Value<int> id;
+  final Value<int> surahNumber;
+  final Value<int> startAyah;
+  final Value<int> endAyah;
+  final Value<String> textContent;
+  final Value<String> sourceNote;
+  const AsbabAlNuzulCompanion({
+    this.id = const Value.absent(),
+    this.surahNumber = const Value.absent(),
+    this.startAyah = const Value.absent(),
+    this.endAyah = const Value.absent(),
+    this.textContent = const Value.absent(),
+    this.sourceNote = const Value.absent(),
+  });
+  AsbabAlNuzulCompanion.insert({
+    this.id = const Value.absent(),
+    required int surahNumber,
+    required int startAyah,
+    required int endAyah,
+    required String textContent,
+    required String sourceNote,
+  }) : surahNumber = Value(surahNumber),
+       startAyah = Value(startAyah),
+       endAyah = Value(endAyah),
+       textContent = Value(textContent),
+       sourceNote = Value(sourceNote);
+  static Insertable<AsbabAlNuzulEntry> custom({
+    Expression<int>? id,
+    Expression<int>? surahNumber,
+    Expression<int>? startAyah,
+    Expression<int>? endAyah,
+    Expression<String>? textContent,
+    Expression<String>? sourceNote,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (surahNumber != null) 'surah_number': surahNumber,
+      if (startAyah != null) 'start_ayah': startAyah,
+      if (endAyah != null) 'end_ayah': endAyah,
+      if (textContent != null) 'text_content': textContent,
+      if (sourceNote != null) 'source_note': sourceNote,
+    });
+  }
+
+  AsbabAlNuzulCompanion copyWith({
+    Value<int>? id,
+    Value<int>? surahNumber,
+    Value<int>? startAyah,
+    Value<int>? endAyah,
+    Value<String>? textContent,
+    Value<String>? sourceNote,
+  }) {
+    return AsbabAlNuzulCompanion(
+      id: id ?? this.id,
+      surahNumber: surahNumber ?? this.surahNumber,
+      startAyah: startAyah ?? this.startAyah,
+      endAyah: endAyah ?? this.endAyah,
+      textContent: textContent ?? this.textContent,
+      sourceNote: sourceNote ?? this.sourceNote,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (surahNumber.present) {
+      map['surah_number'] = Variable<int>(surahNumber.value);
+    }
+    if (startAyah.present) {
+      map['start_ayah'] = Variable<int>(startAyah.value);
+    }
+    if (endAyah.present) {
+      map['end_ayah'] = Variable<int>(endAyah.value);
+    }
+    if (textContent.present) {
+      map['text_content'] = Variable<String>(textContent.value);
+    }
+    if (sourceNote.present) {
+      map['source_note'] = Variable<String>(sourceNote.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AsbabAlNuzulCompanion(')
+          ..write('id: $id, ')
+          ..write('surahNumber: $surahNumber, ')
+          ..write('startAyah: $startAyah, ')
+          ..write('endAyah: $endAyah, ')
+          ..write('textContent: $textContent, ')
+          ..write('sourceNote: $sourceNote')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -3915,12 +5394,19 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $ContentPacksTable contentPacks = $ContentPacksTable(this);
   late final $TafsirsMetaTable tafsirsMeta = $TafsirsMetaTable(this);
   late final $TafsirContentTable tafsirContent = $TafsirContentTable(this);
+  late final $TopicsTable topics = $TopicsTable(this);
+  late final $TopicAyahsTable topicAyahs = $TopicAyahsTable(this);
+  late final $CrossReferencesTable crossReferences = $CrossReferencesTable(
+    this,
+  );
+  late final $AsbabAlNuzulTable asbabAlNuzul = $AsbabAlNuzulTable(this);
   late final QuranDao quranDao = QuranDao(this as AppDatabase);
   late final SearchDao searchDao = SearchDao(this as AppDatabase);
   late final ContentPackDao contentPackDao = ContentPackDao(
     this as AppDatabase,
   );
   late final TafsirDao tafsirDao = TafsirDao(this as AppDatabase);
+  late final ThematicDao thematicDao = ThematicDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -3935,6 +5421,10 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     contentPacks,
     tafsirsMeta,
     tafsirContent,
+    topics,
+    topicAyahs,
+    crossReferences,
+    asbabAlNuzul,
   ];
 }
 
@@ -6191,6 +7681,1036 @@ typedef $$TafsirContentTableProcessedTableManager =
       TafsirContentData,
       PrefetchHooks Function()
     >;
+typedef $$TopicsTableCreateCompanionBuilder =
+    TopicsCompanion Function({
+      required String topicId,
+      required String name,
+      Value<String?> parentTopicId,
+      Value<String> category,
+      Value<int> rowid,
+    });
+typedef $$TopicsTableUpdateCompanionBuilder =
+    TopicsCompanion Function({
+      Value<String> topicId,
+      Value<String> name,
+      Value<String?> parentTopicId,
+      Value<String> category,
+      Value<int> rowid,
+    });
+
+final class $$TopicsTableReferences
+    extends BaseReferences<_$AppDatabase, $TopicsTable, Topic> {
+  $$TopicsTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static MultiTypedResultKey<$TopicAyahsTable, List<TopicAyah>>
+  _topicAyahsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.topicAyahs,
+    aliasName: $_aliasNameGenerator(db.topics.topicId, db.topicAyahs.topicId),
+  );
+
+  $$TopicAyahsTableProcessedTableManager get topicAyahsRefs {
+    final manager = $$TopicAyahsTableTableManager($_db, $_db.topicAyahs).filter(
+      (f) => f.topicId.topicId.sqlEquals($_itemColumn<String>('topic_id')!),
+    );
+
+    final cache = $_typedResult.readTableOrNull(_topicAyahsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$TopicsTableFilterComposer
+    extends Composer<_$AppDatabase, $TopicsTable> {
+  $$TopicsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get topicId => $composableBuilder(
+    column: $table.topicId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get parentTopicId => $composableBuilder(
+    column: $table.parentTopicId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get category => $composableBuilder(
+    column: $table.category,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  Expression<bool> topicAyahsRefs(
+    Expression<bool> Function($$TopicAyahsTableFilterComposer f) f,
+  ) {
+    final $$TopicAyahsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.topicId,
+      referencedTable: $db.topicAyahs,
+      getReferencedColumn: (t) => t.topicId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TopicAyahsTableFilterComposer(
+            $db: $db,
+            $table: $db.topicAyahs,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$TopicsTableOrderingComposer
+    extends Composer<_$AppDatabase, $TopicsTable> {
+  $$TopicsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get topicId => $composableBuilder(
+    column: $table.topicId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get parentTopicId => $composableBuilder(
+    column: $table.parentTopicId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get category => $composableBuilder(
+    column: $table.category,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$TopicsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $TopicsTable> {
+  $$TopicsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get topicId =>
+      $composableBuilder(column: $table.topicId, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get parentTopicId => $composableBuilder(
+    column: $table.parentTopicId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get category =>
+      $composableBuilder(column: $table.category, builder: (column) => column);
+
+  Expression<T> topicAyahsRefs<T extends Object>(
+    Expression<T> Function($$TopicAyahsTableAnnotationComposer a) f,
+  ) {
+    final $$TopicAyahsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.topicId,
+      referencedTable: $db.topicAyahs,
+      getReferencedColumn: (t) => t.topicId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TopicAyahsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.topicAyahs,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$TopicsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $TopicsTable,
+          Topic,
+          $$TopicsTableFilterComposer,
+          $$TopicsTableOrderingComposer,
+          $$TopicsTableAnnotationComposer,
+          $$TopicsTableCreateCompanionBuilder,
+          $$TopicsTableUpdateCompanionBuilder,
+          (Topic, $$TopicsTableReferences),
+          Topic,
+          PrefetchHooks Function({bool topicAyahsRefs})
+        > {
+  $$TopicsTableTableManager(_$AppDatabase db, $TopicsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$TopicsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$TopicsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$TopicsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> topicId = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<String?> parentTopicId = const Value.absent(),
+                Value<String> category = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => TopicsCompanion(
+                topicId: topicId,
+                name: name,
+                parentTopicId: parentTopicId,
+                category: category,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String topicId,
+                required String name,
+                Value<String?> parentTopicId = const Value.absent(),
+                Value<String> category = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => TopicsCompanion.insert(
+                topicId: topicId,
+                name: name,
+                parentTopicId: parentTopicId,
+                category: category,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) =>
+                    (e.readTable(table), $$TopicsTableReferences(db, table, e)),
+              )
+              .toList(),
+          prefetchHooksCallback: ({topicAyahsRefs = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [if (topicAyahsRefs) db.topicAyahs],
+              addJoins: null,
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (topicAyahsRefs)
+                    await $_getPrefetchedData<Topic, $TopicsTable, TopicAyah>(
+                      currentTable: table,
+                      referencedTable: $$TopicsTableReferences
+                          ._topicAyahsRefsTable(db),
+                      managerFromTypedResult: (p0) =>
+                          $$TopicsTableReferences(db, table, p0).topicAyahsRefs,
+                      referencedItemsForCurrentItem: (item, referencedItems) =>
+                          referencedItems.where(
+                            (e) => e.topicId == item.topicId,
+                          ),
+                      typedResults: items,
+                    ),
+                ];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$TopicsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $TopicsTable,
+      Topic,
+      $$TopicsTableFilterComposer,
+      $$TopicsTableOrderingComposer,
+      $$TopicsTableAnnotationComposer,
+      $$TopicsTableCreateCompanionBuilder,
+      $$TopicsTableUpdateCompanionBuilder,
+      (Topic, $$TopicsTableReferences),
+      Topic,
+      PrefetchHooks Function({bool topicAyahsRefs})
+    >;
+typedef $$TopicAyahsTableCreateCompanionBuilder =
+    TopicAyahsCompanion Function({
+      required String topicId,
+      required int surahNumber,
+      required int ayahNumber,
+      Value<int> rowid,
+    });
+typedef $$TopicAyahsTableUpdateCompanionBuilder =
+    TopicAyahsCompanion Function({
+      Value<String> topicId,
+      Value<int> surahNumber,
+      Value<int> ayahNumber,
+      Value<int> rowid,
+    });
+
+final class $$TopicAyahsTableReferences
+    extends BaseReferences<_$AppDatabase, $TopicAyahsTable, TopicAyah> {
+  $$TopicAyahsTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $TopicsTable _topicIdTable(_$AppDatabase db) => db.topics.createAlias(
+    $_aliasNameGenerator(db.topicAyahs.topicId, db.topics.topicId),
+  );
+
+  $$TopicsTableProcessedTableManager get topicId {
+    final $_column = $_itemColumn<String>('topic_id')!;
+
+    final manager = $$TopicsTableTableManager(
+      $_db,
+      $_db.topics,
+    ).filter((f) => f.topicId.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_topicIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$TopicAyahsTableFilterComposer
+    extends Composer<_$AppDatabase, $TopicAyahsTable> {
+  $$TopicAyahsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get surahNumber => $composableBuilder(
+    column: $table.surahNumber,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get ayahNumber => $composableBuilder(
+    column: $table.ayahNumber,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$TopicsTableFilterComposer get topicId {
+    final $$TopicsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.topicId,
+      referencedTable: $db.topics,
+      getReferencedColumn: (t) => t.topicId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TopicsTableFilterComposer(
+            $db: $db,
+            $table: $db.topics,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$TopicAyahsTableOrderingComposer
+    extends Composer<_$AppDatabase, $TopicAyahsTable> {
+  $$TopicAyahsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get surahNumber => $composableBuilder(
+    column: $table.surahNumber,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get ayahNumber => $composableBuilder(
+    column: $table.ayahNumber,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$TopicsTableOrderingComposer get topicId {
+    final $$TopicsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.topicId,
+      referencedTable: $db.topics,
+      getReferencedColumn: (t) => t.topicId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TopicsTableOrderingComposer(
+            $db: $db,
+            $table: $db.topics,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$TopicAyahsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $TopicAyahsTable> {
+  $$TopicAyahsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get surahNumber => $composableBuilder(
+    column: $table.surahNumber,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get ayahNumber => $composableBuilder(
+    column: $table.ayahNumber,
+    builder: (column) => column,
+  );
+
+  $$TopicsTableAnnotationComposer get topicId {
+    final $$TopicsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.topicId,
+      referencedTable: $db.topics,
+      getReferencedColumn: (t) => t.topicId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TopicsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.topics,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$TopicAyahsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $TopicAyahsTable,
+          TopicAyah,
+          $$TopicAyahsTableFilterComposer,
+          $$TopicAyahsTableOrderingComposer,
+          $$TopicAyahsTableAnnotationComposer,
+          $$TopicAyahsTableCreateCompanionBuilder,
+          $$TopicAyahsTableUpdateCompanionBuilder,
+          (TopicAyah, $$TopicAyahsTableReferences),
+          TopicAyah,
+          PrefetchHooks Function({bool topicId})
+        > {
+  $$TopicAyahsTableTableManager(_$AppDatabase db, $TopicAyahsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$TopicAyahsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$TopicAyahsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$TopicAyahsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> topicId = const Value.absent(),
+                Value<int> surahNumber = const Value.absent(),
+                Value<int> ayahNumber = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => TopicAyahsCompanion(
+                topicId: topicId,
+                surahNumber: surahNumber,
+                ayahNumber: ayahNumber,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String topicId,
+                required int surahNumber,
+                required int ayahNumber,
+                Value<int> rowid = const Value.absent(),
+              }) => TopicAyahsCompanion.insert(
+                topicId: topicId,
+                surahNumber: surahNumber,
+                ayahNumber: ayahNumber,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$TopicAyahsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({topicId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (topicId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.topicId,
+                                referencedTable: $$TopicAyahsTableReferences
+                                    ._topicIdTable(db),
+                                referencedColumn: $$TopicAyahsTableReferences
+                                    ._topicIdTable(db)
+                                    .topicId,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$TopicAyahsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $TopicAyahsTable,
+      TopicAyah,
+      $$TopicAyahsTableFilterComposer,
+      $$TopicAyahsTableOrderingComposer,
+      $$TopicAyahsTableAnnotationComposer,
+      $$TopicAyahsTableCreateCompanionBuilder,
+      $$TopicAyahsTableUpdateCompanionBuilder,
+      (TopicAyah, $$TopicAyahsTableReferences),
+      TopicAyah,
+      PrefetchHooks Function({bool topicId})
+    >;
+typedef $$CrossReferencesTableCreateCompanionBuilder =
+    CrossReferencesCompanion Function({
+      Value<int> id,
+      required int sourceSurah,
+      required int sourceAyah,
+      required int targetSurah,
+      required int targetAyah,
+      required String relationshipType,
+      Value<String> notes,
+    });
+typedef $$CrossReferencesTableUpdateCompanionBuilder =
+    CrossReferencesCompanion Function({
+      Value<int> id,
+      Value<int> sourceSurah,
+      Value<int> sourceAyah,
+      Value<int> targetSurah,
+      Value<int> targetAyah,
+      Value<String> relationshipType,
+      Value<String> notes,
+    });
+
+class $$CrossReferencesTableFilterComposer
+    extends Composer<_$AppDatabase, $CrossReferencesTable> {
+  $$CrossReferencesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get sourceSurah => $composableBuilder(
+    column: $table.sourceSurah,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get sourceAyah => $composableBuilder(
+    column: $table.sourceAyah,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get targetSurah => $composableBuilder(
+    column: $table.targetSurah,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get targetAyah => $composableBuilder(
+    column: $table.targetAyah,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get relationshipType => $composableBuilder(
+    column: $table.relationshipType,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get notes => $composableBuilder(
+    column: $table.notes,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$CrossReferencesTableOrderingComposer
+    extends Composer<_$AppDatabase, $CrossReferencesTable> {
+  $$CrossReferencesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get sourceSurah => $composableBuilder(
+    column: $table.sourceSurah,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get sourceAyah => $composableBuilder(
+    column: $table.sourceAyah,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get targetSurah => $composableBuilder(
+    column: $table.targetSurah,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get targetAyah => $composableBuilder(
+    column: $table.targetAyah,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get relationshipType => $composableBuilder(
+    column: $table.relationshipType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get notes => $composableBuilder(
+    column: $table.notes,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$CrossReferencesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $CrossReferencesTable> {
+  $$CrossReferencesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get sourceSurah => $composableBuilder(
+    column: $table.sourceSurah,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get sourceAyah => $composableBuilder(
+    column: $table.sourceAyah,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get targetSurah => $composableBuilder(
+    column: $table.targetSurah,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get targetAyah => $composableBuilder(
+    column: $table.targetAyah,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get relationshipType => $composableBuilder(
+    column: $table.relationshipType,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get notes =>
+      $composableBuilder(column: $table.notes, builder: (column) => column);
+}
+
+class $$CrossReferencesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $CrossReferencesTable,
+          CrossReference,
+          $$CrossReferencesTableFilterComposer,
+          $$CrossReferencesTableOrderingComposer,
+          $$CrossReferencesTableAnnotationComposer,
+          $$CrossReferencesTableCreateCompanionBuilder,
+          $$CrossReferencesTableUpdateCompanionBuilder,
+          (
+            CrossReference,
+            BaseReferences<
+              _$AppDatabase,
+              $CrossReferencesTable,
+              CrossReference
+            >,
+          ),
+          CrossReference,
+          PrefetchHooks Function()
+        > {
+  $$CrossReferencesTableTableManager(
+    _$AppDatabase db,
+    $CrossReferencesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$CrossReferencesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$CrossReferencesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$CrossReferencesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> sourceSurah = const Value.absent(),
+                Value<int> sourceAyah = const Value.absent(),
+                Value<int> targetSurah = const Value.absent(),
+                Value<int> targetAyah = const Value.absent(),
+                Value<String> relationshipType = const Value.absent(),
+                Value<String> notes = const Value.absent(),
+              }) => CrossReferencesCompanion(
+                id: id,
+                sourceSurah: sourceSurah,
+                sourceAyah: sourceAyah,
+                targetSurah: targetSurah,
+                targetAyah: targetAyah,
+                relationshipType: relationshipType,
+                notes: notes,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int sourceSurah,
+                required int sourceAyah,
+                required int targetSurah,
+                required int targetAyah,
+                required String relationshipType,
+                Value<String> notes = const Value.absent(),
+              }) => CrossReferencesCompanion.insert(
+                id: id,
+                sourceSurah: sourceSurah,
+                sourceAyah: sourceAyah,
+                targetSurah: targetSurah,
+                targetAyah: targetAyah,
+                relationshipType: relationshipType,
+                notes: notes,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$CrossReferencesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $CrossReferencesTable,
+      CrossReference,
+      $$CrossReferencesTableFilterComposer,
+      $$CrossReferencesTableOrderingComposer,
+      $$CrossReferencesTableAnnotationComposer,
+      $$CrossReferencesTableCreateCompanionBuilder,
+      $$CrossReferencesTableUpdateCompanionBuilder,
+      (
+        CrossReference,
+        BaseReferences<_$AppDatabase, $CrossReferencesTable, CrossReference>,
+      ),
+      CrossReference,
+      PrefetchHooks Function()
+    >;
+typedef $$AsbabAlNuzulTableCreateCompanionBuilder =
+    AsbabAlNuzulCompanion Function({
+      Value<int> id,
+      required int surahNumber,
+      required int startAyah,
+      required int endAyah,
+      required String textContent,
+      required String sourceNote,
+    });
+typedef $$AsbabAlNuzulTableUpdateCompanionBuilder =
+    AsbabAlNuzulCompanion Function({
+      Value<int> id,
+      Value<int> surahNumber,
+      Value<int> startAyah,
+      Value<int> endAyah,
+      Value<String> textContent,
+      Value<String> sourceNote,
+    });
+
+class $$AsbabAlNuzulTableFilterComposer
+    extends Composer<_$AppDatabase, $AsbabAlNuzulTable> {
+  $$AsbabAlNuzulTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get surahNumber => $composableBuilder(
+    column: $table.surahNumber,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get startAyah => $composableBuilder(
+    column: $table.startAyah,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get endAyah => $composableBuilder(
+    column: $table.endAyah,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get textContent => $composableBuilder(
+    column: $table.textContent,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get sourceNote => $composableBuilder(
+    column: $table.sourceNote,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$AsbabAlNuzulTableOrderingComposer
+    extends Composer<_$AppDatabase, $AsbabAlNuzulTable> {
+  $$AsbabAlNuzulTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get surahNumber => $composableBuilder(
+    column: $table.surahNumber,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get startAyah => $composableBuilder(
+    column: $table.startAyah,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get endAyah => $composableBuilder(
+    column: $table.endAyah,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get textContent => $composableBuilder(
+    column: $table.textContent,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get sourceNote => $composableBuilder(
+    column: $table.sourceNote,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$AsbabAlNuzulTableAnnotationComposer
+    extends Composer<_$AppDatabase, $AsbabAlNuzulTable> {
+  $$AsbabAlNuzulTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get surahNumber => $composableBuilder(
+    column: $table.surahNumber,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get startAyah =>
+      $composableBuilder(column: $table.startAyah, builder: (column) => column);
+
+  GeneratedColumn<int> get endAyah =>
+      $composableBuilder(column: $table.endAyah, builder: (column) => column);
+
+  GeneratedColumn<String> get textContent => $composableBuilder(
+    column: $table.textContent,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get sourceNote => $composableBuilder(
+    column: $table.sourceNote,
+    builder: (column) => column,
+  );
+}
+
+class $$AsbabAlNuzulTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $AsbabAlNuzulTable,
+          AsbabAlNuzulEntry,
+          $$AsbabAlNuzulTableFilterComposer,
+          $$AsbabAlNuzulTableOrderingComposer,
+          $$AsbabAlNuzulTableAnnotationComposer,
+          $$AsbabAlNuzulTableCreateCompanionBuilder,
+          $$AsbabAlNuzulTableUpdateCompanionBuilder,
+          (
+            AsbabAlNuzulEntry,
+            BaseReferences<
+              _$AppDatabase,
+              $AsbabAlNuzulTable,
+              AsbabAlNuzulEntry
+            >,
+          ),
+          AsbabAlNuzulEntry,
+          PrefetchHooks Function()
+        > {
+  $$AsbabAlNuzulTableTableManager(_$AppDatabase db, $AsbabAlNuzulTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$AsbabAlNuzulTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$AsbabAlNuzulTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$AsbabAlNuzulTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> surahNumber = const Value.absent(),
+                Value<int> startAyah = const Value.absent(),
+                Value<int> endAyah = const Value.absent(),
+                Value<String> textContent = const Value.absent(),
+                Value<String> sourceNote = const Value.absent(),
+              }) => AsbabAlNuzulCompanion(
+                id: id,
+                surahNumber: surahNumber,
+                startAyah: startAyah,
+                endAyah: endAyah,
+                textContent: textContent,
+                sourceNote: sourceNote,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int surahNumber,
+                required int startAyah,
+                required int endAyah,
+                required String textContent,
+                required String sourceNote,
+              }) => AsbabAlNuzulCompanion.insert(
+                id: id,
+                surahNumber: surahNumber,
+                startAyah: startAyah,
+                endAyah: endAyah,
+                textContent: textContent,
+                sourceNote: sourceNote,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$AsbabAlNuzulTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $AsbabAlNuzulTable,
+      AsbabAlNuzulEntry,
+      $$AsbabAlNuzulTableFilterComposer,
+      $$AsbabAlNuzulTableOrderingComposer,
+      $$AsbabAlNuzulTableAnnotationComposer,
+      $$AsbabAlNuzulTableCreateCompanionBuilder,
+      $$AsbabAlNuzulTableUpdateCompanionBuilder,
+      (
+        AsbabAlNuzulEntry,
+        BaseReferences<_$AppDatabase, $AsbabAlNuzulTable, AsbabAlNuzulEntry>,
+      ),
+      AsbabAlNuzulEntry,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -6213,4 +8733,12 @@ class $AppDatabaseManager {
       $$TafsirsMetaTableTableManager(_db, _db.tafsirsMeta);
   $$TafsirContentTableTableManager get tafsirContent =>
       $$TafsirContentTableTableManager(_db, _db.tafsirContent);
+  $$TopicsTableTableManager get topics =>
+      $$TopicsTableTableManager(_db, _db.topics);
+  $$TopicAyahsTableTableManager get topicAyahs =>
+      $$TopicAyahsTableTableManager(_db, _db.topicAyahs);
+  $$CrossReferencesTableTableManager get crossReferences =>
+      $$CrossReferencesTableTableManager(_db, _db.crossReferences);
+  $$AsbabAlNuzulTableTableManager get asbabAlNuzul =>
+      $$AsbabAlNuzulTableTableManager(_db, _db.asbabAlNuzul);
 }

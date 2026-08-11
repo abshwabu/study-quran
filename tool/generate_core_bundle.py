@@ -230,7 +230,41 @@ def main():
             ayah_number UNINDEXED,
             text
         );
+
+        CREATE TABLE topics (
+            topic_id TEXT PRIMARY KEY,
+            name TEXT NOT NULL,
+            parent_topic_id TEXT,
+            category TEXT NOT NULL DEFAULT 'General'
+        );
+
+        CREATE TABLE topic_ayahs (
+            topic_id TEXT NOT NULL,
+            surah_number INTEGER NOT NULL,
+            ayah_number INTEGER NOT NULL,
+            PRIMARY KEY (topic_id, surah_number, ayah_number)
+        );
+
+        CREATE TABLE cross_references (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            source_surah INTEGER NOT NULL,
+            source_ayah INTEGER NOT NULL,
+            target_surah INTEGER NOT NULL,
+            target_ayah INTEGER NOT NULL,
+            relationship_type TEXT NOT NULL,
+            notes TEXT NOT NULL DEFAULT ''
+        );
+
+        CREATE TABLE asbab_al_nuzul (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            surah_number INTEGER NOT NULL,
+            start_ayah INTEGER NOT NULL,
+            end_ayah INTEGER NOT NULL,
+            text_content TEXT NOT NULL,
+            source_note TEXT NOT NULL
+        );
     ''')
+
 
     # Insert Surahs
     cursor.executemany('''
@@ -266,8 +300,66 @@ def main():
         ('en.ibnkathir', 'tafsir', 'Tafsir Ibn Kathir (English)', '1.0.0', 0, 'https://cdn.quran.com/tafsir/en.ibnkathir.json', 12000000, 'Downloadable pack'),
         ('ar.tabari', 'tafsir', 'Tafsir Tabari (Arabic)', '1.0.0', 0, 'https://cdn.quran.com/tafsir/ar.tabari.json', 18000000, 'Downloadable pack'),
         ('audio.alafasy', 'audio', 'Mishary Rashid Alafasy 128kbps', '1.0.0', 0, 'https://everyayah.com/data/Alafasy_128kbps/', 650000000, 'EveryAyah.com permissive'),
-        ('morphology.corpus', 'morphology', 'Quranic Grammar & Roots', '1.0.0', 1, 'https://corpus.quran.com/data/morphology.json', 3200000, 'CC BY-NC 3.0 (Bundled Core)')
+        ('morphology.corpus', 'morphology', 'Quranic Grammar & Roots', '1.0.0', 1, 'https://corpus.quran.com/data/morphology.json', 3200000, 'CC BY-NC 3.0 (Bundled Core)'),
+        ('thematic.index', 'thematic', 'Thematic Index & Asbab al-Nuzul', '1.0.0', 1, 'https://cdn.quran.com/thematic/index.json', 2500000, 'Public Domain (Bundled Core)')
     ])
+
+    # Insert Topics (Hierarchical Tree)
+    cursor.executemany('''
+        INSERT INTO topics (topic_id, name, parent_topic_id, category)
+        VALUES (?, ?, ?, ?)
+    ''', [
+        ('theology', 'Theology & Creed (Aqeedah)', None, 'Creed'),
+        ('monotheism', 'Monotheism & Divine Oneness (Tawhid)', 'theology', 'Creed'),
+        ('divine_attributes', 'Attributes of Allah (Asma wa Sifat)', 'theology', 'Creed'),
+        ('worship', 'Worship & Jurisprudence (Ibadah)', None, 'Practice'),
+        ('prayer', 'Salah & Supplication (Dua)', 'worship', 'Practice'),
+        ('charity', 'Zakat & Charity (Infaq)', 'worship', 'Practice'),
+        ('ethics', 'Ethics & Morality (Akhlaq)', None, 'Ethics'),
+        ('mercy', 'Divine & Human Mercy (Rahmah)', 'ethics', 'Ethics'),
+        ('stories', 'Stories of Prophets (Qasas Al-Anbiya)', None, 'History')
+    ])
+
+    # Insert Topic Ayah Mappings
+    cursor.executemany('''
+        INSERT INTO topic_ayahs (topic_id, surah_number, ayah_number)
+        VALUES (?, ?, ?)
+    ''', [
+        ('monotheism', 1, 1),
+        ('monotheism', 1, 2),
+        ('monotheism', 1, 5),
+        ('monotheism', 2, 255),
+        ('divine_attributes', 1, 1),
+        ('divine_attributes', 1, 3),
+        ('prayer', 1, 5),
+        ('prayer', 1, 6),
+        ('prayer', 2, 3),
+        ('charity', 2, 3),
+        ('mercy', 1, 1),
+        ('mercy', 1, 3)
+    ])
+
+    # Insert Cross References
+    cursor.executemany('''
+        INSERT INTO cross_references (source_surah, source_ayah, target_surah, target_ayah, relationship_type, notes)
+        VALUES (?, ?, ?, ?, ?, ?)
+    ''', [
+        (1, 1, 1, 3, 'similar_theme', 'Reiteration of Divine Attributes of Mercy (Ar-Rahman, Ar-Raheem)'),
+        (1, 5, 2, 3, 'similar_theme', 'Worship and reliance on Allah coupled with establishing prayer and charity'),
+        (1, 6, 1, 7, 'elaboration', 'Elaboration of the Straight Path (As-Sirat Al-Mustaqim)'),
+        (1, 5, 1, 2, 'similar_wording', 'Parallel phrasing in declaring exclusive servitude and praise to God'),
+        (2, 256, 109, 6, 'scholarly_abrogation_naskh', 'Discussed by classical commentators regarding freedom of religion vs later verses; presented as recorded scholarly opinion.')
+    ])
+
+    # Insert Asbab al-Nuzul Entries
+    cursor.executemany('''
+        INSERT INTO asbab_al_nuzul (surah_number, start_ayah, end_ayah, text_content, source_note)
+        VALUES (?, ?, ?, ?, ?)
+    ''', [
+        (1, 1, 7, 'Revealed in Makkah when the Prophet (peace be upon him) was instructed by Gabriel to recite Bismillah and Al-Fatihah, establishing the opening foundation of the Quran.', 'Asbab al-Nuzul by Ali ibn Ahmad al-Wahidi (d. 468 AH)'),
+        (2, 1, 5, 'Revealed concerning the early believers among the People of the Book and polytheists who accepted Islam, establishing their belief in the Unseen and steadfastness in prayer.', 'Asbab al-Nuzul by Al-Wahidi')
+    ])
+
 
     # Insert Roots
     cursor.executemany('''

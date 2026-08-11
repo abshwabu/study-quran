@@ -15,6 +15,8 @@ import 'widgets/ayah_actions_bottom_sheet.dart';
 import '../../tafsir/presentation/tafsir_library_screen.dart';
 import '../../search/presentation/search_screen.dart';
 import '../../morphology/presentation/root_browser_screen.dart';
+import '../../thematic/presentation/topic_browser_screen.dart';
+
 
 class QuranReaderScreen extends ConsumerStatefulWidget {
   const QuranReaderScreen({super.key});
@@ -121,7 +123,19 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen> {
                 },
               ),
               IconButton(
+                icon: const Icon(Icons.category),
+                tooltip: 'Thematic Topic Index',
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (ctx) => const TopicBrowserScreen(),
+                    ),
+                  );
+                },
+              ),
+              IconButton(
                 icon: const Icon(Icons.blur_on),
+
                 tooltip: 'Root Browser',
                 onPressed: () {
                   Navigator.of(context).push(
