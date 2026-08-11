@@ -25,8 +25,9 @@ You are an AI research assistant specializing in Quranic textual analysis and co
 ''';
 
   static String _buildUrl(String apiKey) {
-    return 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-lite:generateContent?key=$apiKey';
+    return 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key=$apiKey';
   }
+
 
 
   /// Test Connection to validate API key
