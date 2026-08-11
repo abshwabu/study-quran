@@ -19,6 +19,16 @@ class AyahWithTranslation {
   });
 }
 
+class WordWithRoot {
+  final Word word;
+  final Root? root;
+
+  WordWithRoot({
+    required this.word,
+    this.root,
+  });
+}
+
 @DriftAccessor(tables: [Surahs, Ayahs, TranslationsMeta, AyahTranslations, Words, Roots])
 class QuranDao extends DatabaseAccessor<AppDatabase> with _$QuranDaoMixin {
   QuranDao(AppDatabase db) : super(db);
@@ -86,11 +96,36 @@ class QuranDao extends DatabaseAccessor<AppDatabase> with _$QuranDaoMixin {
     );
   }
 
-  // --- Hook for Prompts 04 & 05: Morphology & Roots ---
-  Future<List<Word>> getWordsForAyah(int surahNumber, int ayahNumber) {
-    return (select(words)
-          ..where((w) => w.surahNumber.equals(surahNumber) & w.ayahNumber.equals(ayahNumber))
-          ..orderBy([(w) => OrderingTerm.asc(w.position)]))
+  /// Fetch word-by-word segmentations with joined root metadata for an Ayah
+  Future<List<WordWithRoot>> getWordsWithRootsForAyah(int surahNumber, int ayahNumber) async {
+    final query = select(words).join([
+      leftOuterJoin(roots, roots.rootId.equalsExp(words.rootId)),
+    ])
+      ..where(words.surahNumber.equals(surahNumber) & words.ayahNumber.equals(ayahNumber))
+      ..orderBy([OrderingTerm.asc(words.position)]);
+
+    final rows = await query.get();
+    return rows.map((r) {
+      return WordWithRoot(
+        word: r.readTable(words),
+        root: r.readTableOrNull(roots),
+      );
+    }).toList();
+  }
+
+  /// Fetch all Root entries for the Root Browser
+  Future<List<Root>> getAllRoots() {
+    return (select(roots)..orderBy([(r) => OrderingTerm.asc(r.rootTranslit)])).get();
+  }
+
+  /// Search roots by query
+  Future<List<Root>> searchRoots(String searchQuery) {
+    final clean = searchQuery.trim();
+    if (clean.isEmpty) return getAllRoots();
+
+    return (select(roots)
+          ..where((r) => r.rootArabic.contains(clean) | r.rootTranslit.contains(clean) | r.meaningsSummary.contains(clean))
+          ..orderBy([(r) => OrderingTerm.asc(r.rootTranslit)]))
         .get();
   }
 }

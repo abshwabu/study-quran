@@ -171,7 +171,9 @@ def main():
         CREATE TABLE roots (
             root_id INTEGER PRIMARY KEY,
             root_arabic TEXT NOT NULL,
-            root_translit TEXT NOT NULL
+            root_translit TEXT NOT NULL,
+            meanings_summary TEXT NOT NULL DEFAULT '',
+            occurrence_count INTEGER NOT NULL DEFAULT 0
         );
 
         CREATE TABLE words (
@@ -181,6 +183,9 @@ def main():
             position INTEGER NOT NULL,
             arabic_text TEXT NOT NULL,
             transliteration TEXT NOT NULL,
+            translation_gloss TEXT NOT NULL DEFAULT '',
+            part_of_speech TEXT NOT NULL DEFAULT '',
+            grammar_details TEXT NOT NULL DEFAULT '',
             root_id INTEGER
         );
 
@@ -239,7 +244,7 @@ def main():
         VALUES ('en.saheeh', 'en', 'Saheeh International', 'Quran.com / Tanzil.net', 'Public redistribution permitted with attribution')
     ''')
 
-    # Insert Tafsir Metadata (Bundled + Downloadable)
+    # Insert Tafsir Metadata
     cursor.executemany('''
         INSERT INTO tafsirs_meta (tafsir_id, name, author, language, source, license_note)
         VALUES (?, ?, ?, ?, ?, ?)
@@ -250,7 +255,7 @@ def main():
         ('ar.tabari', 'تفسير الطبري', 'الإمام ابن جرير الطبري', 'ar', 'altafsir.com', 'Downloadable pack')
     ])
 
-    # Insert Content Pack Metadata for default pack
+    # Insert Content Pack Metadata
     cursor.executemany('''
         INSERT INTO content_packs (pack_id, type, name, version, downloaded, download_url, size_bytes, license_note)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
@@ -261,10 +266,82 @@ def main():
         ('en.ibnkathir', 'tafsir', 'Tafsir Ibn Kathir (English)', '1.0.0', 0, 'https://cdn.quran.com/tafsir/en.ibnkathir.json', 12000000, 'Downloadable pack'),
         ('ar.tabari', 'tafsir', 'Tafsir Tabari (Arabic)', '1.0.0', 0, 'https://cdn.quran.com/tafsir/ar.tabari.json', 18000000, 'Downloadable pack'),
         ('audio.alafasy', 'audio', 'Mishary Rashid Alafasy 128kbps', '1.0.0', 0, 'https://everyayah.com/data/Alafasy_128kbps/', 650000000, 'EveryAyah.com permissive'),
-        ('morphology.corpus', 'morphology', 'Quranic Grammar & Roots', '1.0.0', 0, 'https://corpus.quran.com/data/morphology.json', 3200000, 'CC BY-NC 3.0')
+        ('morphology.corpus', 'morphology', 'Quranic Grammar & Roots', '1.0.0', 1, 'https://corpus.quran.com/data/morphology.json', 3200000, 'CC BY-NC 3.0 (Bundled Core)')
     ])
 
+    # Insert Roots
+    cursor.executemany('''
+        INSERT INTO roots (root_id, root_arabic, root_translit, meanings_summary, occurrence_count)
+        VALUES (?, ?, ?, ?, ?)
+    ''', [
+        (1, 'ر ح م', 'r-h-m', 'To show mercy, compassion, grace, womb of kinship', 339),
+        (2, 'ح م د', 'h-m-d', 'To praise, glorify, express gratitude, laudation', 63),
+        (3, 'م ل ك', 'm-l-k', 'To possess, rule, master, king, sovereignty', 206),
+        (4, 'ع ب د', 'a-b-d', 'To serve, worship, devote, slave, servant', 275),
+        (5, 'ه د ي', 'h-d-y', 'To guide, direct, show the way, gift, guidance', 316),
+        (6, 'ق ر ء', 'q-r-a', 'To read, recite, gather together, Quran', 88),
+        (7, 'ك ت ب', 'k-t-b', 'To write, record, decree, prescribe, book', 319),
+        (8, 'ع ل م', 'a-l-m', 'To know, learn, knowledge, mark, scholar', 854),
+        (9, 'ا ل ه', 'a-l-h', 'Deity, God, divine worship, sanctuary', 2851),
+        (10, 'ن ع م', 'n-a-m', 'To favor, bestow blessing, delight, grace', 144),
+        (11, 'ص ر ط', 's-r-t', 'Path, way, established avenue', 45),
+        (12, 'غ ض ب', 'gh-d-b', 'Wrath, anger, displeasure', 24),
+        (13, 'ض ل ل', 'd-l-l', 'To stray, err, wander, misguidance', 191)
+    ])
 
+    # Insert Word-by-Word Morphology Data for Surah 1 & Surah 2
+    cursor.executemany('''
+        INSERT INTO words (surah_number, ayah_number, position, arabic_text, transliteration, translation_gloss, part_of_speech, grammar_details, root_id)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ''', [
+        # Surah 1 Ayah 1
+        (1, 1, 1, "بِسْمِ", "Bi-smi", "In (the) name", "Preposition + Noun", "Genitive noun prefixed with preposition bi-", 7),
+        (1, 1, 2, "ٱللَّهِ", "Allah", "of Allah", "Proper Noun", "Genitive proper noun (Majrur)", 9),
+        (1, 1, 3, "ٱلرَّحْمَٰنِ", "Ar-Rahman", "the Entirely Merciful", "Adjective", "Genitive masculine singular adjective", 1),
+        (1, 1, 4, "ٱلرَّحِيمِ", "Ar-Raheem", "the Especially Merciful", "Adjective", "Genitive masculine singular adjective", 1),
+        # Surah 1 Ayah 2
+        (1, 2, 1, "ٱلْحَمْدُ", "Al-hamdu", "[All] praise", "Noun", "Nominative masculine noun (Marfu')", 2),
+        (1, 2, 2, "لِلَّهِ", "li-llahi", "[is] for Allah", "Preposition + Proper Noun", "Preposition lam + genitive proper noun", 9),
+        (1, 2, 3, "رَبِّ", "Rabbi", "Lord", "Noun", "Genitive noun (Majrur)", 1),
+        (1, 2, 4, "ٱلْعَالَمِينَ", "al-alamin", "of the worlds", "Noun", "Genitive masculine plural noun", 8),
+        # Surah 1 Ayah 3
+        (1, 3, 1, "ٱلرَّحْمَٰنِ", "Ar-Rahman", "the Entirely Merciful", "Adjective", "Genitive masculine singular adjective", 1),
+        (1, 3, 2, "ٱلرَّحِيمِ", "Ar-Raheem", "the Especially Merciful", "Adjective", "Genitive masculine singular adjective", 1),
+        # Surah 1 Ayah 4
+        (1, 4, 1, "مَالِكِ", "Maliki", "Master", "Noun", "Genitive active participle noun", 3),
+        (1, 4, 2, "يَوْمِ", "yawmi", "(of the) Day", "Noun", "Genitive masculine noun", None),
+        (1, 4, 3, "ٱلدِّينِ", "ad-deen", "(of) Judgment", "Noun", "Genitive masculine noun", None),
+        # Surah 1 Ayah 5
+        (1, 5, 1, "إِيَّاكَ", "Iyyaka", "You alone", "Personal Pronoun", "Accusative 2nd person masculine singular pronoun", None),
+        (1, 5, 2, "نَعْبُدُ", "na'budu", "we worship", "Verb", "1st person plural imperfect verb", 4),
+        (1, 5, 3, "وَإِيَّاكَ", "wa-iyyaka", "and You alone", "Conjunction + Pronoun", "Prefix conjunction wa + 2nd person pronoun", None),
+        (1, 5, 4, "نَسْتَعِينُ", "nasta'in", "we ask for help", "Verb", "Form X 1st person plural imperfect verb", 4),
+        # Surah 1 Ayah 6
+        (1, 6, 1, "ٱهْدِنَا", "Ihdina", "Guide us", "Imperative Verb + Pronoun", "Form I imperative verb + 1st person plural object pronoun", 5),
+        (1, 6, 2, "ٱلصِّرَاطَ", "as-sirata", "(to) the Path", "Noun", "Accusative masculine singular noun", 11),
+        (1, 6, 3, "ٱلْمُسْتَقِيمَ", "al-mustaqim", "the Straight", "Adjective", "Form X accusative masculine singular participle", 5),
+        # Surah 1 Ayah 7
+        (1, 7, 1, "صِرَاطَ", "Sirata", "(The) path", "Noun", "Accusative noun (Mansub)", 11),
+        (1, 7, 2, "ٱلَّذِينَ", "alladhina", "(of) those", "Relative Pronoun", "Masculine plural relative pronoun", None),
+        (1, 7, 3, "أَنْعَمْتَ", "an'amta", "You have favored", "Verb", "Form IV 2nd person masculine singular perfect verb", 10),
+        (1, 7, 4, "عَلَيْهِمْ", "alayhim", "upon them", "Preposition + Pronoun", "Preposition 'ala + 3rd person masculine plural pronoun", None),
+        (1, 7, 5, "غَيْرِ", "ghayri", "not (of)", "Noun", "Genitive noun of negation", None),
+        (1, 7, 6, "ٱلْمَغْضُوبِ", "al-maghdubi", "those who earned anger", "Passive Participle", "Genitive masculine passive participle", 12),
+        (1, 7, 7, "عَلَيْهِمْ", "alayhim", "upon them", "Preposition + Pronoun", "Preposition 'ala + 3rd person masculine plural pronoun", None),
+        (1, 7, 8, "وَلَا", "wa-la", "and not", "Conjunction + Negative Particle", "Conjunction wa + negative particle la", None),
+        (1, 7, 9, "ٱلضَّالِّينَ", "ad-dallin", "those who are astray", "Active Participle", "Genitive masculine plural active participle", 13),
+
+        # Surah 2 Ayah 1
+        (2, 1, 1, "الم", "Alif-Lam-Mim", "Alif Lam Mim", "Muqatta'at", "Disjointed letters of divine wisdom", None),
+        # Surah 2 Ayah 2
+        (2, 2, 1, "ذَٰلِكَ", "Dhalika", "This", "Demonstrative Pronoun", "Masculine singular demonstrative pronoun", None),
+        (2, 2, 2, "ٱلْكِتَابُ", "al-kitabu", "(is) the Book", "Noun", "Nominative masculine singular noun", 7),
+        (2, 2, 3, "لَا", "la", "no", "Negative Particle", "Absolute negative particle", None),
+        (2, 2, 4, "رَيْبَ", "rayba", "doubt", "Noun", "Accusative masculine singular noun", None),
+        (2, 2, 5, "فِيهِ", "fihi", "in it", "Preposition + Pronoun", "Preposition fi + 3rd person masculine singular pronoun", None),
+        (2, 2, 6, "هُدًى", "hudan", "a guidance", "Noun", "Accusative indefinite noun", 5),
+        (2, 2, 7, "لِّلْمُتَّقِينَ", "lil-muttaqin", "for the God-fearing", "Preposition + Active Participle", "Preposition lam + Form VIII genitive masculine plural participle", None)
+    ])
 
     print("Fetching complete Quran dataset (6236 ayahs) from alquran.cloud...")
     req_ar = urllib.request.Request('https://api.alquran.cloud/v1/quran/quran-uthmani', headers={'User-Agent': 'Mozilla/5.0'})
@@ -282,7 +359,6 @@ def main():
     fts_trans_rows = []
     tafsir_content_rows = []
 
-    # Authentic commentary samples for Surah 1 & key range entries
     jalalayn_fatihah = [
         (1, 1, 1, "In the Name of God, the Merciful, the Compassionate: 'In the Name of God' is the phrase to start with before any action. 'Allah' is the proper name of the Creator."),
         (1, 2, 2, "Praise be to God, the Lord of all Creation: 'Al-Hamd' is the ultimate expression of gratitude and praise due exclusively to God, Lord and Sustainer of all worlds."),
@@ -308,7 +384,6 @@ def main():
     for item in muyassar_fatihah:
         tafsir_content_rows.append(('ar.muyassar', item[0], item[1], item[2], item[3]))
 
-    # Range-based entry demonstration for Surah 2 (Ayahs 1-5 commentary together)
     tafsir_content_rows.append((
         'en.jalalayn', 2, 1, 5,
         "[Range Commentary: Surah Al-Baqarah 2:1-5] Alif Lam Mim. This Book, in which there is no doubt whatsoever, is a divine guidance for the God-fearing who believe in the Unseen, establish prayer, and spend out of what We have provided for them."
@@ -339,7 +414,6 @@ def main():
             fts_arabic_rows.append((surah_num, ayah_num, ar_text))
             fts_trans_rows.append(('en.saheeh', surah_num, ayah_num, tr_text))
 
-            # General commentary entry fallback for surahs > 2
             if surah_num > 2 or (surah_num == 2 and ayah_num > 5):
                 tafsir_content_rows.append((
                     'en.jalalayn', surah_num, ayah_num, ayah_num,
@@ -377,79 +451,12 @@ def main():
         VALUES (?, ?, ?, ?, ?)
     ''', tafsir_content_rows)
 
-    # Populate sample roots
-    cursor.executemany('''
-        INSERT INTO roots (root_id, root_arabic, root_translit)
-        VALUES (?, ?, ?)
-    ''', [
-        (1, 'ر ح م', 'r-h-m'),
-        (2, 'ح م د', 'h-m-d'),
-        (3, 'م ل ك', 'm-l-k'),
-        (4, 'ع ب د', 'a-b-d'),
-        (5, 'ه د ي', 'h-d-y'),
-        (6, 'ق ر ء', 'q-r-a'),
-        (7, 'ك ت ب', 'k-t-b'),
-        (8, 'ع ل م', 'a-l-m'),
-        (9, 'ا ل ه', 'a-l-h')
-    ])
-
-    # Insert word segmentations for Surah 1 and Surah 2
-    cursor.executemany('''
-        INSERT INTO words (surah_number, ayah_number, position, arabic_text, transliteration, root_id)
-        VALUES (?, ?, ?, ?, ?, ?)
-    ''', [
-        (1, 1, 1, "بِسْمِ", "Bi-smi", 7),
-        (1, 1, 2, "ٱللَّهِ", "Allah", 9),
-        (1, 1, 3, "ٱلرَّحْمَٰنِ", "Ar-Rahman", 1),
-        (1, 1, 4, "ٱلرَّحِيمِ", "Ar-Raheem", 1),
-        (1, 2, 1, "ٱلْحَمْدُ", "Al-hamdu", 2),
-        (1, 2, 2, "لِلَّهِ", "li-llahi", 9),
-        (1, 2, 3, "رَبِّ", "Rabbi", 1),
-        (1, 2, 4, "ٱلْعَالَمِينَ", "al-alamin", 8),
-        (1, 3, 1, "ٱلرَّحْمَٰنِ", "Ar-Rahman", 1),
-        (1, 3, 2, "ٱلرَّحِيمِ", "Ar-Raheem", 1),
-        (1, 4, 1, "مَالِكِ", "Maliki", 3),
-        (1, 4, 2, "يَوْمِ", "yawmi", None),
-        (1, 4, 3, "ٱلدِّينِ", "ad-deen", None),
-        (1, 5, 1, "إِيَّاكَ", "Iyyaka", None),
-        (1, 5, 2, "نَعْبُدُ", "na'budu", 4),
-        (1, 5, 3, "وَإِيَّاكَ", "wa-iyyaka", None),
-        (1, 5, 4, "نَسْتَعِينُ", "nasta'in", 4),
-        (1, 6, 1, "ٱهْدِنَا", "Ihdina", 5),
-        (1, 6, 2, "ٱلصِّرَاطَ", "as-sirata", None),
-        (1, 6, 3, "ٱلْمُسْتَقِيمَ", "al-mustaqim", 5),
-        (1, 7, 1, "صِرَاطَ", "Sirata", None),
-        (1, 7, 2, "ٱلَّذِينَ", "alladhina", None),
-        (1, 7, 3, "أَنْعَمْتَ", "an'amta", None),
-        (1, 7, 4, "عَلَيْهِمْ", "alayhim", None),
-        (1, 7, 5, "غَيْرِ", "ghayri", None),
-        (1, 7, 6, "ٱلْمَغْضُوبِ", "al-maghdubi", None),
-        (1, 7, 7, "عَلَيْهِمْ", "alayhim", None),
-        (1, 7, 8, "وَلَا", "wa-la", None),
-        (1, 7, 9, "ٱلضَّالِّينَ", "ad-dallin", None),
-        (2, 1, 1, "الم", "Alif-Lam-Mim", None),
-        (2, 2, 1, "ذَٰلِكَ", "Dhalika", None),
-        (2, 2, 2, "ٱلْكِتَابُ", "al-kitabu", 7),
-        (2, 2, 3, "لَا", "la", None),
-        (2, 2, 4, "رَيْبَ", "rayba", None),
-        (2, 2, 5, "فِيهِ", "fihi", None),
-        (2, 2, 6, "هُدًى", "hudan", 5),
-        (2, 2, 7, "لِّلْمُتَّقِينَ", "lil-muttaqin", None),
-        (2, 3, 1, "ٱلَّذِينَ", "alladhina", None),
-        (2, 3, 2, "يُؤْمِنُونَ", "yu'minuna", None),
-        (2, 3, 3, "بِٱلْغَيْبِ", "bil-ghaybi", None),
-        (2, 3, 4, "وَيُقِيمُونَ", "wa-yuqimuna", None),
-        (2, 3, 5, "ٱلصَّلَاةَ", "as-salata", None)
-    ])
-
-
     cursor.execute("PRAGMA user_version = 1;")
     conn.commit()
     conn.close()
 
-    print(f"Successfully generated core_bundle.db with {len(ayah_rows)} verses and {len(tafsir_content_rows)} tafsir entries!")
+    print(f"Successfully generated core_bundle.db with {len(ayah_rows)} verses and morphology dataset!")
 
-    # Generate mock_manifest.json
     mock_manifest = {
         "manifest_version": "1.0",
         "generated_at": "2026-08-09T00:00:00Z",
@@ -462,15 +469,6 @@ def main():
                 "download_url": "https://cdn.quran.com/translations/en.saheeh.json",
                 "size_bytes": 1200000,
                 "license_note": "Public redistribution permitted with attribution"
-            },
-            {
-                "pack_id": "en.clearquran",
-                "type": "translation",
-                "name": "The Clear Quran (Mustafa Khattab)",
-                "version": "1.0.0",
-                "download_url": "https://cdn.quran.com/translations/en.clearquran.json",
-                "size_bytes": 1350000,
-                "license_note": "Non-commercial permissions verified"
             },
             {
                 "pack_id": "ar.muyassar",
@@ -491,40 +489,13 @@ def main():
                 "license_note": "Public domain (Bundled)"
             },
             {
-                "pack_id": "en.ibnkathir",
-                "type": "tafsir",
-                "name": "Tafsir Ibn Kathir (English)",
-                "version": "1.0.0",
-                "download_url": "https://cdn.quran.com/tafsir/en.ibnkathir.json",
-                "size_bytes": 12000000,
-                "license_note": "Free non-commercial research use"
-            },
-            {
-                "pack_id": "ar.tabari",
-                "type": "tafsir",
-                "name": "Tafsir Tabari (Arabic)",
-                "version": "1.0.0",
-                "download_url": "https://cdn.quran.com/tafsir/ar.tabari.json",
-                "size_bytes": 18000000,
-                "license_note": "Classical domain"
-            },
-            {
-                "pack_id": "audio.alafasy",
-                "type": "audio",
-                "name": "Mishary Rashid Alafasy (128kbps)",
-                "version": "1.0.0",
-                "download_url": "https://everyayah.com/data/Alafasy_128kbps/",
-                "size_bytes": 650000000,
-                "license_note": "EveryAyah.com public archive"
-            },
-            {
                 "pack_id": "morphology.corpus",
                 "type": "morphology",
                 "name": "Quranic Grammar & Root Index",
                 "version": "1.0.0",
                 "download_url": "https://corpus.quran.com/data/morphology.json",
                 "size_bytes": 3200000,
-                "license_note": "Creative Commons Attribution 3.0"
+                "license_note": "CC BY-NC 3.0 (Bundled Core)"
             }
         ]
     }

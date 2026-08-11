@@ -1600,8 +1600,38 @@ class $RootsTable extends Roots with TableInfo<$RootsTable, Root> {
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _meaningsSummaryMeta = const VerificationMeta(
+    'meaningsSummary',
+  );
   @override
-  List<GeneratedColumn> get $columns => [rootId, rootArabic, rootTranslit];
+  late final GeneratedColumn<String> meaningsSummary = GeneratedColumn<String>(
+    'meanings_summary',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
+  static const VerificationMeta _occurrenceCountMeta = const VerificationMeta(
+    'occurrenceCount',
+  );
+  @override
+  late final GeneratedColumn<int> occurrenceCount = GeneratedColumn<int>(
+    'occurrence_count',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    rootId,
+    rootArabic,
+    rootTranslit,
+    meaningsSummary,
+    occurrenceCount,
+  ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -1639,6 +1669,24 @@ class $RootsTable extends Roots with TableInfo<$RootsTable, Root> {
     } else if (isInserting) {
       context.missing(_rootTranslitMeta);
     }
+    if (data.containsKey('meanings_summary')) {
+      context.handle(
+        _meaningsSummaryMeta,
+        meaningsSummary.isAcceptableOrUnknown(
+          data['meanings_summary']!,
+          _meaningsSummaryMeta,
+        ),
+      );
+    }
+    if (data.containsKey('occurrence_count')) {
+      context.handle(
+        _occurrenceCountMeta,
+        occurrenceCount.isAcceptableOrUnknown(
+          data['occurrence_count']!,
+          _occurrenceCountMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -1660,6 +1708,14 @@ class $RootsTable extends Roots with TableInfo<$RootsTable, Root> {
         DriftSqlType.string,
         data['${effectivePrefix}root_translit'],
       )!,
+      meaningsSummary: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}meanings_summary'],
+      )!,
+      occurrenceCount: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}occurrence_count'],
+      )!,
     );
   }
 
@@ -1673,10 +1729,14 @@ class Root extends DataClass implements Insertable<Root> {
   final int rootId;
   final String rootArabic;
   final String rootTranslit;
+  final String meaningsSummary;
+  final int occurrenceCount;
   const Root({
     required this.rootId,
     required this.rootArabic,
     required this.rootTranslit,
+    required this.meaningsSummary,
+    required this.occurrenceCount,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -1684,6 +1744,8 @@ class Root extends DataClass implements Insertable<Root> {
     map['root_id'] = Variable<int>(rootId);
     map['root_arabic'] = Variable<String>(rootArabic);
     map['root_translit'] = Variable<String>(rootTranslit);
+    map['meanings_summary'] = Variable<String>(meaningsSummary);
+    map['occurrence_count'] = Variable<int>(occurrenceCount);
     return map;
   }
 
@@ -1692,6 +1754,8 @@ class Root extends DataClass implements Insertable<Root> {
       rootId: Value(rootId),
       rootArabic: Value(rootArabic),
       rootTranslit: Value(rootTranslit),
+      meaningsSummary: Value(meaningsSummary),
+      occurrenceCount: Value(occurrenceCount),
     );
   }
 
@@ -1704,6 +1768,8 @@ class Root extends DataClass implements Insertable<Root> {
       rootId: serializer.fromJson<int>(json['rootId']),
       rootArabic: serializer.fromJson<String>(json['rootArabic']),
       rootTranslit: serializer.fromJson<String>(json['rootTranslit']),
+      meaningsSummary: serializer.fromJson<String>(json['meaningsSummary']),
+      occurrenceCount: serializer.fromJson<int>(json['occurrenceCount']),
     );
   }
   @override
@@ -1713,15 +1779,24 @@ class Root extends DataClass implements Insertable<Root> {
       'rootId': serializer.toJson<int>(rootId),
       'rootArabic': serializer.toJson<String>(rootArabic),
       'rootTranslit': serializer.toJson<String>(rootTranslit),
+      'meaningsSummary': serializer.toJson<String>(meaningsSummary),
+      'occurrenceCount': serializer.toJson<int>(occurrenceCount),
     };
   }
 
-  Root copyWith({int? rootId, String? rootArabic, String? rootTranslit}) =>
-      Root(
-        rootId: rootId ?? this.rootId,
-        rootArabic: rootArabic ?? this.rootArabic,
-        rootTranslit: rootTranslit ?? this.rootTranslit,
-      );
+  Root copyWith({
+    int? rootId,
+    String? rootArabic,
+    String? rootTranslit,
+    String? meaningsSummary,
+    int? occurrenceCount,
+  }) => Root(
+    rootId: rootId ?? this.rootId,
+    rootArabic: rootArabic ?? this.rootArabic,
+    rootTranslit: rootTranslit ?? this.rootTranslit,
+    meaningsSummary: meaningsSummary ?? this.meaningsSummary,
+    occurrenceCount: occurrenceCount ?? this.occurrenceCount,
+  );
   Root copyWithCompanion(RootsCompanion data) {
     return Root(
       rootId: data.rootId.present ? data.rootId.value : this.rootId,
@@ -1731,6 +1806,12 @@ class Root extends DataClass implements Insertable<Root> {
       rootTranslit: data.rootTranslit.present
           ? data.rootTranslit.value
           : this.rootTranslit,
+      meaningsSummary: data.meaningsSummary.present
+          ? data.meaningsSummary.value
+          : this.meaningsSummary,
+      occurrenceCount: data.occurrenceCount.present
+          ? data.occurrenceCount.value
+          : this.occurrenceCount,
     );
   }
 
@@ -1739,46 +1820,66 @@ class Root extends DataClass implements Insertable<Root> {
     return (StringBuffer('Root(')
           ..write('rootId: $rootId, ')
           ..write('rootArabic: $rootArabic, ')
-          ..write('rootTranslit: $rootTranslit')
+          ..write('rootTranslit: $rootTranslit, ')
+          ..write('meaningsSummary: $meaningsSummary, ')
+          ..write('occurrenceCount: $occurrenceCount')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(rootId, rootArabic, rootTranslit);
+  int get hashCode => Object.hash(
+    rootId,
+    rootArabic,
+    rootTranslit,
+    meaningsSummary,
+    occurrenceCount,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is Root &&
           other.rootId == this.rootId &&
           other.rootArabic == this.rootArabic &&
-          other.rootTranslit == this.rootTranslit);
+          other.rootTranslit == this.rootTranslit &&
+          other.meaningsSummary == this.meaningsSummary &&
+          other.occurrenceCount == this.occurrenceCount);
 }
 
 class RootsCompanion extends UpdateCompanion<Root> {
   final Value<int> rootId;
   final Value<String> rootArabic;
   final Value<String> rootTranslit;
+  final Value<String> meaningsSummary;
+  final Value<int> occurrenceCount;
   const RootsCompanion({
     this.rootId = const Value.absent(),
     this.rootArabic = const Value.absent(),
     this.rootTranslit = const Value.absent(),
+    this.meaningsSummary = const Value.absent(),
+    this.occurrenceCount = const Value.absent(),
   });
   RootsCompanion.insert({
     this.rootId = const Value.absent(),
     required String rootArabic,
     required String rootTranslit,
+    this.meaningsSummary = const Value.absent(),
+    this.occurrenceCount = const Value.absent(),
   }) : rootArabic = Value(rootArabic),
        rootTranslit = Value(rootTranslit);
   static Insertable<Root> custom({
     Expression<int>? rootId,
     Expression<String>? rootArabic,
     Expression<String>? rootTranslit,
+    Expression<String>? meaningsSummary,
+    Expression<int>? occurrenceCount,
   }) {
     return RawValuesInsertable({
       if (rootId != null) 'root_id': rootId,
       if (rootArabic != null) 'root_arabic': rootArabic,
       if (rootTranslit != null) 'root_translit': rootTranslit,
+      if (meaningsSummary != null) 'meanings_summary': meaningsSummary,
+      if (occurrenceCount != null) 'occurrence_count': occurrenceCount,
     });
   }
 
@@ -1786,11 +1887,15 @@ class RootsCompanion extends UpdateCompanion<Root> {
     Value<int>? rootId,
     Value<String>? rootArabic,
     Value<String>? rootTranslit,
+    Value<String>? meaningsSummary,
+    Value<int>? occurrenceCount,
   }) {
     return RootsCompanion(
       rootId: rootId ?? this.rootId,
       rootArabic: rootArabic ?? this.rootArabic,
       rootTranslit: rootTranslit ?? this.rootTranslit,
+      meaningsSummary: meaningsSummary ?? this.meaningsSummary,
+      occurrenceCount: occurrenceCount ?? this.occurrenceCount,
     );
   }
 
@@ -1806,6 +1911,12 @@ class RootsCompanion extends UpdateCompanion<Root> {
     if (rootTranslit.present) {
       map['root_translit'] = Variable<String>(rootTranslit.value);
     }
+    if (meaningsSummary.present) {
+      map['meanings_summary'] = Variable<String>(meaningsSummary.value);
+    }
+    if (occurrenceCount.present) {
+      map['occurrence_count'] = Variable<int>(occurrenceCount.value);
+    }
     return map;
   }
 
@@ -1814,7 +1925,9 @@ class RootsCompanion extends UpdateCompanion<Root> {
     return (StringBuffer('RootsCompanion(')
           ..write('rootId: $rootId, ')
           ..write('rootArabic: $rootArabic, ')
-          ..write('rootTranslit: $rootTranslit')
+          ..write('rootTranslit: $rootTranslit, ')
+          ..write('meaningsSummary: $meaningsSummary, ')
+          ..write('occurrenceCount: $occurrenceCount')
           ..write(')'))
         .toString();
   }
@@ -1893,6 +2006,42 @@ class $WordsTable extends Words with TableInfo<$WordsTable, Word> {
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _translationGlossMeta = const VerificationMeta(
+    'translationGloss',
+  );
+  @override
+  late final GeneratedColumn<String> translationGloss = GeneratedColumn<String>(
+    'translation_gloss',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
+  static const VerificationMeta _partOfSpeechMeta = const VerificationMeta(
+    'partOfSpeech',
+  );
+  @override
+  late final GeneratedColumn<String> partOfSpeech = GeneratedColumn<String>(
+    'part_of_speech',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
+  static const VerificationMeta _grammarDetailsMeta = const VerificationMeta(
+    'grammarDetails',
+  );
+  @override
+  late final GeneratedColumn<String> grammarDetails = GeneratedColumn<String>(
+    'grammar_details',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
   static const VerificationMeta _rootIdMeta = const VerificationMeta('rootId');
   @override
   late final GeneratedColumn<int> rootId = GeneratedColumn<int>(
@@ -1911,6 +2060,9 @@ class $WordsTable extends Words with TableInfo<$WordsTable, Word> {
     position,
     arabicText,
     transliteration,
+    translationGloss,
+    partOfSpeech,
+    grammarDetails,
     rootId,
   ];
   @override
@@ -1974,6 +2126,33 @@ class $WordsTable extends Words with TableInfo<$WordsTable, Word> {
     } else if (isInserting) {
       context.missing(_transliterationMeta);
     }
+    if (data.containsKey('translation_gloss')) {
+      context.handle(
+        _translationGlossMeta,
+        translationGloss.isAcceptableOrUnknown(
+          data['translation_gloss']!,
+          _translationGlossMeta,
+        ),
+      );
+    }
+    if (data.containsKey('part_of_speech')) {
+      context.handle(
+        _partOfSpeechMeta,
+        partOfSpeech.isAcceptableOrUnknown(
+          data['part_of_speech']!,
+          _partOfSpeechMeta,
+        ),
+      );
+    }
+    if (data.containsKey('grammar_details')) {
+      context.handle(
+        _grammarDetailsMeta,
+        grammarDetails.isAcceptableOrUnknown(
+          data['grammar_details']!,
+          _grammarDetailsMeta,
+        ),
+      );
+    }
     if (data.containsKey('root_id')) {
       context.handle(
         _rootIdMeta,
@@ -2013,6 +2192,18 @@ class $WordsTable extends Words with TableInfo<$WordsTable, Word> {
         DriftSqlType.string,
         data['${effectivePrefix}transliteration'],
       )!,
+      translationGloss: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}translation_gloss'],
+      )!,
+      partOfSpeech: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}part_of_speech'],
+      )!,
+      grammarDetails: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}grammar_details'],
+      )!,
       rootId: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}root_id'],
@@ -2033,6 +2224,9 @@ class Word extends DataClass implements Insertable<Word> {
   final int position;
   final String arabicText;
   final String transliteration;
+  final String translationGloss;
+  final String partOfSpeech;
+  final String grammarDetails;
   final int? rootId;
   const Word({
     required this.id,
@@ -2041,6 +2235,9 @@ class Word extends DataClass implements Insertable<Word> {
     required this.position,
     required this.arabicText,
     required this.transliteration,
+    required this.translationGloss,
+    required this.partOfSpeech,
+    required this.grammarDetails,
     this.rootId,
   });
   @override
@@ -2052,6 +2249,9 @@ class Word extends DataClass implements Insertable<Word> {
     map['position'] = Variable<int>(position);
     map['arabic_text'] = Variable<String>(arabicText);
     map['transliteration'] = Variable<String>(transliteration);
+    map['translation_gloss'] = Variable<String>(translationGloss);
+    map['part_of_speech'] = Variable<String>(partOfSpeech);
+    map['grammar_details'] = Variable<String>(grammarDetails);
     if (!nullToAbsent || rootId != null) {
       map['root_id'] = Variable<int>(rootId);
     }
@@ -2066,6 +2266,9 @@ class Word extends DataClass implements Insertable<Word> {
       position: Value(position),
       arabicText: Value(arabicText),
       transliteration: Value(transliteration),
+      translationGloss: Value(translationGloss),
+      partOfSpeech: Value(partOfSpeech),
+      grammarDetails: Value(grammarDetails),
       rootId: rootId == null && nullToAbsent
           ? const Value.absent()
           : Value(rootId),
@@ -2084,6 +2287,9 @@ class Word extends DataClass implements Insertable<Word> {
       position: serializer.fromJson<int>(json['position']),
       arabicText: serializer.fromJson<String>(json['arabicText']),
       transliteration: serializer.fromJson<String>(json['transliteration']),
+      translationGloss: serializer.fromJson<String>(json['translationGloss']),
+      partOfSpeech: serializer.fromJson<String>(json['partOfSpeech']),
+      grammarDetails: serializer.fromJson<String>(json['grammarDetails']),
       rootId: serializer.fromJson<int?>(json['rootId']),
     );
   }
@@ -2097,6 +2303,9 @@ class Word extends DataClass implements Insertable<Word> {
       'position': serializer.toJson<int>(position),
       'arabicText': serializer.toJson<String>(arabicText),
       'transliteration': serializer.toJson<String>(transliteration),
+      'translationGloss': serializer.toJson<String>(translationGloss),
+      'partOfSpeech': serializer.toJson<String>(partOfSpeech),
+      'grammarDetails': serializer.toJson<String>(grammarDetails),
       'rootId': serializer.toJson<int?>(rootId),
     };
   }
@@ -2108,6 +2317,9 @@ class Word extends DataClass implements Insertable<Word> {
     int? position,
     String? arabicText,
     String? transliteration,
+    String? translationGloss,
+    String? partOfSpeech,
+    String? grammarDetails,
     Value<int?> rootId = const Value.absent(),
   }) => Word(
     id: id ?? this.id,
@@ -2116,6 +2328,9 @@ class Word extends DataClass implements Insertable<Word> {
     position: position ?? this.position,
     arabicText: arabicText ?? this.arabicText,
     transliteration: transliteration ?? this.transliteration,
+    translationGloss: translationGloss ?? this.translationGloss,
+    partOfSpeech: partOfSpeech ?? this.partOfSpeech,
+    grammarDetails: grammarDetails ?? this.grammarDetails,
     rootId: rootId.present ? rootId.value : this.rootId,
   );
   Word copyWithCompanion(WordsCompanion data) {
@@ -2134,6 +2349,15 @@ class Word extends DataClass implements Insertable<Word> {
       transliteration: data.transliteration.present
           ? data.transliteration.value
           : this.transliteration,
+      translationGloss: data.translationGloss.present
+          ? data.translationGloss.value
+          : this.translationGloss,
+      partOfSpeech: data.partOfSpeech.present
+          ? data.partOfSpeech.value
+          : this.partOfSpeech,
+      grammarDetails: data.grammarDetails.present
+          ? data.grammarDetails.value
+          : this.grammarDetails,
       rootId: data.rootId.present ? data.rootId.value : this.rootId,
     );
   }
@@ -2147,6 +2371,9 @@ class Word extends DataClass implements Insertable<Word> {
           ..write('position: $position, ')
           ..write('arabicText: $arabicText, ')
           ..write('transliteration: $transliteration, ')
+          ..write('translationGloss: $translationGloss, ')
+          ..write('partOfSpeech: $partOfSpeech, ')
+          ..write('grammarDetails: $grammarDetails, ')
           ..write('rootId: $rootId')
           ..write(')'))
         .toString();
@@ -2160,6 +2387,9 @@ class Word extends DataClass implements Insertable<Word> {
     position,
     arabicText,
     transliteration,
+    translationGloss,
+    partOfSpeech,
+    grammarDetails,
     rootId,
   );
   @override
@@ -2172,6 +2402,9 @@ class Word extends DataClass implements Insertable<Word> {
           other.position == this.position &&
           other.arabicText == this.arabicText &&
           other.transliteration == this.transliteration &&
+          other.translationGloss == this.translationGloss &&
+          other.partOfSpeech == this.partOfSpeech &&
+          other.grammarDetails == this.grammarDetails &&
           other.rootId == this.rootId);
 }
 
@@ -2182,6 +2415,9 @@ class WordsCompanion extends UpdateCompanion<Word> {
   final Value<int> position;
   final Value<String> arabicText;
   final Value<String> transliteration;
+  final Value<String> translationGloss;
+  final Value<String> partOfSpeech;
+  final Value<String> grammarDetails;
   final Value<int?> rootId;
   const WordsCompanion({
     this.id = const Value.absent(),
@@ -2190,6 +2426,9 @@ class WordsCompanion extends UpdateCompanion<Word> {
     this.position = const Value.absent(),
     this.arabicText = const Value.absent(),
     this.transliteration = const Value.absent(),
+    this.translationGloss = const Value.absent(),
+    this.partOfSpeech = const Value.absent(),
+    this.grammarDetails = const Value.absent(),
     this.rootId = const Value.absent(),
   });
   WordsCompanion.insert({
@@ -2199,6 +2438,9 @@ class WordsCompanion extends UpdateCompanion<Word> {
     required int position,
     required String arabicText,
     required String transliteration,
+    this.translationGloss = const Value.absent(),
+    this.partOfSpeech = const Value.absent(),
+    this.grammarDetails = const Value.absent(),
     this.rootId = const Value.absent(),
   }) : surahNumber = Value(surahNumber),
        ayahNumber = Value(ayahNumber),
@@ -2212,6 +2454,9 @@ class WordsCompanion extends UpdateCompanion<Word> {
     Expression<int>? position,
     Expression<String>? arabicText,
     Expression<String>? transliteration,
+    Expression<String>? translationGloss,
+    Expression<String>? partOfSpeech,
+    Expression<String>? grammarDetails,
     Expression<int>? rootId,
   }) {
     return RawValuesInsertable({
@@ -2221,6 +2466,9 @@ class WordsCompanion extends UpdateCompanion<Word> {
       if (position != null) 'position': position,
       if (arabicText != null) 'arabic_text': arabicText,
       if (transliteration != null) 'transliteration': transliteration,
+      if (translationGloss != null) 'translation_gloss': translationGloss,
+      if (partOfSpeech != null) 'part_of_speech': partOfSpeech,
+      if (grammarDetails != null) 'grammar_details': grammarDetails,
       if (rootId != null) 'root_id': rootId,
     });
   }
@@ -2232,6 +2480,9 @@ class WordsCompanion extends UpdateCompanion<Word> {
     Value<int>? position,
     Value<String>? arabicText,
     Value<String>? transliteration,
+    Value<String>? translationGloss,
+    Value<String>? partOfSpeech,
+    Value<String>? grammarDetails,
     Value<int?>? rootId,
   }) {
     return WordsCompanion(
@@ -2241,6 +2492,9 @@ class WordsCompanion extends UpdateCompanion<Word> {
       position: position ?? this.position,
       arabicText: arabicText ?? this.arabicText,
       transliteration: transliteration ?? this.transliteration,
+      translationGloss: translationGloss ?? this.translationGloss,
+      partOfSpeech: partOfSpeech ?? this.partOfSpeech,
+      grammarDetails: grammarDetails ?? this.grammarDetails,
       rootId: rootId ?? this.rootId,
     );
   }
@@ -2266,6 +2520,15 @@ class WordsCompanion extends UpdateCompanion<Word> {
     if (transliteration.present) {
       map['transliteration'] = Variable<String>(transliteration.value);
     }
+    if (translationGloss.present) {
+      map['translation_gloss'] = Variable<String>(translationGloss.value);
+    }
+    if (partOfSpeech.present) {
+      map['part_of_speech'] = Variable<String>(partOfSpeech.value);
+    }
+    if (grammarDetails.present) {
+      map['grammar_details'] = Variable<String>(grammarDetails.value);
+    }
     if (rootId.present) {
       map['root_id'] = Variable<int>(rootId.value);
     }
@@ -2281,6 +2544,9 @@ class WordsCompanion extends UpdateCompanion<Word> {
           ..write('position: $position, ')
           ..write('arabicText: $arabicText, ')
           ..write('transliteration: $transliteration, ')
+          ..write('translationGloss: $translationGloss, ')
+          ..write('partOfSpeech: $partOfSpeech, ')
+          ..write('grammarDetails: $grammarDetails, ')
           ..write('rootId: $rootId')
           ..write(')'))
         .toString();
@@ -4513,12 +4779,16 @@ typedef $$RootsTableCreateCompanionBuilder =
       Value<int> rootId,
       required String rootArabic,
       required String rootTranslit,
+      Value<String> meaningsSummary,
+      Value<int> occurrenceCount,
     });
 typedef $$RootsTableUpdateCompanionBuilder =
     RootsCompanion Function({
       Value<int> rootId,
       Value<String> rootArabic,
       Value<String> rootTranslit,
+      Value<String> meaningsSummary,
+      Value<int> occurrenceCount,
     });
 
 final class $$RootsTableReferences
@@ -4565,6 +4835,16 @@ class $$RootsTableFilterComposer extends Composer<_$AppDatabase, $RootsTable> {
 
   ColumnFilters<String> get rootTranslit => $composableBuilder(
     column: $table.rootTranslit,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get meaningsSummary => $composableBuilder(
+    column: $table.meaningsSummary,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get occurrenceCount => $composableBuilder(
+    column: $table.occurrenceCount,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -4617,6 +4897,16 @@ class $$RootsTableOrderingComposer
     column: $table.rootTranslit,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<String> get meaningsSummary => $composableBuilder(
+    column: $table.meaningsSummary,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get occurrenceCount => $composableBuilder(
+    column: $table.occurrenceCount,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$RootsTableAnnotationComposer
@@ -4638,6 +4928,16 @@ class $$RootsTableAnnotationComposer
 
   GeneratedColumn<String> get rootTranslit => $composableBuilder(
     column: $table.rootTranslit,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get meaningsSummary => $composableBuilder(
+    column: $table.meaningsSummary,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get occurrenceCount => $composableBuilder(
+    column: $table.occurrenceCount,
     builder: (column) => column,
   );
 
@@ -4698,20 +4998,28 @@ class $$RootsTableTableManager
                 Value<int> rootId = const Value.absent(),
                 Value<String> rootArabic = const Value.absent(),
                 Value<String> rootTranslit = const Value.absent(),
+                Value<String> meaningsSummary = const Value.absent(),
+                Value<int> occurrenceCount = const Value.absent(),
               }) => RootsCompanion(
                 rootId: rootId,
                 rootArabic: rootArabic,
                 rootTranslit: rootTranslit,
+                meaningsSummary: meaningsSummary,
+                occurrenceCount: occurrenceCount,
               ),
           createCompanionCallback:
               ({
                 Value<int> rootId = const Value.absent(),
                 required String rootArabic,
                 required String rootTranslit,
+                Value<String> meaningsSummary = const Value.absent(),
+                Value<int> occurrenceCount = const Value.absent(),
               }) => RootsCompanion.insert(
                 rootId: rootId,
                 rootArabic: rootArabic,
                 rootTranslit: rootTranslit,
+                meaningsSummary: meaningsSummary,
+                occurrenceCount: occurrenceCount,
               ),
           withReferenceMapper: (p0) => p0
               .map(
@@ -4768,6 +5076,9 @@ typedef $$WordsTableCreateCompanionBuilder =
       required int position,
       required String arabicText,
       required String transliteration,
+      Value<String> translationGloss,
+      Value<String> partOfSpeech,
+      Value<String> grammarDetails,
       Value<int?> rootId,
     });
 typedef $$WordsTableUpdateCompanionBuilder =
@@ -4778,6 +5089,9 @@ typedef $$WordsTableUpdateCompanionBuilder =
       Value<int> position,
       Value<String> arabicText,
       Value<String> transliteration,
+      Value<String> translationGloss,
+      Value<String> partOfSpeech,
+      Value<String> grammarDetails,
       Value<int?> rootId,
     });
 
@@ -4839,6 +5153,21 @@ class $$WordsTableFilterComposer extends Composer<_$AppDatabase, $WordsTable> {
 
   ColumnFilters<String> get transliteration => $composableBuilder(
     column: $table.transliteration,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get translationGloss => $composableBuilder(
+    column: $table.translationGloss,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get partOfSpeech => $composableBuilder(
+    column: $table.partOfSpeech,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get grammarDetails => $composableBuilder(
+    column: $table.grammarDetails,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -4905,6 +5234,21 @@ class $$WordsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get translationGloss => $composableBuilder(
+    column: $table.translationGloss,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get partOfSpeech => $composableBuilder(
+    column: $table.partOfSpeech,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get grammarDetails => $composableBuilder(
+    column: $table.grammarDetails,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   $$RootsTableOrderingComposer get rootId {
     final $$RootsTableOrderingComposer composer = $composerBuilder(
       composer: this,
@@ -4961,6 +5305,21 @@ class $$WordsTableAnnotationComposer
 
   GeneratedColumn<String> get transliteration => $composableBuilder(
     column: $table.transliteration,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get translationGloss => $composableBuilder(
+    column: $table.translationGloss,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get partOfSpeech => $composableBuilder(
+    column: $table.partOfSpeech,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get grammarDetails => $composableBuilder(
+    column: $table.grammarDetails,
     builder: (column) => column,
   );
 
@@ -5022,6 +5381,9 @@ class $$WordsTableTableManager
                 Value<int> position = const Value.absent(),
                 Value<String> arabicText = const Value.absent(),
                 Value<String> transliteration = const Value.absent(),
+                Value<String> translationGloss = const Value.absent(),
+                Value<String> partOfSpeech = const Value.absent(),
+                Value<String> grammarDetails = const Value.absent(),
                 Value<int?> rootId = const Value.absent(),
               }) => WordsCompanion(
                 id: id,
@@ -5030,6 +5392,9 @@ class $$WordsTableTableManager
                 position: position,
                 arabicText: arabicText,
                 transliteration: transliteration,
+                translationGloss: translationGloss,
+                partOfSpeech: partOfSpeech,
+                grammarDetails: grammarDetails,
                 rootId: rootId,
               ),
           createCompanionCallback:
@@ -5040,6 +5405,9 @@ class $$WordsTableTableManager
                 required int position,
                 required String arabicText,
                 required String transliteration,
+                Value<String> translationGloss = const Value.absent(),
+                Value<String> partOfSpeech = const Value.absent(),
+                Value<String> grammarDetails = const Value.absent(),
                 Value<int?> rootId = const Value.absent(),
               }) => WordsCompanion.insert(
                 id: id,
@@ -5048,6 +5416,9 @@ class $$WordsTableTableManager
                 position: position,
                 arabicText: arabicText,
                 transliteration: transliteration,
+                translationGloss: translationGloss,
+                partOfSpeech: partOfSpeech,
+                grammarDetails: grammarDetails,
                 rootId: rootId,
               ),
           withReferenceMapper: (p0) => p0

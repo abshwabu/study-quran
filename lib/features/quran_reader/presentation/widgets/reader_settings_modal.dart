@@ -62,13 +62,18 @@ class ReaderSettingsModal extends ConsumerWidget {
               segments: const [
                 ButtonSegment(
                   value: ReadingMode.verseByVerse,
-                  label: Text('Verse-by-Verse'),
+                  label: Text('Verse'),
                   icon: Icon(Icons.view_headline),
                 ),
                 ButtonSegment(
                   value: ReadingMode.continuousScroll,
-                  label: Text('Continuous Mushaf'),
-                  icon: Icon(Icons.auto_stories),
+                  label: Text('Mushaf'),
+                  icon: Icon(Icons.menu_book),
+                ),
+                ButtonSegment(
+                  value: ReadingMode.wordByWord,
+                  label: Text('Word-by-Word'),
+                  icon: Icon(Icons.grid_view),
                 ),
               ],
               selected: {prefs.readingMode},

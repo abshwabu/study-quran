@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-enum ReadingMode { verseByVerse, continuousScroll }
+enum ReadingMode { verseByVerse, continuousScroll, wordByWord }
+
 
 class ReaderPreferences {
   final ReadingMode readingMode;
