@@ -7,12 +7,14 @@ import 'tables/content_packs.dart';
 import 'tables/tafsir.dart';
 import 'tables/thematic.dart';
 import 'tables/workspace.dart';
+import 'tables/ai_history.dart';
 import 'daos/quran_dao.dart';
 import 'daos/search_dao.dart';
 import 'daos/content_pack_dao.dart';
 import 'daos/tafsir_dao.dart';
 import 'daos/thematic_dao.dart';
 import 'daos/workspace_dao.dart';
+import 'daos/ai_history_dao.dart';
 import 'fts_setup.dart';
 import 'connection.dart';
 
@@ -38,6 +40,7 @@ part 'app_database.g.dart';
     Notes,
     Tags,
     ItemTags,
+    AiHistory,
   ],
   daos: [
     QuranDao,
@@ -46,6 +49,7 @@ part 'app_database.g.dart';
     TafsirDao,
     ThematicDao,
     WorkspaceDao,
+    AiHistoryDao,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -168,6 +172,16 @@ class AppDatabase extends _$AppDatabase {
             item_id TEXT NOT NULL,
             tag_id TEXT NOT NULL,
             PRIMARY KEY (item_type, item_id, tag_id)
+          );
+        ''');
+        await customStatement('''
+          CREATE TABLE IF NOT EXISTS ai_history (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            session_type TEXT NOT NULL,
+            context_label TEXT NOT NULL,
+            prompt_sent TEXT NOT NULL,
+            response_received TEXT NOT NULL,
+            created_at INTEGER NOT NULL
           );
         ''');
       },

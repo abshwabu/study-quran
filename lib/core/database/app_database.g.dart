@@ -7069,6 +7069,429 @@ class ItemTagsCompanion extends UpdateCompanion<ItemTag> {
   }
 }
 
+class $AiHistoryTable extends AiHistory
+    with TableInfo<$AiHistoryTable, AiHistoryEntry> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $AiHistoryTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _sessionTypeMeta = const VerificationMeta(
+    'sessionType',
+  );
+  @override
+  late final GeneratedColumn<String> sessionType = GeneratedColumn<String>(
+    'session_type',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _contextLabelMeta = const VerificationMeta(
+    'contextLabel',
+  );
+  @override
+  late final GeneratedColumn<String> contextLabel = GeneratedColumn<String>(
+    'context_label',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _promptSentMeta = const VerificationMeta(
+    'promptSent',
+  );
+  @override
+  late final GeneratedColumn<String> promptSent = GeneratedColumn<String>(
+    'prompt_sent',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _responseReceivedMeta = const VerificationMeta(
+    'responseReceived',
+  );
+  @override
+  late final GeneratedColumn<String> responseReceived = GeneratedColumn<String>(
+    'response_received',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    sessionType,
+    contextLabel,
+    promptSent,
+    responseReceived,
+    createdAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'ai_history';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<AiHistoryEntry> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('session_type')) {
+      context.handle(
+        _sessionTypeMeta,
+        sessionType.isAcceptableOrUnknown(
+          data['session_type']!,
+          _sessionTypeMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_sessionTypeMeta);
+    }
+    if (data.containsKey('context_label')) {
+      context.handle(
+        _contextLabelMeta,
+        contextLabel.isAcceptableOrUnknown(
+          data['context_label']!,
+          _contextLabelMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_contextLabelMeta);
+    }
+    if (data.containsKey('prompt_sent')) {
+      context.handle(
+        _promptSentMeta,
+        promptSent.isAcceptableOrUnknown(data['prompt_sent']!, _promptSentMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_promptSentMeta);
+    }
+    if (data.containsKey('response_received')) {
+      context.handle(
+        _responseReceivedMeta,
+        responseReceived.isAcceptableOrUnknown(
+          data['response_received']!,
+          _responseReceivedMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_responseReceivedMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  AiHistoryEntry map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return AiHistoryEntry(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      sessionType: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}session_type'],
+      )!,
+      contextLabel: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}context_label'],
+      )!,
+      promptSent: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}prompt_sent'],
+      )!,
+      responseReceived: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}response_received'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+    );
+  }
+
+  @override
+  $AiHistoryTable createAlias(String alias) {
+    return $AiHistoryTable(attachedDatabase, alias);
+  }
+}
+
+class AiHistoryEntry extends DataClass implements Insertable<AiHistoryEntry> {
+  final int id;
+  final String sessionType;
+  final String contextLabel;
+  final String promptSent;
+  final String responseReceived;
+  final DateTime createdAt;
+  const AiHistoryEntry({
+    required this.id,
+    required this.sessionType,
+    required this.contextLabel,
+    required this.promptSent,
+    required this.responseReceived,
+    required this.createdAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['session_type'] = Variable<String>(sessionType);
+    map['context_label'] = Variable<String>(contextLabel);
+    map['prompt_sent'] = Variable<String>(promptSent);
+    map['response_received'] = Variable<String>(responseReceived);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    return map;
+  }
+
+  AiHistoryCompanion toCompanion(bool nullToAbsent) {
+    return AiHistoryCompanion(
+      id: Value(id),
+      sessionType: Value(sessionType),
+      contextLabel: Value(contextLabel),
+      promptSent: Value(promptSent),
+      responseReceived: Value(responseReceived),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory AiHistoryEntry.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return AiHistoryEntry(
+      id: serializer.fromJson<int>(json['id']),
+      sessionType: serializer.fromJson<String>(json['sessionType']),
+      contextLabel: serializer.fromJson<String>(json['contextLabel']),
+      promptSent: serializer.fromJson<String>(json['promptSent']),
+      responseReceived: serializer.fromJson<String>(json['responseReceived']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'sessionType': serializer.toJson<String>(sessionType),
+      'contextLabel': serializer.toJson<String>(contextLabel),
+      'promptSent': serializer.toJson<String>(promptSent),
+      'responseReceived': serializer.toJson<String>(responseReceived),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+    };
+  }
+
+  AiHistoryEntry copyWith({
+    int? id,
+    String? sessionType,
+    String? contextLabel,
+    String? promptSent,
+    String? responseReceived,
+    DateTime? createdAt,
+  }) => AiHistoryEntry(
+    id: id ?? this.id,
+    sessionType: sessionType ?? this.sessionType,
+    contextLabel: contextLabel ?? this.contextLabel,
+    promptSent: promptSent ?? this.promptSent,
+    responseReceived: responseReceived ?? this.responseReceived,
+    createdAt: createdAt ?? this.createdAt,
+  );
+  AiHistoryEntry copyWithCompanion(AiHistoryCompanion data) {
+    return AiHistoryEntry(
+      id: data.id.present ? data.id.value : this.id,
+      sessionType: data.sessionType.present
+          ? data.sessionType.value
+          : this.sessionType,
+      contextLabel: data.contextLabel.present
+          ? data.contextLabel.value
+          : this.contextLabel,
+      promptSent: data.promptSent.present
+          ? data.promptSent.value
+          : this.promptSent,
+      responseReceived: data.responseReceived.present
+          ? data.responseReceived.value
+          : this.responseReceived,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AiHistoryEntry(')
+          ..write('id: $id, ')
+          ..write('sessionType: $sessionType, ')
+          ..write('contextLabel: $contextLabel, ')
+          ..write('promptSent: $promptSent, ')
+          ..write('responseReceived: $responseReceived, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    sessionType,
+    contextLabel,
+    promptSent,
+    responseReceived,
+    createdAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is AiHistoryEntry &&
+          other.id == this.id &&
+          other.sessionType == this.sessionType &&
+          other.contextLabel == this.contextLabel &&
+          other.promptSent == this.promptSent &&
+          other.responseReceived == this.responseReceived &&
+          other.createdAt == this.createdAt);
+}
+
+class AiHistoryCompanion extends UpdateCompanion<AiHistoryEntry> {
+  final Value<int> id;
+  final Value<String> sessionType;
+  final Value<String> contextLabel;
+  final Value<String> promptSent;
+  final Value<String> responseReceived;
+  final Value<DateTime> createdAt;
+  const AiHistoryCompanion({
+    this.id = const Value.absent(),
+    this.sessionType = const Value.absent(),
+    this.contextLabel = const Value.absent(),
+    this.promptSent = const Value.absent(),
+    this.responseReceived = const Value.absent(),
+    this.createdAt = const Value.absent(),
+  });
+  AiHistoryCompanion.insert({
+    this.id = const Value.absent(),
+    required String sessionType,
+    required String contextLabel,
+    required String promptSent,
+    required String responseReceived,
+    required DateTime createdAt,
+  }) : sessionType = Value(sessionType),
+       contextLabel = Value(contextLabel),
+       promptSent = Value(promptSent),
+       responseReceived = Value(responseReceived),
+       createdAt = Value(createdAt);
+  static Insertable<AiHistoryEntry> custom({
+    Expression<int>? id,
+    Expression<String>? sessionType,
+    Expression<String>? contextLabel,
+    Expression<String>? promptSent,
+    Expression<String>? responseReceived,
+    Expression<DateTime>? createdAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (sessionType != null) 'session_type': sessionType,
+      if (contextLabel != null) 'context_label': contextLabel,
+      if (promptSent != null) 'prompt_sent': promptSent,
+      if (responseReceived != null) 'response_received': responseReceived,
+      if (createdAt != null) 'created_at': createdAt,
+    });
+  }
+
+  AiHistoryCompanion copyWith({
+    Value<int>? id,
+    Value<String>? sessionType,
+    Value<String>? contextLabel,
+    Value<String>? promptSent,
+    Value<String>? responseReceived,
+    Value<DateTime>? createdAt,
+  }) {
+    return AiHistoryCompanion(
+      id: id ?? this.id,
+      sessionType: sessionType ?? this.sessionType,
+      contextLabel: contextLabel ?? this.contextLabel,
+      promptSent: promptSent ?? this.promptSent,
+      responseReceived: responseReceived ?? this.responseReceived,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (sessionType.present) {
+      map['session_type'] = Variable<String>(sessionType.value);
+    }
+    if (contextLabel.present) {
+      map['context_label'] = Variable<String>(contextLabel.value);
+    }
+    if (promptSent.present) {
+      map['prompt_sent'] = Variable<String>(promptSent.value);
+    }
+    if (responseReceived.present) {
+      map['response_received'] = Variable<String>(responseReceived.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AiHistoryCompanion(')
+          ..write('id: $id, ')
+          ..write('sessionType: $sessionType, ')
+          ..write('contextLabel: $contextLabel, ')
+          ..write('promptSent: $promptSent, ')
+          ..write('responseReceived: $responseReceived, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -7096,6 +7519,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $NotesTable notes = $NotesTable(this);
   late final $TagsTable tags = $TagsTable(this);
   late final $ItemTagsTable itemTags = $ItemTagsTable(this);
+  late final $AiHistoryTable aiHistory = $AiHistoryTable(this);
   late final QuranDao quranDao = QuranDao(this as AppDatabase);
   late final SearchDao searchDao = SearchDao(this as AppDatabase);
   late final ContentPackDao contentPackDao = ContentPackDao(
@@ -7104,6 +7528,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final TafsirDao tafsirDao = TafsirDao(this as AppDatabase);
   late final ThematicDao thematicDao = ThematicDao(this as AppDatabase);
   late final WorkspaceDao workspaceDao = WorkspaceDao(this as AppDatabase);
+  late final AiHistoryDao aiHistoryDao = AiHistoryDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -7127,6 +7552,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     notes,
     tags,
     itemTags,
+    aiHistory,
   ];
 }
 
@@ -11798,6 +12224,227 @@ typedef $$ItemTagsTableProcessedTableManager =
       ItemTag,
       PrefetchHooks Function({bool tagId})
     >;
+typedef $$AiHistoryTableCreateCompanionBuilder =
+    AiHistoryCompanion Function({
+      Value<int> id,
+      required String sessionType,
+      required String contextLabel,
+      required String promptSent,
+      required String responseReceived,
+      required DateTime createdAt,
+    });
+typedef $$AiHistoryTableUpdateCompanionBuilder =
+    AiHistoryCompanion Function({
+      Value<int> id,
+      Value<String> sessionType,
+      Value<String> contextLabel,
+      Value<String> promptSent,
+      Value<String> responseReceived,
+      Value<DateTime> createdAt,
+    });
+
+class $$AiHistoryTableFilterComposer
+    extends Composer<_$AppDatabase, $AiHistoryTable> {
+  $$AiHistoryTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get sessionType => $composableBuilder(
+    column: $table.sessionType,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get contextLabel => $composableBuilder(
+    column: $table.contextLabel,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get promptSent => $composableBuilder(
+    column: $table.promptSent,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get responseReceived => $composableBuilder(
+    column: $table.responseReceived,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$AiHistoryTableOrderingComposer
+    extends Composer<_$AppDatabase, $AiHistoryTable> {
+  $$AiHistoryTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get sessionType => $composableBuilder(
+    column: $table.sessionType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get contextLabel => $composableBuilder(
+    column: $table.contextLabel,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get promptSent => $composableBuilder(
+    column: $table.promptSent,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get responseReceived => $composableBuilder(
+    column: $table.responseReceived,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$AiHistoryTableAnnotationComposer
+    extends Composer<_$AppDatabase, $AiHistoryTable> {
+  $$AiHistoryTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get sessionType => $composableBuilder(
+    column: $table.sessionType,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get contextLabel => $composableBuilder(
+    column: $table.contextLabel,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get promptSent => $composableBuilder(
+    column: $table.promptSent,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get responseReceived => $composableBuilder(
+    column: $table.responseReceived,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+}
+
+class $$AiHistoryTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $AiHistoryTable,
+          AiHistoryEntry,
+          $$AiHistoryTableFilterComposer,
+          $$AiHistoryTableOrderingComposer,
+          $$AiHistoryTableAnnotationComposer,
+          $$AiHistoryTableCreateCompanionBuilder,
+          $$AiHistoryTableUpdateCompanionBuilder,
+          (
+            AiHistoryEntry,
+            BaseReferences<_$AppDatabase, $AiHistoryTable, AiHistoryEntry>,
+          ),
+          AiHistoryEntry,
+          PrefetchHooks Function()
+        > {
+  $$AiHistoryTableTableManager(_$AppDatabase db, $AiHistoryTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$AiHistoryTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$AiHistoryTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$AiHistoryTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> sessionType = const Value.absent(),
+                Value<String> contextLabel = const Value.absent(),
+                Value<String> promptSent = const Value.absent(),
+                Value<String> responseReceived = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+              }) => AiHistoryCompanion(
+                id: id,
+                sessionType: sessionType,
+                contextLabel: contextLabel,
+                promptSent: promptSent,
+                responseReceived: responseReceived,
+                createdAt: createdAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String sessionType,
+                required String contextLabel,
+                required String promptSent,
+                required String responseReceived,
+                required DateTime createdAt,
+              }) => AiHistoryCompanion.insert(
+                id: id,
+                sessionType: sessionType,
+                contextLabel: contextLabel,
+                promptSent: promptSent,
+                responseReceived: responseReceived,
+                createdAt: createdAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$AiHistoryTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $AiHistoryTable,
+      AiHistoryEntry,
+      $$AiHistoryTableFilterComposer,
+      $$AiHistoryTableOrderingComposer,
+      $$AiHistoryTableAnnotationComposer,
+      $$AiHistoryTableCreateCompanionBuilder,
+      $$AiHistoryTableUpdateCompanionBuilder,
+      (
+        AiHistoryEntry,
+        BaseReferences<_$AppDatabase, $AiHistoryTable, AiHistoryEntry>,
+      ),
+      AiHistoryEntry,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -11837,4 +12484,6 @@ class $AppDatabaseManager {
   $$TagsTableTableManager get tags => $$TagsTableTableManager(_db, _db.tags);
   $$ItemTagsTableTableManager get itemTags =>
       $$ItemTagsTableTableManager(_db, _db.itemTags);
+  $$AiHistoryTableTableManager get aiHistory =>
+      $$AiHistoryTableTableManager(_db, _db.aiHistory);
 }

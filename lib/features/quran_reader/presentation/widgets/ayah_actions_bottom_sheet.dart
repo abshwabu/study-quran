@@ -9,6 +9,8 @@ import '../../../tafsir/presentation/tafsir_comparison_screen.dart';
 import '../../../thematic/presentation/widgets/cross_references_bottom_sheet.dart';
 import '../../../thematic/presentation/widgets/asbab_al_nuzul_bottom_sheet.dart';
 import '../../../workspace/providers/workspace_providers.dart';
+import '../../../ai_assistant/presentation/widgets/ai_explain_ayah_modal.dart';
+
 
 class AyahActionsBottomSheet extends ConsumerWidget {
   final AyahWithTranslation ayahData;
@@ -238,7 +240,28 @@ ${ayahData.ayah.arabicTextUthmani}
                 },
               ),
 
-              // 6. Bookmark / Add Research Note
+              // 6. AI Explain This Ayah (Gemini Assistant)
+              ListTile(
+                leading: CircleAvatar(
+                  backgroundColor: Colors.blue.shade50,
+                  child: Icon(Icons.auto_awesome, color: Colors.blue.shade800),
+                ),
+                title: const Text('AI Explain This Ayah'),
+                subtitle: const Text('Optional Gemini AI verse explanation & insights'),
+                onTap: () {
+                  Navigator.pop(context);
+                  AiExplainAyahModal.show(
+                    context,
+                    surahNameTranslit: surahMeta.nameTranslit,
+                    surahNumber: ayahData.ayah.surahNumber,
+                    ayahNumber: ayahData.ayah.ayahNumber,
+                    arabicTextUthmani: ayahData.ayah.arabicTextUthmani,
+                    translationText: ayahData.translationText ?? '',
+                  );
+                },
+              ),
+
+              // 7. Bookmark / Add Research Note
               ListTile(
                 leading: CircleAvatar(
                   backgroundColor: Colors.orange.shade50,
@@ -251,6 +274,7 @@ ${ayahData.ayah.arabicTextUthmani}
                   _showBookmarkAndNoteDialog(context, ref);
                 },
               ),
+
 
               // 7. Play Audio Action (Hook for Prompt 09)
               ListTile(
