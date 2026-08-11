@@ -16,6 +16,8 @@ import '../../tafsir/presentation/tafsir_library_screen.dart';
 import '../../search/presentation/search_screen.dart';
 import '../../morphology/presentation/root_browser_screen.dart';
 import '../../thematic/presentation/topic_browser_screen.dart';
+import '../../workspace/presentation/workspace_screen.dart';
+
 
 
 class QuranReaderScreen extends ConsumerStatefulWidget {
@@ -123,7 +125,19 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen> {
                 },
               ),
               IconButton(
+                icon: const Icon(Icons.workspaces_outline),
+                tooltip: 'Research Workspace',
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (ctx) => const WorkspaceScreen(),
+                    ),
+                  );
+                },
+              ),
+              IconButton(
                 icon: const Icon(Icons.category),
+
                 tooltip: 'Thematic Topic Index',
                 onPressed: () {
                   Navigator.of(context).push(

@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:studyquran/core/database/daos/quran_dao.dart';
 import 'package:studyquran/core/database/app_database.dart';
+import 'package:studyquran/core/database/providers.dart';
 import '../../../tafsir/presentation/single_tafsir_screen.dart';
 import '../../../tafsir/presentation/tafsir_comparison_screen.dart';
 import '../../../thematic/presentation/widgets/cross_references_bottom_sheet.dart';
 import '../../../thematic/presentation/widgets/asbab_al_nuzul_bottom_sheet.dart';
+import '../../../workspace/providers/workspace_providers.dart';
 
-class AyahActionsBottomSheet extends StatelessWidget {
+class AyahActionsBottomSheet extends ConsumerWidget {
   final AyahWithTranslation ayahData;
   final Surah surahMeta;
 
@@ -46,8 +49,79 @@ ${ayahData.ayah.arabicTextUthmani}
     );
   }
 
+  void _showBookmarkAndNoteDialog(BuildContext context, WidgetRef ref) {
+    final noteController = TextEditingController();
+    final dao = ref.read(workspaceDaoProvider);
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('Bookmark & Research Note (${ayahData.ayah.surahNumber}:${ayahData.ayah.ayahNumber})'),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.teal, foregroundColor: Colors.white),
+                onPressed: () async {
+                  await dao.addBookmark(
+                    surahNumber: ayahData.ayah.surahNumber,
+                    ayahNumber: ayahData.ayah.ayahNumber,
+                  );
+                  ref.invalidate(bookmarksProvider);
+                  if (!ctx.mounted) return;
+                  Navigator.pop(ctx);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Ayah bookmarked to Research Workspace!')),
+                  );
+                },
+                icon: const Icon(Icons.bookmark_add),
+                label: const Text('Add 1-Tap Bookmark'),
+              ),
+              const Divider(height: 24),
+              const Text('Add Personal Research Note', style: TextStyle(fontWeight: FontWeight.bold)),
+              const SizedBox(height: 8),
+              TextField(
+                controller: noteController,
+                maxLines: 4,
+                decoration: const InputDecoration(
+                  hintText: 'Write research insights, commentary notes, or reflection...',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+          ElevatedButton(
+            onPressed: () async {
+              if (noteController.text.trim().isEmpty) return;
+              final noteId = 'note_${ayahData.ayah.surahNumber}_${ayahData.ayah.ayahNumber}_${DateTime.now().millisecondsSinceEpoch}';
+              await dao.saveNote(
+                noteId: noteId,
+                surahNumber: ayahData.ayah.surahNumber,
+                startAyah: ayahData.ayah.ayahNumber,
+                endAyah: ayahData.ayah.ayahNumber,
+                textContent: noteController.text.trim(),
+              );
+              ref.invalidate(notesProvider);
+              if (!ctx.mounted) return;
+              Navigator.pop(ctx);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Research note saved!')),
+              );
+            },
+            child: const Text('Save Note'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return SafeArea(
       child: SingleChildScrollView(
         child: Container(
@@ -164,7 +238,21 @@ ${ayahData.ayah.arabicTextUthmani}
                 },
               ),
 
-              // 6. Play Audio Action (Hook for Prompt 09)
+              // 6. Bookmark / Add Research Note
+              ListTile(
+                leading: CircleAvatar(
+                  backgroundColor: Colors.orange.shade50,
+                  child: Icon(Icons.bookmark_add, color: Colors.orange.shade800),
+                ),
+                title: const Text('Bookmark / Add Research Note'),
+                subtitle: const Text('Save to Workspace collections & write research notes'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _showBookmarkAndNoteDialog(context, ref);
+                },
+              ),
+
+              // 7. Play Audio Action (Hook for Prompt 09)
               ListTile(
                 leading: CircleAvatar(
                   backgroundColor: Colors.blue.shade50,
@@ -177,25 +265,6 @@ ${ayahData.ayah.arabicTextUthmani}
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       content: Text('Audio recitation feature will be wired in Prompt 09'),
-                      duration: Duration(seconds: 2),
-                    ),
-                  );
-                },
-              ),
-
-              // 7. Bookmark & Notes Action (Hook for Prompt 07)
-              ListTile(
-                leading: CircleAvatar(
-                  backgroundColor: Colors.orange.shade50,
-                  child: Icon(Icons.bookmark_border, color: Colors.orange.shade800),
-                ),
-                title: const Text('Bookmark / Add Note'),
-                subtitle: const Text('Research Workspace & Tags (Prompt 07 hook)'),
-                onTap: () {
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Bookmarks & Research notes will be wired in Prompt 07'),
                       duration: Duration(seconds: 2),
                     ),
                   );
