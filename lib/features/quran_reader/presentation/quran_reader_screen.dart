@@ -129,76 +129,6 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen> {
                 },
               ),
               IconButton(
-                icon: const Icon(Icons.download),
-                tooltip: 'Content Pack Downloader',
-                onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (ctx) => const ContentPackManagerScreen(),
-                    ),
-                  );
-                },
-              ),
-              IconButton(
-                icon: const Icon(Icons.auto_awesome),
-
-                tooltip: 'AI Research Assistant',
-                onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (ctx) => const AiSettingsScreen(),
-                    ),
-                  );
-                },
-              ),
-              IconButton(
-                icon: const Icon(Icons.workspaces_outline),
-
-                tooltip: 'Research Workspace',
-                onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (ctx) => const WorkspaceScreen(),
-                    ),
-                  );
-                },
-              ),
-              IconButton(
-                icon: const Icon(Icons.category),
-
-                tooltip: 'Thematic Topic Index',
-                onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (ctx) => const TopicBrowserScreen(),
-                    ),
-                  );
-                },
-              ),
-              IconButton(
-                icon: const Icon(Icons.blur_on),
-
-                tooltip: 'Root Browser',
-                onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (ctx) => const RootBrowserScreen(),
-                    ),
-                  );
-                },
-              ),
-              IconButton(
-                icon: const Icon(Icons.library_books),
-                tooltip: 'Tafsir Library',
-                onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (ctx) => const TafsirLibraryScreen(),
-                    ),
-                  );
-                },
-              ),
-              IconButton(
                 icon: const Icon(Icons.explore_outlined),
                 tooltip: 'Jump to Ayah',
                 onPressed: () => JumpToDialog.show(
@@ -213,7 +143,108 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen> {
                 tooltip: 'Reader Preferences',
                 onPressed: () => ReaderSettingsModal.show(context),
               ),
+              PopupMenuButton<String>(
+                icon: const Icon(Icons.more_vert),
+                tooltip: 'More Research Tools',
+                onSelected: (value) {
+                  switch (value) {
+                    case 'workspace':
+                      Navigator.of(context).push(
+                        MaterialPageRoute(builder: (ctx) => const WorkspaceScreen()),
+                      );
+                      break;
+                    case 'topics':
+                      Navigator.of(context).push(
+                        MaterialPageRoute(builder: (ctx) => const TopicBrowserScreen()),
+                      );
+                      break;
+                    case 'roots':
+                      Navigator.of(context).push(
+                        MaterialPageRoute(builder: (ctx) => const RootBrowserScreen()),
+                      );
+                      break;
+                    case 'tafsir':
+                      Navigator.of(context).push(
+                        MaterialPageRoute(builder: (ctx) => const TafsirLibraryScreen()),
+                      );
+                      break;
+                    case 'ai':
+                      Navigator.of(context).push(
+                        MaterialPageRoute(builder: (ctx) => const AiSettingsScreen()),
+                      );
+                      break;
+                    case 'downloads':
+                      Navigator.of(context).push(
+                        MaterialPageRoute(builder: (ctx) => const ContentPackManagerScreen()),
+                      );
+                      break;
+                  }
+                },
+                itemBuilder: (context) => const [
+                  PopupMenuItem(
+                    value: 'workspace',
+                    child: Row(
+                      children: [
+                        Icon(Icons.workspaces_outline, color: Colors.teal),
+                        SizedBox(width: 12),
+                        Text('Research Workspace'),
+                      ],
+                    ),
+                  ),
+                  PopupMenuItem(
+                    value: 'topics',
+                    child: Row(
+                      children: [
+                        Icon(Icons.category, color: Colors.teal),
+                        SizedBox(width: 12),
+                        Text('Thematic Topic Index'),
+                      ],
+                    ),
+                  ),
+                  PopupMenuItem(
+                    value: 'roots',
+                    child: Row(
+                      children: [
+                        Icon(Icons.blur_on, color: Colors.teal),
+                        SizedBox(width: 12),
+                        Text('Root Word Browser'),
+                      ],
+                    ),
+                  ),
+                  PopupMenuItem(
+                    value: 'tafsir',
+                    child: Row(
+                      children: [
+                        Icon(Icons.library_books, color: Colors.teal),
+                        SizedBox(width: 12),
+                        Text('Tafsir Library'),
+                      ],
+                    ),
+                  ),
+                  PopupMenuItem(
+                    value: 'ai',
+                    child: Row(
+                      children: [
+                        Icon(Icons.auto_awesome, color: Colors.blue),
+                        SizedBox(width: 12),
+                        Text('AI Research Assistant'),
+                      ],
+                    ),
+                  ),
+                  PopupMenuItem(
+                    value: 'downloads',
+                    child: Row(
+                      children: [
+                        Icon(Icons.download, color: Colors.orange),
+                        SizedBox(width: 12),
+                        Text('Content Pack Downloader'),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ],
+
           ),
           body: ayahsAsync.when(
             loading: () => const Center(
