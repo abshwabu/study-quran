@@ -58,10 +58,11 @@ class ThematicDao extends DatabaseAccessor<AppDatabase> with _$ThematicDaoMixin 
   /// Search topics by keyword
   Future<List<Topic>> searchTopics(String query) {
     final clean = query.trim();
-    if (clean.isEmpty) return getRootTopics();
+    if (clean.isEmpty) return select(topics).get();
 
     return (select(topics)..where((t) => t.name.contains(clean) | t.category.contains(clean))).get();
   }
+
 
   /// Fetch all Ayahs associated with a Topic
   Future<List<TopicAyahResult>> getAyahsForTopic(String topicId, {String translationId = 'en.saheeh'}) async {
@@ -77,7 +78,8 @@ class ThematicDao extends DatabaseAccessor<AppDatabase> with _$ThematicDaoMixin 
       INNER JOIN surahs s ON s.number = ta.surah_number
       INNER JOIN ayahs a ON a.surah_number = ta.surah_number AND a.ayah_number = ta.ayah_number
       LEFT JOIN ayah_translations t ON t.translation_id = ? AND t.surah_number = ta.surah_number AND t.ayah_number = ta.ayah_number
-      WHERE ta.topic_id = ?
+      WHERE ta.topic_id = ? OR ta.topic_id IN (SELECT topic_id FROM topics WHERE parent_topic_id = ?)
+      GROUP BY ta.surah_number, ta.ayah_number
       ORDER BY ta.surah_number, ta.ayah_number;
     ''';
 
@@ -86,8 +88,10 @@ class ThematicDao extends DatabaseAccessor<AppDatabase> with _$ThematicDaoMixin 
       variables: [
         Variable.withString(translationId),
         Variable.withString(topicId),
+        Variable.withString(topicId),
       ],
     ).get();
+
 
     return rows.map((row) {
       return TopicAyahResult(

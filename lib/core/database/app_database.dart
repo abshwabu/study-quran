@@ -184,7 +184,71 @@ class AppDatabase extends _$AppDatabase {
             created_at INTEGER NOT NULL
           );
         ''');
+
+        // Seed default thematic topics, cross references, and asbab al-nuzul if surahs table is populated (real app mode)
+        final surahCountRow = await customSelect('SELECT COUNT(*) AS c FROM surahs;').getSingle();
+        final hasSurahs = surahCountRow.read<int>('c') > 0;
+
+        if (hasSurahs) {
+          final topicCount = await customSelect('SELECT COUNT(*) AS c FROM topics;').getSingle();
+          if (topicCount.read<int>('c') == 0) {
+            await customStatement('''
+              INSERT INTO topics (topic_id, name, parent_topic_id, category) VALUES
+              ('fiqh', 'Fiqh & Jurisprudence', NULL, 'Jurisprudence'),
+              ('fiqh_salat', 'Prayer & Worship (Salah)', 'fiqh', 'Jurisprudence'),
+              ('fiqh_zakat', 'Charity & Almsgiving (Zakat)', 'fiqh', 'Jurisprudence'),
+              ('fiqh_sawm', 'Fasting & Ramadan (Sawm)', 'fiqh', 'Jurisprudence'),
+              ('aqeedah', 'Creed & Theology (Aqeedah)', NULL, 'Theology'),
+              ('aqeedah_tawheed', 'Monotheism & Oneness of Allah (Tawheed)', 'aqeedah', 'Theology'),
+              ('aqeedah_prophets', 'Belief in Prophets & Messengers', 'aqeedah', 'Theology'),
+              ('ethics', 'Morals & Character (Akhlaq)', NULL, 'Ethics'),
+              ('ethics_patience', 'Patience & Perseverance (Sabr)', 'ethics', 'Ethics'),
+              ('ethics_gratitude', 'Gratitude & Thankfulness (Shukr)', 'ethics', 'Ethics'),
+              ('eschatology', 'The Hereafter & Day of Judgment', NULL, 'Eschatology'),
+              ('day_of_judgment', 'Day of Judgment (Yawm al-Qiyamah)', 'eschatology', 'Eschatology'),
+              ('jannah', 'Paradise & Eternal Rewards (Jannah)', 'eschatology', 'Eschatology');
+            ''');
+
+            await customStatement('''
+              INSERT INTO topic_ayahs (topic_id, surah_number, ayah_number) VALUES
+              ('fiqh_salat', 1, 2),
+              ('fiqh_salat', 1, 5),
+              ('fiqh_salat', 1, 6),
+              ('fiqh_salat', 1, 7),
+              ('fiqh_zakat', 1, 2),
+              ('fiqh_zakat', 1, 5),
+              ('aqeedah_tawheed', 1, 1),
+              ('aqeedah_tawheed', 1, 2),
+              ('aqeedah_tawheed', 1, 5),
+              ('ethics_patience', 1, 5),
+              ('ethics_patience', 1, 6),
+              ('ethics_gratitude', 1, 2),
+              ('day_of_judgment', 1, 4),
+              ('jannah', 1, 6),
+              ('jannah', 1, 7);
+            ''');
+          }
+
+          final crossCount = await customSelect('SELECT COUNT(*) AS c FROM cross_references;').getSingle();
+          if (crossCount.read<int>('c') == 0) {
+            await customStatement('''
+              INSERT INTO cross_references (source_surah, source_ayah, target_surah, target_ayah, relationship_type, notes) VALUES
+              (1, 2, 1, 5, 'Similar Theme: Praise & Worship', 'Direct thematic connection'),
+              (1, 5, 1, 6, 'Sequential Exhortation: Seeking Guidance', 'Dua for the Straight Path');
+            ''');
+          }
+
+          final asbabCount = await customSelect('SELECT COUNT(*) AS c FROM asbab_al_nuzul;').getSingle();
+          if (asbabCount.read<int>('c') == 0) {
+            await customStatement('''
+              INSERT INTO asbab_al_nuzul (surah_number, start_ayah, end_ayah, text_content, source_note) VALUES
+              (1, 1, 7, 'Surah Al-Fatihah was revealed in Makkah as the comprehensive opening of the Quran, taught by Jibreel (AS) to Prophet Muhammad (ﷺ).', 'Asbab al-Nuzul by Al-Wahidi');
+            ''');
+          }
+        }
       },
+
+
     );
   }
 }
