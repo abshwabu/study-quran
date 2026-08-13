@@ -19,6 +19,8 @@ import '../../thematic/presentation/topic_browser_screen.dart';
 import '../../workspace/presentation/workspace_screen.dart';
 import '../../ai_assistant/presentation/ai_settings_screen.dart';
 import '../../content_packs/presentation/content_pack_manager_screen.dart';
+import '../../settings/presentation/settings_screen.dart';
+
 
 
 
@@ -178,6 +180,11 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen> {
                         MaterialPageRoute(builder: (ctx) => const ContentPackManagerScreen()),
                       );
                       break;
+                    case 'settings':
+                      Navigator.of(context).push(
+                        MaterialPageRoute(builder: (ctx) => const SettingsScreen()),
+                      );
+                      break;
                   }
                 },
                 itemBuilder: (context) => const [
@@ -241,9 +248,20 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen> {
                       ],
                     ),
                   ),
+                  PopupMenuItem(
+                    value: 'settings',
+                    child: Row(
+                      children: [
+                        Icon(Icons.settings, color: Colors.grey),
+                        SizedBox(width: 12),
+                        Text('Settings & Preferences'),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ],
+
 
           ),
           body: ayahsAsync.when(
