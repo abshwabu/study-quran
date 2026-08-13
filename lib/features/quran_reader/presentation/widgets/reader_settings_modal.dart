@@ -92,6 +92,51 @@ class ReaderSettingsModal extends ConsumerWidget {
               onChanged: (_) => notifier.toggleTajweedColoring(),
             ),
 
+            if (prefs.showTajweedColoring) ...[
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Row(
+                      children: [
+                        CircleAvatar(radius: 5, backgroundColor: Color(0xFF2196F3)),
+                        SizedBox(width: 4),
+                        Text('Madd', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        CircleAvatar(radius: 5, backgroundColor: Color(0xFF4CAF50)),
+                        SizedBox(width: 4),
+                        Text('Ghunnah', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        CircleAvatar(radius: 5, backgroundColor: Color(0xFFFF9800)),
+                        SizedBox(width: 4),
+                        Text('Qalqalah', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        CircleAvatar(radius: 5, backgroundColor: Color(0xFF9C27B0)),
+                        SizedBox(width: 4),
+                        Text('Ikhfa', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 12),
+            ],
+
+
             // 3. Translation Visibility Toggle
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
