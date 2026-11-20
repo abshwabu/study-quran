@@ -120,6 +120,10 @@ class _SingleTafsirScreenState extends ConsumerState<SingleTafsirScreen> {
                   builder: (context) => TafsirComparisonScreen(
                     surahNumber: _currentSurah,
                     ayahNumber: _currentAyah,
+                    initialSelectedTafsirIds: [
+                      _activeTafsirId,
+                      if (_activeTafsirId == 'ar.muyassar') 'en.jalalayn' else 'ar.muyassar',
+                    ],
                   ),
                 ),
               );

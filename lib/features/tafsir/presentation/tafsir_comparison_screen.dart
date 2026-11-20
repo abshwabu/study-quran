@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/database/providers.dart';
-import '../../../core/database/daos/tafsir_dao.dart';
+import '../../content_packs/presentation/content_pack_manager_screen.dart';
+import '../../quran_reader/presentation/widgets/jump_to_dialog.dart';
 import '../providers/tafsir_providers.dart';
 
 class TafsirComparisonScreen extends ConsumerStatefulWidget {
@@ -21,15 +22,20 @@ class TafsirComparisonScreen extends ConsumerStatefulWidget {
 }
 
 class _TafsirComparisonScreenState extends ConsumerState<TafsirComparisonScreen> {
+  late int _currentSurah;
+  late int _currentAyah;
   late Set<String> _selectedTafsirIds;
 
   @override
   void initState() {
     super.initState();
+    _currentSurah = widget.surahNumber;
+    _currentAyah = widget.ayahNumber;
+
     if (widget.initialSelectedTafsirIds != null && widget.initialSelectedTafsirIds!.isNotEmpty) {
       _selectedTafsirIds = Set.from(widget.initialSelectedTafsirIds!);
     } else {
-      // Default to comparing ar.muyassar and en.jalalayn
+      // Default to comparing the pre-bundled ar.muyassar and en.jalalayn
       _selectedTafsirIds = {'ar.muyassar', 'en.jalalayn'};
     }
   }
@@ -39,6 +45,13 @@ class _TafsirComparisonScreenState extends ConsumerState<TafsirComparisonScreen>
       if (_selectedTafsirIds.contains(tafsirId)) {
         if (_selectedTafsirIds.length > 1) {
           _selectedTafsirIds.remove(tafsirId);
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('At least one Tafsir must remain selected.'),
+              duration: Duration(seconds: 1),
+            ),
+          );
         }
       } else {
         _selectedTafsirIds.add(tafsirId);
@@ -46,43 +59,107 @@ class _TafsirComparisonScreenState extends ConsumerState<TafsirComparisonScreen>
     });
   }
 
+  void _navigateAyah(int delta, int maxAyahs) {
+    final target = _currentAyah + delta;
+    if (target >= 1 && target <= maxAyahs) {
+      setState(() {
+        _currentAyah = target;
+      });
+    }
+  }
+
+  void _openJumpDialog() {
+    JumpToDialog.show(
+      context,
+      initialSurah: _currentSurah,
+      initialAyah: _currentAyah,
+      onJump: (surah, ayah) {
+        setState(() {
+          _currentSurah = surah;
+          _currentAyah = ayah;
+        });
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final metaListAsync = ref.watch(availableTafsirsMetaProvider);
+    final downloadedIdsAsync = ref.watch(downloadedTafsirIdsProvider);
     final surahsAsync = ref.watch(surahsProvider);
-    final ayahsAsync = ref.watch(surahDetailProvider(widget.surahNumber));
+    final ayahsAsync = ref.watch(surahDetailProvider(_currentSurah));
 
     final comparisonAsync = ref.watch(
-      comparisonTafsirsProvider((
-        tafsirIds: _selectedTafsirIds.toList(),
-        surahNumber: widget.surahNumber,
-        ayahNumber: widget.ayahNumber,
-      )),
+      comparisonTafsirsProvider(
+        ComparisonQueryParam(
+          tafsirIds: _selectedTafsirIds.toList(),
+          surahNumber: _currentSurah,
+          ayahNumber: _currentAyah,
+        ),
+      ),
     );
 
     final surahMeta = surahsAsync.value?.firstWhere(
-      (s) => s.number == widget.surahNumber,
+      (s) => s.number == _currentSurah,
       orElse: () => surahsAsync.value?.first ?? surahsAsync.value![0],
     );
 
     final currentAyahData = ayahsAsync.value?.firstWhere(
-      (a) => a.ayah.ayahNumber == widget.ayahNumber,
+      (a) => a.ayah.ayahNumber == _currentAyah,
       orElse: () => ayahsAsync.value?.first ?? ayahsAsync.value![0],
     );
 
+    final downloadedIds = downloadedIdsAsync.value ?? const ['ar.muyassar', 'en.jalalayn'];
+    final maxAyahs = surahMeta?.ayahCount ?? 286;
+
     return Scaffold(
       appBar: AppBar(
-        title: Text('Compare Tafsirs (${surahMeta?.nameTranslit ?? "Surah ${widget.surahNumber}"} ${widget.surahNumber}:${widget.ayahNumber})'),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              'Compare Tafsirs',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            Text(
+              '${surahMeta?.nameTranslit ?? "Surah $_currentSurah"} ($_currentSurah:$_currentAyah)',
+              style: TextStyle(
+                fontSize: 12,
+                color: colorScheme.onSurfaceVariant,
+                fontWeight: FontWeight.normal,
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.pin_drop_outlined),
+            tooltip: 'Jump to Ayah',
+            onPressed: _openJumpDialog,
+          ),
+          IconButton(
+            icon: const Icon(Icons.download_outlined),
+            tooltip: 'Content Packs',
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (ctx) => const ContentPackManagerScreen(),
+                ),
+              );
+            },
+          ),
+        ],
       ),
       body: Column(
         children: [
-          // Ayah Arabic Header
+          // Ayah Arabic Header Card
           Container(
             width: double.infinity,
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
-              color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.6),
+              color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
               border: Border(bottom: BorderSide(color: colorScheme.outlineVariant)),
             ),
             child: Column(
@@ -103,7 +180,11 @@ class _TafsirComparisonScreenState extends ConsumerState<TafsirComparisonScreen>
                   const SizedBox(height: 6),
                   Text(
                     currentAyahData!.translationText!,
-                    style: TextStyle(fontSize: 13, color: colorScheme.onSurfaceVariant),
+                    style: TextStyle(
+                      fontSize: 13,
+                      height: 1.4,
+                      color: colorScheme.onSurfaceVariant,
+                    ),
                   ),
                 ],
               ],
@@ -112,21 +193,37 @@ class _TafsirComparisonScreenState extends ConsumerState<TafsirComparisonScreen>
 
           // Selector Filter Chips
           metaListAsync.when(
-            loading: () => const SizedBox(height: 40),
+            loading: () => const SizedBox(height: 48),
             error: (_, __) => const SizedBox.shrink(),
             data: (metas) {
               return Container(
+                width: double.infinity,
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: Row(
                     children: metas.map((meta) {
                       final isSelected = _selectedTafsirIds.contains(meta.tafsirId);
+                      final isDownloaded = downloadedIds.contains(meta.tafsirId);
+
                       return Padding(
                         padding: const EdgeInsets.only(right: 8),
                         child: FilterChip(
                           selected: isSelected,
-                          label: Text(meta.name),
+                          avatar: isDownloaded
+                              ? null
+                              : Icon(
+                                  Icons.cloud_outlined,
+                                  size: 16,
+                                  color: isSelected ? colorScheme.onPrimaryContainer : colorScheme.outline,
+                                ),
+                          label: Text(
+                            meta.name,
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                            ),
+                          ),
                           selectedColor: colorScheme.primaryContainer,
                           onSelected: (_) => _toggleTafsirSelection(meta.tafsirId),
                         ),
@@ -142,13 +239,27 @@ class _TafsirComparisonScreenState extends ConsumerState<TafsirComparisonScreen>
           // Comparison List / Columns Body
           Expanded(
             child: comparisonAsync.when(
-              loading: () => Center(child: CircularProgressIndicator(color: colorScheme.primary)),
-              error: (err, stack) => Center(child: Text('Error loading comparison: $err')),
-              data: (entries) {
-                if (entries.isEmpty) {
+              loading: () => Center(
+                child: CircularProgressIndicator(color: colorScheme.primary),
+              ),
+              error: (err, stack) => Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.error_outline, size: 40, color: colorScheme.error),
+                      const SizedBox(height: 12),
+                      Text('Error loading comparison: $err', textAlign: TextAlign.center),
+                    ],
+                  ),
+                ),
+              ),
+              data: (items) {
+                if (items.isEmpty) {
                   return Center(
                     child: Text(
-                      'No commentary available for selected Tafsirs.',
+                      'No Tafsir selected for comparison.',
                       style: TextStyle(color: colorScheme.onSurfaceVariant),
                     ),
                   );
@@ -159,32 +270,43 @@ class _TafsirComparisonScreenState extends ConsumerState<TafsirComparisonScreen>
                     final isWideScreen = constraints.maxWidth >= 700;
 
                     if (isWideScreen) {
-                      // Side-by-Side Column Layout for Wide Screens
+                      // Side-by-Side Column Layout for Tablets / Wide Screens
                       return Row(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: entries.map((entry) {
+                        children: items.map((item) {
                           return Expanded(
-                            child: Container(
+                            child: Card(
                               margin: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: colorScheme.surfaceContainer,
-                                border: Border.all(color: colorScheme.outlineVariant),
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(16),
+                                side: BorderSide(color: colorScheme.outlineVariant),
                               ),
-                              child: _TafsirCard(entry: entry),
+                              child: SingleChildScrollView(
+                                padding: const EdgeInsets.all(16),
+                                child: _TafsirComparisonCardContent(item: item),
+                              ),
                             ),
                           );
                         }).toList(),
                       );
                     } else {
-                      // Stacked Layout for Phone / Narrow Screens
+                      // Stacked Layout for Mobile Screens
                       return ListView.separated(
                         padding: const EdgeInsets.all(16),
-                        itemCount: entries.length,
+                        itemCount: items.length,
                         separatorBuilder: (context, index) => const SizedBox(height: 16),
                         itemBuilder: (context, index) {
                           return Card(
-                            child: _TafsirCard(entry: entryCard(entries[index])),
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                              side: BorderSide(color: colorScheme.outlineVariant),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(16),
+                              child: _TafsirComparisonCardContent(item: items[index]),
+                            ),
                           );
                         },
                       );
@@ -194,59 +316,198 @@ class _TafsirComparisonScreenState extends ConsumerState<TafsirComparisonScreen>
               },
             ),
           ),
+
+          // Footer Navigation Bar (Ayah Navigation)
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            decoration: BoxDecoration(
+              color: colorScheme.surface,
+              border: Border(top: BorderSide(color: colorScheme.outlineVariant)),
+            ),
+            child: SafeArea(
+              top: false,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  OutlinedButton.icon(
+                    onPressed: _currentAyah > 1 ? () => _navigateAyah(-1, maxAyahs) : null,
+                    icon: const Icon(Icons.arrow_back_ios_new, size: 14),
+                    label: const Text('Prev Ayah'),
+                  ),
+                  InkWell(
+                    onTap: _openJumpDialog,
+                    borderRadius: BorderRadius.circular(20),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: colorScheme.primaryContainer.withValues(alpha: 0.6),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: colorScheme.primary.withValues(alpha: 0.3)),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.unfold_more, size: 16, color: colorScheme.primary),
+                          const SizedBox(width: 4),
+                          Text(
+                            'Ayah $_currentAyah of $maxAyahs',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 13,
+                              color: colorScheme.primary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  OutlinedButton.icon(
+                    onPressed: _currentAyah < maxAyahs ? () => _navigateAyah(1, maxAyahs) : null,
+                    iconAlignment: IconAlignment.end,
+                    icon: const Icon(Icons.arrow_forward_ios, size: 14),
+                    label: const Text('Next Ayah'),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     );
   }
-
-  TafsirEntryWithMeta entryCard(TafsirEntryWithMeta entry) => entry;
 }
 
-class _TafsirCard extends StatelessWidget {
-  final TafsirEntryWithMeta entry;
+class _TafsirComparisonCardContent extends StatelessWidget {
+  final TafsirComparisonItem item;
 
-  const _TafsirCard({required this.entry});
+  const _TafsirComparisonCardContent({required this.item});
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final isRange = entry.content.startAyah != entry.content.endAyah;
+    final isArabic = item.meta.language == 'ar';
+    final content = item.content;
 
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Text(
-                  entry.meta.name,
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: colorScheme.primary),
-                  overflow: TextOverflow.ellipsis,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // Header: Name & Language Badge
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Text(
+                item.meta.name,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  color: colorScheme.primary,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+              decoration: BoxDecoration(
+                color: colorScheme.surfaceContainerHighest,
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: Text(
+                item.meta.language.toUpperCase(),
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold,
+                  color: colorScheme.onSurfaceVariant,
                 ),
               ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                decoration: BoxDecoration(
-                  color: colorScheme.surfaceContainerHighest,
-                  borderRadius: BorderRadius.circular(6),
+            ),
+          ],
+        ),
+        const SizedBox(height: 2),
+        Text(
+          'Author: ${item.meta.author}',
+          style: TextStyle(fontSize: 12, color: colorScheme.onSurfaceVariant),
+        ),
+        const SizedBox(height: 8),
+
+        // Case 1: Tafsir pack is NOT downloaded yet
+        if (!item.isDownloaded) ...[
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: colorScheme.tertiaryContainer.withValues(alpha: 0.4),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: colorScheme.tertiary.withValues(alpha: 0.3)),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Icon(Icons.cloud_download_outlined, size: 36, color: colorScheme.tertiary),
+                const SizedBox(height: 8),
+                Text(
+                  '${item.meta.name} is not downloaded yet',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                    color: colorScheme.onTertiaryContainer,
+                  ),
+                  textAlign: TextAlign.center,
                 ),
-                child: Text(
-                  entry.meta.language.toUpperCase(),
-                  style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: colorScheme.onSurfaceVariant),
+                const SizedBox(height: 4),
+                Text(
+                  'Download this classical commentary pack to compare it alongside other Tafsirs offline.',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: colorScheme.onTertiaryContainer.withValues(alpha: 0.8),
+                  ),
+                  textAlign: TextAlign.center,
                 ),
-              ),
-            ],
+                const SizedBox(height: 12),
+                FilledButton.tonalIcon(
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (ctx) => const ContentPackManagerScreen(),
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.download, size: 16),
+                  label: const Text('Download Pack'),
+                ),
+              ],
+            ),
           ),
-          const SizedBox(height: 2),
-          Text(
-            'Author: ${entry.meta.author}',
-            style: TextStyle(fontSize: 12, color: colorScheme.onSurfaceVariant),
+        ]
+        // Case 2: Downloaded, but no commentary entry for this verse
+        else if (content == null) ...[
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Column(
+              children: [
+                Icon(Icons.info_outline, size: 28, color: colorScheme.onSurfaceVariant),
+                const SizedBox(height: 8),
+                Text(
+                  'No commentary recorded for this verse in ${item.meta.name}.',
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
           ),
-          if (isRange) ...[
-            const SizedBox(height: 6),
+        ]
+        // Case 3: Commentary present!
+        else ...[
+          if (content.startAyah != content.endAyah) ...[
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
               decoration: BoxDecoration(
@@ -254,23 +515,29 @@ class _TafsirCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(6),
               ),
               child: Text(
-                'Range Commentary: Ayahs ${entry.content.startAyah}–${entry.content.endAyah}',
-                style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: colorScheme.secondary),
+                'Range Commentary: Ayahs ${content.startAyah}–${content.endAyah}',
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold,
+                  color: colorScheme.secondary,
+                ),
               ),
             ),
+            const SizedBox(height: 8),
           ],
           Divider(height: 16, color: colorScheme.outlineVariant),
           Text(
-            entry.content.textContent,
-            textDirection: entry.meta.language == 'ar' ? TextDirection.rtl : TextDirection.ltr,
+            content.textContent,
+            textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
+            textAlign: isArabic ? TextAlign.right : TextAlign.left,
             style: TextStyle(
-              fontSize: entry.meta.language == 'ar' ? 17 : 14,
-              height: 1.6,
+              fontSize: isArabic ? 17 : 14.5,
+              height: 1.65,
               color: colorScheme.onSurface,
             ),
           ),
         ],
-      ),
+      ],
     );
   }
 }

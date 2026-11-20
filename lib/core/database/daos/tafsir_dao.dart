@@ -88,4 +88,12 @@ class TafsirDao extends DatabaseAccessor<AppDatabase> with _$TafsirDaoMixin {
   Future<void> insertTafsirContentEntry(TafsirContentCompanion entry) {
     return into(tafsirContent).insert(entry);
   }
+
+  /// Get list of Tafsir IDs that have content installed in the database
+  Future<List<String>> getDownloadedTafsirIds() async {
+    final query = selectOnly(tafsirContent, distinct: true)
+      ..addColumns([tafsirContent.tafsirId]);
+    final rows = await query.get();
+    return rows.map((r) => r.read(tafsirContent.tafsirId)!).toList();
+  }
 }

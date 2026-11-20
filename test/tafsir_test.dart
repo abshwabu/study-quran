@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:drift/native.dart';
 import 'package:studyquran/core/database/app_database.dart';
 import 'package:studyquran/core/database/daos/tafsir_dao.dart';
+import 'package:studyquran/features/tafsir/providers/tafsir_providers.dart';
 
 void main() {
   late AppDatabase db;
@@ -108,5 +109,33 @@ void main() {
     expect(comparison.length, equals(2));
     final ids = comparison.map((c) => c.meta.tafsirId).toList();
     expect(ids, containsAll(['ar.muyassar', 'en.jalalayn']));
+  });
+
+  test('getDownloadedTafsirIds returns distinct downloaded IDs', () async {
+    final downloaded = await tafsirDao.getDownloadedTafsirIds();
+    expect(downloaded, containsAll(['ar.muyassar', 'en.jalalayn']));
+    expect(downloaded.contains('en.ibnkathir'), isFalse);
+  });
+
+  test('ComparisonQueryParam value equality and order independence', () {
+    final param1 = ComparisonQueryParam(
+      tafsirIds: ['ar.muyassar', 'en.jalalayn'],
+      surahNumber: 1,
+      ayahNumber: 1,
+    );
+    final param2 = ComparisonQueryParam(
+      tafsirIds: ['en.jalalayn', 'ar.muyassar'],
+      surahNumber: 1,
+      ayahNumber: 1,
+    );
+    final param3 = ComparisonQueryParam(
+      tafsirIds: ['ar.muyassar'],
+      surahNumber: 1,
+      ayahNumber: 1,
+    );
+
+    expect(param1, equals(param2));
+    expect(param1.hashCode, equals(param2.hashCode));
+    expect(param1 == param3, isFalse);
   });
 }
