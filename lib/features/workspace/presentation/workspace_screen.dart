@@ -63,6 +63,7 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> with SingleTi
 
   void _showBackupRestoreDialog(BuildContext context) {
     final jsonController = TextEditingController();
+    final colorScheme = Theme.of(context).colorScheme;
 
     showDialog(
       context: context,
@@ -72,9 +73,9 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> with SingleTi
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text(
+              Text(
                 'Export your entire workspace (bookmarks, notes, collections) as a JSON file or import a backup.',
-                style: TextStyle(fontSize: 13, color: Colors.grey),
+                style: TextStyle(fontSize: 13, color: colorScheme.onSurfaceVariant),
               ),
               const SizedBox(height: 16),
               ElevatedButton.icon(
@@ -100,12 +101,10 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> with SingleTi
                 maxLines: 4,
                 decoration: const InputDecoration(
                   hintText: 'Paste backup JSON string here to restore...',
-                  border: OutlineInputBorder(),
                 ),
               ),
               const SizedBox(height: 12),
               ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.teal, foregroundColor: Colors.white),
                 onPressed: () async {
                   if (jsonController.text.trim().isEmpty) return;
                   try {
@@ -117,12 +116,19 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> with SingleTi
                     if (!ctx.mounted) return;
                     Navigator.pop(ctx);
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Workspace restored successfully!')),
+                      const SnackBar(
+                        content: Text('Workspace restored successfully!'),
+                        behavior: SnackBarBehavior.floating,
+                      ),
                     );
                   } catch (e) {
                     if (!ctx.mounted) return;
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Failed to import JSON: $e')),
+                      SnackBar(
+                        content: Text('Failed to import JSON: $e'),
+                        backgroundColor: colorScheme.error,
+                        behavior: SnackBarBehavior.floating,
+                      ),
                     );
                   }
                 },
@@ -182,6 +188,7 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> with SingleTi
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     final bookmarksAsync = ref.watch(bookmarksProvider);
     final notesAsync = ref.watch(notesProvider);
     final collectionsAsync = ref.watch(collectionsProvider);
@@ -204,6 +211,9 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> with SingleTi
         ],
         bottom: TabBar(
           controller: _tabController,
+          indicatorColor: colorScheme.primary,
+          labelColor: colorScheme.primary,
+          unselectedLabelColor: colorScheme.onSurfaceVariant,
           tabs: const [
             Tab(icon: Icon(Icons.bookmark), text: 'Bookmarks'),
             Tab(icon: Icon(Icons.note_alt), text: 'Notes'),
@@ -220,11 +230,17 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> with SingleTi
               if (selectedCollection != null) ...[
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  color: Colors.teal.shade50,
+                  decoration: BoxDecoration(
+                    color: colorScheme.primaryContainer.withValues(alpha: 0.6),
+                    border: Border(bottom: BorderSide(color: colorScheme.outlineVariant)),
+                  ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text('Filtered by Collection', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.teal)),
+                      Text(
+                        'Filtered by Collection',
+                        style: TextStyle(fontWeight: FontWeight.bold, color: colorScheme.primary),
+                      ),
                       TextButton(
                         onPressed: () => ref.read(selectedCollectionFilterProvider.notifier).state = null,
                         child: const Text('Clear Filter'),
@@ -235,21 +251,24 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> with SingleTi
               ],
               Expanded(
                 child: bookmarksAsync.when(
-                  loading: () => const Center(child: CircularProgressIndicator()),
+                  loading: () => Center(child: CircularProgressIndicator(color: colorScheme.primary)),
                   error: (err, stack) => Center(child: Text('Error: $err')),
                   data: (bookmarks) {
                     if (bookmarks.isEmpty) {
-                      return const Center(
+                      return Center(
                         child: Padding(
-                          padding: EdgeInsets.all(32),
+                          padding: const EdgeInsets.all(32),
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(Icons.bookmark_border, size: 48, color: Colors.grey),
-                              SizedBox(height: 12),
-                              Text('No bookmarks added yet.'),
-                              SizedBox(height: 4),
-                              Text('Bookmark verses while reading to organize your research.', style: TextStyle(color: Colors.grey)),
+                              Icon(Icons.bookmark_border, size: 48, color: colorScheme.onSurfaceVariant),
+                              const SizedBox(height: 12),
+                              const Text('No bookmarks added yet.', style: TextStyle(fontWeight: FontWeight.bold)),
+                              const SizedBox(height: 4),
+                              Text(
+                                'Bookmark verses while reading to organize your research.',
+                                style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 13),
+                              ),
                             ],
                           ),
                         ),
@@ -257,7 +276,7 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> with SingleTi
                     }
 
                     return ListView.separated(
-                      padding: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                       itemCount: bookmarks.length,
                       separatorBuilder: (context, index) => const SizedBox(height: 8),
                       itemBuilder: (context, index) {
@@ -270,12 +289,19 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> with SingleTi
                               children: [
                                 Text(
                                   '${item.surahNameTranslit} (${item.bookmark.surahNumber}:${item.bookmark.ayahNumber})',
-                                  style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.teal),
+                                  style: TextStyle(fontWeight: FontWeight.bold, color: colorScheme.primary),
                                 ),
                                 if (item.collection != null)
-                                  Chip(
-                                    visualDensity: VisualDensity.compact,
-                                    label: Text(item.collection!.name, style: const TextStyle(fontSize: 10)),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                    decoration: BoxDecoration(
+                                      color: colorScheme.secondary.withValues(alpha: 0.15),
+                                      borderRadius: BorderRadius.circular(6),
+                                    ),
+                                    child: Text(
+                                      item.collection!.name,
+                                      style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: colorScheme.secondary),
+                                    ),
                                   ),
                               ],
                             ),
@@ -287,11 +313,18 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> with SingleTi
                                   item.arabicTextUthmani,
                                   textAlign: TextAlign.right,
                                   textDirection: TextDirection.rtl,
-                                  style: const TextStyle(fontFamily: 'Uthmani', fontSize: 18),
+                                  style: TextStyle(
+                                    fontFamily: 'Uthmani',
+                                    fontSize: 18,
+                                    color: colorScheme.onSurface,
+                                  ),
                                 ),
                                 if (item.translationText != null) ...[
                                   const SizedBox(height: 4),
-                                  Text(item.translationText!, style: const TextStyle(fontSize: 13, color: Colors.black87)),
+                                  Text(
+                                    item.translationText!,
+                                    style: TextStyle(fontSize: 13, color: colorScheme.onSurfaceVariant),
+                                  ),
                                 ],
                               ],
                             ),
@@ -311,7 +344,10 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> with SingleTi
                                   await Clipboard.setData(ClipboardData(text: citation));
                                   if (!context.mounted) return;
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text('Citation copied to clipboard!')),
+                                    const SnackBar(
+                                      content: Text('Citation copied to clipboard!'),
+                                      behavior: SnackBarBehavior.floating,
+                                    ),
                                   );
                                 }
                               },
@@ -344,10 +380,9 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> with SingleTi
                 padding: const EdgeInsets.all(16),
                 child: TextField(
                   controller: _notesSearchController,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     hintText: 'Search personal research notes...',
-                    prefixIcon: const Icon(Icons.search),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    prefixIcon: Icon(Icons.search),
                   ),
                   onChanged: (val) {
                     ref.read(notesQueryProvider.notifier).state = val.trim();
@@ -356,14 +391,17 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> with SingleTi
               ),
               Expanded(
                 child: notesAsync.when(
-                  loading: () => const Center(child: CircularProgressIndicator()),
+                  loading: () => Center(child: CircularProgressIndicator(color: colorScheme.primary)),
                   error: (err, stack) => Center(child: Text('Error: $err')),
                   data: (notes) {
                     if (notes.isEmpty) {
-                      return const Center(
+                      return Center(
                         child: Padding(
-                          padding: EdgeInsets.all(32),
-                          child: Text('No research notes found.'),
+                          padding: const EdgeInsets.all(32),
+                          child: Text(
+                            'No research notes found.',
+                            style: TextStyle(color: colorScheme.onSurfaceVariant),
+                          ),
                         ),
                       );
                     }
@@ -379,27 +417,28 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> with SingleTi
                           child: ListTile(
                             title: Text(
                               '${item.surahNameTranslit} (${item.note.surahNumber}:${item.note.startAyah})',
-                              style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.teal),
+                              style: TextStyle(fontWeight: FontWeight.bold, color: colorScheme.primary),
                             ),
                             subtitle: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 const SizedBox(height: 6),
                                 Container(
-                                  padding: const EdgeInsets.all(8),
+                                  padding: const EdgeInsets.all(10),
                                   decoration: BoxDecoration(
-                                    color: Colors.amber.shade50,
-                                    borderRadius: BorderRadius.circular(6),
+                                    color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.6),
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(color: colorScheme.outlineVariant),
                                   ),
                                   child: Text(
                                     item.note.textContent,
-                                    style: const TextStyle(fontSize: 14, color: Colors.black87, fontWeight: FontWeight.w500),
+                                    style: TextStyle(fontSize: 14, color: colorScheme.onSurface, fontWeight: FontWeight.w500),
                                   ),
                                 ),
                               ],
                             ),
                             trailing: IconButton(
-                              icon: const Icon(Icons.delete_outline, color: Colors.red),
+                              icon: Icon(Icons.delete_outline, color: colorScheme.error),
                               onPressed: () async {
                                 await ref.read(workspaceDaoProvider).deleteNote(item.note.noteId);
                                 ref.invalidate(notesProvider);
@@ -431,14 +470,17 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> with SingleTi
               ),
               Expanded(
                 child: collectionsAsync.when(
-                  loading: () => const Center(child: CircularProgressIndicator()),
+                  loading: () => Center(child: CircularProgressIndicator(color: colorScheme.primary)),
                   error: (err, stack) => Center(child: Text('Error: $err')),
                   data: (collections) {
                     if (collections.isEmpty) {
-                      return const Center(
+                      return Center(
                         child: Padding(
-                          padding: EdgeInsets.all(32),
-                          child: Text('No research collections created yet.'),
+                          padding: const EdgeInsets.all(32),
+                          child: Text(
+                            'No research collections created yet.',
+                            style: TextStyle(color: colorScheme.onSurfaceVariant),
+                          ),
                         ),
                       );
                     }
@@ -452,14 +494,22 @@ class _WorkspaceScreenState extends ConsumerState<WorkspaceScreen> with SingleTi
 
                         return Card(
                           child: ListTile(
-                            leading: const CircleAvatar(
-                              backgroundColor: Color(0xFFE0F2F1),
-                              child: Icon(Icons.folder, color: Colors.teal),
+                            leading: Container(
+                              width: 40,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                color: colorScheme.primaryContainer,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Icon(Icons.folder, color: colorScheme.primary, size: 22),
                             ),
                             title: Text(col.name, style: const TextStyle(fontWeight: FontWeight.bold)),
-                            subtitle: Text(col.description.isNotEmpty ? col.description : 'User Research Collection'),
+                            subtitle: Text(
+                              col.description.isNotEmpty ? col.description : 'User Research Collection',
+                              style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 12),
+                            ),
                             trailing: IconButton(
-                              icon: const Icon(Icons.delete_outline),
+                              icon: Icon(Icons.delete_outline, color: colorScheme.error),
                               onPressed: () async {
                                 await ref.read(workspaceDaoProvider).deleteCollection(col.collectionId);
                                 ref.invalidate(collectionsProvider);

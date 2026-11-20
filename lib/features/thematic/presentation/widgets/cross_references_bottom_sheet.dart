@@ -18,7 +18,7 @@ class CrossReferencesBottomSheet extends ConsumerWidget {
       context: context,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       builder: (ctx) => CrossReferencesBottomSheet(surahNumber: surahNumber, ayahNumber: ayahNumber),
     );
@@ -39,23 +39,24 @@ class CrossReferencesBottomSheet extends ConsumerWidget {
     }
   }
 
-  Color _getRelationshipColor(String type) {
+  Color _getRelationshipColor(String type, ColorScheme colorScheme) {
     switch (type) {
       case 'similar_theme':
-        return Colors.teal;
+        return colorScheme.primary;
       case 'same_story':
         return Colors.blue;
       case 'similar_wording':
-        return Colors.purple;
+        return const Color(0xFFAB47BC);
       case 'scholarly_abrogation_naskh':
-        return Colors.amber.shade900;
+        return colorScheme.secondary;
       default:
-        return Colors.grey;
+        return colorScheme.onSurfaceVariant;
     }
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colorScheme = Theme.of(context).colorScheme;
     final crossRefsAsync = ref.watch(crossReferencesForAyahProvider((
       surahNumber: surahNumber,
       ayahNumber: ayahNumber,
@@ -64,7 +65,7 @@ class CrossReferencesBottomSheet extends ConsumerWidget {
     return SafeArea(
       child: SingleChildScrollView(
         child: Container(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.only(top: 8, left: 16, right: 16, bottom: 24),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -74,7 +75,7 @@ class CrossReferencesBottomSheet extends ConsumerWidget {
                 children: [
                   Text(
                     'Cross-References ($surahNumber:$ayahNumber)',
-                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: colorScheme.onSurface),
                   ),
                   IconButton(
                     icon: const Icon(Icons.close),
@@ -82,23 +83,23 @@ class CrossReferencesBottomSheet extends ConsumerWidget {
                   ),
                 ],
               ),
-              const Divider(),
+              Divider(color: colorScheme.outlineVariant),
               const SizedBox(height: 8),
 
               crossRefsAsync.when(
-                loading: () => const Center(child: CircularProgressIndicator()),
+                loading: () => Center(child: CircularProgressIndicator(color: colorScheme.primary)),
                 error: (err, stack) => Center(child: Text('Error loading cross references: $err')),
                 data: (crossRefs) {
                   if (crossRefs.isEmpty) {
-                    return const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 32),
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 32),
                       child: Column(
                         children: [
-                          Icon(Icons.compare_arrows, size: 48, color: Colors.grey),
-                          SizedBox(height: 12),
+                          Icon(Icons.compare_arrows, size: 48, color: colorScheme.onSurfaceVariant),
+                          const SizedBox(height: 12),
                           Text(
                             'No explicit cross-references recorded for this ayah.',
-                            style: TextStyle(color: Colors.grey),
+                            style: TextStyle(color: colorScheme.onSurfaceVariant),
                           ),
                         ],
                       ),
@@ -115,18 +116,18 @@ class CrossReferencesBottomSheet extends ConsumerWidget {
                         Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: Colors.amber.shade50,
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: Colors.amber.shade300),
+                            color: colorScheme.secondary.withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: colorScheme.secondary.withValues(alpha: 0.3)),
                           ),
                           child: Row(
                             children: [
-                              Icon(Icons.gavel, color: Colors.amber.shade900),
+                              Icon(Icons.gavel, color: colorScheme.secondary),
                               const SizedBox(width: 12),
                               Expanded(
                                 child: Text(
                                   'Scholarly Disclaimer: Abrogation (Naskh) is subject to scholarly debate. Entries reflect classical commentary works (e.g. Al-Nasikh wal-Mansukh), presented for academic research.',
-                                  style: TextStyle(fontSize: 12, color: Colors.amber.shade900, height: 1.3),
+                                  style: TextStyle(fontSize: 12, color: colorScheme.secondary, height: 1.3),
                                 ),
                               ),
                             ],
@@ -137,7 +138,7 @@ class CrossReferencesBottomSheet extends ConsumerWidget {
 
                       ...crossRefs.map((item) {
                         final type = item.crossRef.relationshipType;
-                        final color = _getRelationshipColor(type);
+                        final color = _getRelationshipColor(type, colorScheme);
                         final label = _formatRelationshipLabel(type);
 
                         return Card(
@@ -150,44 +151,55 @@ class CrossReferencesBottomSheet extends ConsumerWidget {
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Chip(
-                                      backgroundColor: color.withValues(alpha: 0.1),
-                                      avatar: Icon(Icons.link, size: 14, color: color),
-                                      label: Text(
-                                        label,
-                                        style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: color),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                      decoration: BoxDecoration(
+                                        color: color.withValues(alpha: 0.12),
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Icon(Icons.link, size: 14, color: color),
+                                          const SizedBox(width: 4),
+                                          Text(
+                                            label,
+                                            style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: color),
+                                          ),
+                                        ],
                                       ),
                                     ),
                                     Text(
                                       'Surah ${item.targetSurahNameTranslit} (${item.crossRef.targetSurah}:${item.crossRef.targetAyah})',
-                                      style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.teal),
+                                      style: TextStyle(fontWeight: FontWeight.bold, color: colorScheme.primary),
                                     ),
                                   ],
                                 ),
-                                const SizedBox(height: 8),
+                                const SizedBox(height: 10),
 
                                 Text(
                                   item.targetArabicText,
                                   textAlign: TextAlign.right,
                                   textDirection: TextDirection.rtl,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontFamily: 'Uthmani',
                                     fontSize: 18,
                                     height: 1.6,
+                                    color: colorScheme.onSurface,
                                   ),
                                 ),
                                 if (item.targetTranslationText != null) ...[
                                   const SizedBox(height: 6),
                                   Text(
                                     item.targetTranslationText!,
-                                    style: const TextStyle(fontSize: 13, color: Colors.black87),
+                                    style: TextStyle(fontSize: 13, color: colorScheme.onSurfaceVariant),
                                   ),
                                 ],
                                 if (item.crossRef.notes.isNotEmpty) ...[
                                   const SizedBox(height: 6),
                                   Text(
                                     'Note: ${item.crossRef.notes}',
-                                    style: const TextStyle(fontSize: 12, fontStyle: FontStyle.italic, color: Colors.grey),
+                                    style: TextStyle(fontSize: 12, fontStyle: FontStyle.italic, color: colorScheme.onSurfaceVariant),
                                   ),
                                 ],
                                 const SizedBox(height: 8),

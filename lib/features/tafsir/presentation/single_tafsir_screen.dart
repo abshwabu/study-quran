@@ -44,6 +44,7 @@ class _SingleTafsirScreenState extends ConsumerState<SingleTafsirScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     final metaListAsync = ref.watch(availableTafsirsMetaProvider);
     final surahsAsync = ref.watch(surahsProvider);
     final ayahsAsync = ref.watch(surahDetailProvider(_currentSurah));
@@ -84,17 +85,24 @@ class _SingleTafsirScreenState extends ConsumerState<SingleTafsirScreen> {
                 },
                 itemBuilder: (context) {
                   return metas.map((meta) {
+                    final isCurrent = meta.tafsirId == _activeTafsirId;
                     return PopupMenuItem<String>(
                       value: meta.tafsirId,
                       child: Row(
                         children: [
                           Icon(
-                            meta.tafsirId == _activeTafsirId ? Icons.check : Icons.book_outlined,
+                            isCurrent ? Icons.check : Icons.book_outlined,
                             size: 18,
-                            color: meta.tafsirId == _activeTafsirId ? Colors.teal : Colors.grey,
+                            color: isCurrent ? colorScheme.primary : colorScheme.onSurfaceVariant,
                           ),
                           const SizedBox(width: 8),
-                          Text(meta.name),
+                          Text(
+                            meta.name,
+                            style: TextStyle(
+                              fontWeight: isCurrent ? FontWeight.bold : FontWeight.normal,
+                              color: isCurrent ? colorScheme.primary : colorScheme.onSurface,
+                            ),
+                          ),
                         ],
                       ),
                     );
@@ -125,39 +133,63 @@ class _SingleTafsirScreenState extends ConsumerState<SingleTafsirScreen> {
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(16),
-            color: Theme.of(context).colorScheme.surfaceContainerHighest,
+            decoration: BoxDecoration(
+              color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.6),
+              border: Border(bottom: BorderSide(color: colorScheme.outlineVariant)),
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Chip(
-                      label: Text('${surahMeta?.nameTranslit ?? "Surah"} $_currentSurah:$_currentAyah'),
-                      visualDensity: VisualDensity.compact,
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: colorScheme.primaryContainer,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Text(
+                        '${surahMeta?.nameTranslit ?? "Surah"} $_currentSurah:$_currentAyah',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: colorScheme.primary,
+                        ),
+                      ),
                     ),
                     Text(
                       surahMeta?.nameArabic ?? '',
-                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontFamily: 'Amiri',
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: colorScheme.primary,
+                      ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 10),
                 Text(
                   currentAyahData?.ayah.arabicTextUthmani ?? '',
                   textAlign: TextAlign.right,
                   textDirection: TextDirection.rtl,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontFamily: 'Uthmani',
                     fontSize: 22,
                     height: 1.8,
+                    color: colorScheme.onSurface,
                   ),
                 ),
                 if (currentAyahData?.translationText != null) ...[
                   const SizedBox(height: 8),
                   Text(
                     currentAyahData!.translationText!,
-                    style: const TextStyle(fontSize: 14, color: Colors.black87),
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: colorScheme.onSurfaceVariant,
+                      height: 1.45,
+                    ),
                   ),
                 ],
               ],
@@ -167,7 +199,7 @@ class _SingleTafsirScreenState extends ConsumerState<SingleTafsirScreen> {
           // Commentary Body
           Expanded(
             child: commentaryAsync.when(
-              loading: () => const Center(child: CircularProgressIndicator()),
+              loading: () => Center(child: CircularProgressIndicator(color: colorScheme.primary)),
               error: (err, stack) => Center(
                 child: Padding(
                   padding: const EdgeInsets.all(16),
@@ -182,9 +214,12 @@ class _SingleTafsirScreenState extends ConsumerState<SingleTafsirScreen> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Icon(Icons.info_outline, size: 48, color: Colors.grey),
+                          Icon(Icons.info_outline, size: 48, color: colorScheme.onSurfaceVariant),
                           const SizedBox(height: 12),
-                          Text('No commentary found for Ayah $_currentSurah:$_currentAyah in this Tafsir.'),
+                          Text(
+                            'No commentary found for Ayah $_currentSurah:$_currentAyah in this Tafsir.',
+                            style: TextStyle(color: colorScheme.onSurfaceVariant),
+                          ),
                         ],
                       ),
                     ),
@@ -198,25 +233,33 @@ class _SingleTafsirScreenState extends ConsumerState<SingleTafsirScreen> {
                   children: [
                     Row(
                       children: [
-                        Icon(Icons.auto_stories, color: Theme.of(context).colorScheme.primary),
+                        Icon(Icons.auto_stories, color: colorScheme.primary),
                         const SizedBox(width: 8),
-                        Text(
-                          entry.meta.name,
-                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        Expanded(
+                          child: Text(
+                            entry.meta.name,
+                            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
                         ),
                       ],
                     ),
                     const SizedBox(height: 4),
                     Text(
                       'Author: ${entry.meta.author} • Language: ${entry.meta.language.toUpperCase()}',
-                      style: const TextStyle(fontSize: 12, color: Colors.grey),
+                      style: TextStyle(fontSize: 12, color: colorScheme.onSurfaceVariant),
                     ),
                     if (isRange) ...[
                       const SizedBox(height: 8),
-                      Chip(
-                        avatar: const Icon(Icons.linear_scale, size: 16),
-                        backgroundColor: Colors.amber.shade100,
-                        label: Text('Range Commentary: Ayahs ${entry.content.startAyah}–${entry.content.endAyah}'),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: colorScheme.secondary.withValues(alpha: 0.15),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          'Range Commentary: Ayahs ${entry.content.startAyah}–${entry.content.endAyah}',
+                          style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: colorScheme.secondary),
+                        ),
                       ),
                     ],
                     const Divider(height: 24),
@@ -226,7 +269,7 @@ class _SingleTafsirScreenState extends ConsumerState<SingleTafsirScreen> {
                       style: TextStyle(
                         fontSize: entry.meta.language == 'ar' ? 18 : 15,
                         height: 1.7,
-                        color: Colors.black87,
+                        color: colorScheme.onSurface,
                       ),
                     ),
                   ],
@@ -238,25 +281,39 @@ class _SingleTafsirScreenState extends ConsumerState<SingleTafsirScreen> {
           // Footer Navigation
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            color: Theme.of(context).colorScheme.surfaceContainerHighest,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                ElevatedButton.icon(
-                  onPressed: _currentAyah > 1 ? () => _navigateAyah(-1) : null,
-                  icon: const Icon(Icons.arrow_back),
-                  label: const Text('Prev Ayah'),
-                ),
-                Text(
-                  'Ayah $_currentAyah',
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-                ElevatedButton.icon(
-                  onPressed: (surahMeta != null && _currentAyah < surahMeta.ayahCount) ? () => _navigateAyah(1) : null,
-                  icon: const Icon(Icons.arrow_forward),
-                  label: const Text('Next Ayah'),
-                ),
-              ],
+            decoration: BoxDecoration(
+              color: colorScheme.surface,
+              border: Border(top: BorderSide(color: colorScheme.outlineVariant)),
+            ),
+            child: SafeArea(
+              top: false,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  OutlinedButton.icon(
+                    onPressed: _currentAyah > 1 ? () => _navigateAyah(-1) : null,
+                    icon: const Icon(Icons.arrow_back_ios_new, size: 14),
+                    label: const Text('Prev Ayah'),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: colorScheme.primaryContainer.withValues(alpha: 0.6),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      'Ayah $_currentAyah',
+                      style: TextStyle(fontWeight: FontWeight.bold, color: colorScheme.primary),
+                    ),
+                  ),
+                  OutlinedButton.icon(
+                    onPressed: (surahMeta != null && _currentAyah < surahMeta.ayahCount) ? () => _navigateAyah(1) : null,
+                    iconAlignment: IconAlignment.end,
+                    icon: const Icon(Icons.arrow_forward_ios, size: 14),
+                    label: const Text('Next Ayah'),
+                  ),
+                ],
+              ),
             ),
           ),
         ],

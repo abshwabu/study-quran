@@ -48,6 +48,7 @@ class _TafsirComparisonScreenState extends ConsumerState<TafsirComparisonScreen>
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     final metaListAsync = ref.watch(availableTafsirsMetaProvider);
     final surahsAsync = ref.watch(surahsProvider);
     final ayahsAsync = ref.watch(surahDetailProvider(widget.surahNumber));
@@ -80,7 +81,10 @@ class _TafsirComparisonScreenState extends ConsumerState<TafsirComparisonScreen>
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(16),
-            color: Theme.of(context).colorScheme.surfaceContainerHighest,
+            decoration: BoxDecoration(
+              color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.6),
+              border: Border(bottom: BorderSide(color: colorScheme.outlineVariant)),
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -88,17 +92,18 @@ class _TafsirComparisonScreenState extends ConsumerState<TafsirComparisonScreen>
                   currentAyahData?.ayah.arabicTextUthmani ?? '',
                   textAlign: TextAlign.right,
                   textDirection: TextDirection.rtl,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontFamily: 'Uthmani',
                     fontSize: 20,
                     height: 1.7,
+                    color: colorScheme.onSurface,
                   ),
                 ),
                 if (currentAyahData?.translationText != null) ...[
                   const SizedBox(height: 6),
                   Text(
                     currentAyahData!.translationText!,
-                    style: const TextStyle(fontSize: 13, color: Colors.black87),
+                    style: TextStyle(fontSize: 13, color: colorScheme.onSurfaceVariant),
                   ),
                 ],
               ],
@@ -122,7 +127,7 @@ class _TafsirComparisonScreenState extends ConsumerState<TafsirComparisonScreen>
                         child: FilterChip(
                           selected: isSelected,
                           label: Text(meta.name),
-                          selectedColor: Theme.of(context).colorScheme.primaryContainer,
+                          selectedColor: colorScheme.primaryContainer,
                           onSelected: (_) => _toggleTafsirSelection(meta.tafsirId),
                         ),
                       );
@@ -132,17 +137,20 @@ class _TafsirComparisonScreenState extends ConsumerState<TafsirComparisonScreen>
               );
             },
           ),
-          const Divider(height: 1),
+          Divider(height: 1, color: colorScheme.outlineVariant),
 
           // Comparison List / Columns Body
           Expanded(
             child: comparisonAsync.when(
-              loading: () => const Center(child: CircularProgressIndicator()),
+              loading: () => Center(child: CircularProgressIndicator(color: colorScheme.primary)),
               error: (err, stack) => Center(child: Text('Error loading comparison: $err')),
               data: (entries) {
                 if (entries.isEmpty) {
-                  return const Center(
-                    child: Text('No commentary available for selected Tafsirs.'),
+                  return Center(
+                    child: Text(
+                      'No commentary available for selected Tafsirs.',
+                      style: TextStyle(color: colorScheme.onSurfaceVariant),
+                    ),
                   );
                 }
 
@@ -159,8 +167,9 @@ class _TafsirComparisonScreenState extends ConsumerState<TafsirComparisonScreen>
                             child: Container(
                               margin: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
-                                border: Border.all(color: Colors.grey.shade300),
-                                borderRadius: BorderRadius.circular(12),
+                                color: colorScheme.surfaceContainer,
+                                border: Border.all(color: colorScheme.outlineVariant),
+                                borderRadius: BorderRadius.circular(16),
                               ),
                               child: _TafsirCard(entry: entry),
                             ),
@@ -175,8 +184,7 @@ class _TafsirComparisonScreenState extends ConsumerState<TafsirComparisonScreen>
                         separatorBuilder: (context, index) => const SizedBox(height: 16),
                         itemBuilder: (context, index) {
                           return Card(
-                            elevation: 2,
-                            child: _TafsirCard(entry: entries[index]),
+                            child: _TafsirCard(entry: entryCard(entries[index])),
                           );
                         },
                       );
@@ -190,6 +198,8 @@ class _TafsirComparisonScreenState extends ConsumerState<TafsirComparisonScreen>
       ),
     );
   }
+
+  TafsirEntryWithMeta entryCard(TafsirEntryWithMeta entry) => entry;
 }
 
 class _TafsirCard extends StatelessWidget {
@@ -199,6 +209,7 @@ class _TafsirCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     final isRange = entry.content.startAyah != entry.content.endAyah;
 
     return Padding(
@@ -209,41 +220,53 @@ class _TafsirCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                entry.meta.name,
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.teal),
+              Expanded(
+                child: Text(
+                  entry.meta.name,
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: colorScheme.primary),
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
-              Chip(
-                labelPadding: const EdgeInsets.symmetric(horizontal: 4),
-                visualDensity: VisualDensity.compact,
-                label: Text(entry.meta.language.toUpperCase(), style: const TextStyle(fontSize: 10)),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: colorScheme.surfaceContainerHighest,
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Text(
+                  entry.meta.language.toUpperCase(),
+                  style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: colorScheme.onSurfaceVariant),
+                ),
               ),
             ],
           ),
+          const SizedBox(height: 2),
           Text(
             'Author: ${entry.meta.author}',
-            style: const TextStyle(fontSize: 12, color: Colors.grey),
+            style: TextStyle(fontSize: 12, color: colorScheme.onSurfaceVariant),
           ),
           if (isRange) ...[
             const SizedBox(height: 6),
-            Chip(
-              avatar: const Icon(Icons.linear_scale, size: 14),
-              backgroundColor: Colors.amber.shade100,
-              labelStyle: const TextStyle(fontSize: 11),
-              label: Text('Range Commentary: Ayahs ${entry.content.startAyah}–${entry.content.endAyah}'),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+              decoration: BoxDecoration(
+                color: colorScheme.secondary.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: Text(
+                'Range Commentary: Ayahs ${entry.content.startAyah}–${entry.content.endAyah}',
+                style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: colorScheme.secondary),
+              ),
             ),
           ],
-          const Divider(height: 16),
-          Expanded(
-            child: SingleChildScrollView(
-              child: Text(
-                entry.content.textContent,
-                textDirection: entry.meta.language == 'ar' ? TextDirection.rtl : TextDirection.ltr,
-                style: TextStyle(
-                  fontSize: entry.meta.language == 'ar' ? 17 : 14,
-                  height: 1.6,
-                ),
-              ),
+          Divider(height: 16, color: colorScheme.outlineVariant),
+          Text(
+            entry.content.textContent,
+            textDirection: entry.meta.language == 'ar' ? TextDirection.rtl : TextDirection.ltr,
+            style: TextStyle(
+              fontSize: entry.meta.language == 'ar' ? 17 : 14,
+              height: 1.6,
+              color: colorScheme.onSurface,
             ),
           ),
         ],

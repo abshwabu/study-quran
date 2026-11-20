@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/database/providers.dart';
 import '../providers/tafsir_providers.dart';
-
 import '../../content_packs/presentation/content_pack_manager_screen.dart';
 
 class TafsirLibraryScreen extends ConsumerWidget {
@@ -10,6 +9,7 @@ class TafsirLibraryScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colorScheme = Theme.of(context).colorScheme;
     final metaAsync = ref.watch(availableTafsirsMetaProvider);
     final packsAsync = ref.watch(availableContentPacksProvider);
     final defaultId = ref.watch(defaultTafsirIdProvider);
@@ -31,9 +31,8 @@ class TafsirLibraryScreen extends ConsumerWidget {
           ),
         ],
       ),
-
       body: metaAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => Center(child: CircularProgressIndicator(color: colorScheme.primary)),
         error: (err, stack) => Center(child: Text('Error loading Tafsirs: $err')),
         data: (tafsirMetas) {
           final packs = packsAsync.value ?? [];
@@ -45,21 +44,28 @@ class TafsirLibraryScreen extends ConsumerWidget {
           }
 
           return ListView(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             children: [
-              const Card(
+              Card(
                 elevation: 0,
-                color: Color(0xFFF0F7FF),
+                color: colorScheme.primaryContainer.withValues(alpha: 0.5),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  side: BorderSide(color: colorScheme.primary.withValues(alpha: 0.2)),
+                ),
                 child: Padding(
-                  padding: EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(16),
                   child: Row(
                     children: [
-                      Icon(Icons.library_books, color: Colors.blue),
-                      SizedBox(width: 12),
+                      Icon(Icons.library_books, color: colorScheme.primary),
+                      const SizedBox(width: 12),
                       Expanded(
                         child: Text(
                           'Select your default Tafsir for quick per-ayah reading or download additional classical commentary packs.',
-                          style: TextStyle(fontSize: 13, color: Colors.black87),
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: colorScheme.onPrimaryContainer,
+                          ),
                         ),
                       ),
                     ],
@@ -78,10 +84,10 @@ class TafsirLibraryScreen extends ConsumerWidget {
                       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
                       child: Text(
                         '$lang Tafsirs',
-                        style: const TextStyle(
-                          fontSize: 16,
+                        style: TextStyle(
+                          fontSize: 15,
                           fontWeight: FontWeight.bold,
-                          color: Colors.teal,
+                          color: colorScheme.primary,
                         ),
                       ),
                     ),
@@ -104,33 +110,45 @@ class TafsirLibraryScreen extends ConsumerWidget {
                           subtitle: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('${meta.author} • Source: ${meta.source}'),
-                              const SizedBox(height: 4),
+                              Text(
+                                '${meta.author} • Source: ${meta.source}',
+                                style: TextStyle(fontSize: 12, color: colorScheme.onSurfaceVariant),
+                              ),
+                              const SizedBox(height: 6),
                               Row(
                                 children: [
-                                  Chip(
-                                    labelPadding: const EdgeInsets.symmetric(horizontal: 4),
-                                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                    visualDensity: VisualDensity.compact,
-                                    backgroundColor: isDownloaded ? Colors.green.shade50 : Colors.orange.shade50,
-                                    label: Text(
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                    decoration: BoxDecoration(
+                                      color: isDownloaded
+                                          ? colorScheme.primary.withValues(alpha: 0.15)
+                                          : colorScheme.secondary.withValues(alpha: 0.15),
+                                      borderRadius: BorderRadius.circular(6),
+                                    ),
+                                    child: Text(
                                       isDownloaded ? 'Downloaded' : 'Available (${(pack.sizeBytes / (1024 * 1024)).toStringAsFixed(1)} MB)',
                                       style: TextStyle(
                                         fontSize: 11,
-                                        color: isDownloaded ? Colors.green.shade800 : Colors.orange.shade800,
+                                        fontWeight: FontWeight.w600,
+                                        color: isDownloaded ? colorScheme.primary : colorScheme.secondary,
                                       ),
                                     ),
                                   ),
                                   if (isDefault) ...[
                                     const SizedBox(width: 8),
-                                    const Chip(
-                                      labelPadding: EdgeInsets.symmetric(horizontal: 4),
-                                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                      visualDensity: VisualDensity.compact,
-                                      backgroundColor: Colors.blueAccent,
-                                      label: Text(
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                      decoration: BoxDecoration(
+                                        color: colorScheme.primary,
+                                        borderRadius: BorderRadius.circular(6),
+                                      ),
+                                      child: Text(
                                         'Default',
-                                        style: TextStyle(fontSize: 11, color: Colors.white),
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.bold,
+                                          color: colorScheme.onPrimary,
+                                        ),
                                       ),
                                     ),
                                   ],
@@ -138,20 +156,15 @@ class TafsirLibraryScreen extends ConsumerWidget {
                               ),
                             ],
                           ),
-                          trailing: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              IconButton(
-                                icon: Icon(
-                                  isDefault ? Icons.check_circle : Icons.radio_button_unchecked,
-                                  color: isDefault ? Colors.teal : Colors.grey,
-                                ),
-                                tooltip: 'Set as Default Tafsir',
-                                onPressed: () {
-                                  ref.read(defaultTafsirIdProvider.notifier).setDefaultTafsir(meta.tafsirId);
-                                },
-                              ),
-                            ],
+                          trailing: IconButton(
+                            icon: Icon(
+                              isDefault ? Icons.check_circle : Icons.radio_button_unchecked,
+                              color: isDefault ? colorScheme.primary : colorScheme.onSurfaceVariant,
+                            ),
+                            tooltip: 'Set as Default Tafsir',
+                            onPressed: () {
+                              ref.read(defaultTafsirIdProvider.notifier).setDefaultTafsir(meta.tafsirId);
+                            },
                           ),
                         ),
                       );

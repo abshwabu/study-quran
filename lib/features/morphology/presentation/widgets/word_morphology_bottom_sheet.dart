@@ -15,7 +15,7 @@ class WordMorphologyBottomSheet extends StatelessWidget {
       context: context,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       builder: (ctx) => WordMorphologyBottomSheet(wordData: wordData),
     );
@@ -23,13 +23,14 @@ class WordMorphologyBottomSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     final word = wordData.word;
     final root = wordData.root;
 
     return SafeArea(
       child: SingleChildScrollView(
         child: Container(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.only(top: 8, left: 20, right: 20, bottom: 24),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -38,14 +39,17 @@ class WordMorphologyBottomSheet extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text('Word Grammar & Morphology', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.grey)),
+                  Text(
+                    'Word Grammar & Morphology',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: colorScheme.onSurface),
+                  ),
                   IconButton(
                     icon: const Icon(Icons.close),
                     onPressed: () => Navigator.pop(context),
                   ),
                 ],
               ),
-              const Divider(),
+              Divider(color: colorScheme.outlineVariant),
               const SizedBox(height: 8),
 
               // Arabic Word Header
@@ -54,23 +58,23 @@ class WordMorphologyBottomSheet extends StatelessWidget {
                   children: [
                     Text(
                       word.arabicText,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontFamily: 'Uthmani',
                         fontSize: 34,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF1B5E20),
+                        color: colorScheme.primary,
                       ),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       word.transliteration,
-                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.teal),
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: colorScheme.secondary),
                     ),
                     if (word.translationGloss.isNotEmpty) ...[
                       const SizedBox(height: 4),
                       Text(
                         '"${word.translationGloss}"',
-                        style: const TextStyle(fontSize: 16, fontStyle: FontStyle.italic, color: Colors.black87),
+                        style: TextStyle(fontSize: 15, fontStyle: FontStyle.italic, color: colorScheme.onSurfaceVariant),
                       ),
                     ],
                   ],
@@ -80,16 +84,29 @@ class WordMorphologyBottomSheet extends StatelessWidget {
 
               // Part of Speech Badge
               if (word.partOfSpeech.isNotEmpty) ...[
-                const Text('Part of Speech', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.grey)),
+                Text(
+                  'Part of Speech',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: colorScheme.primary),
+                ),
                 const SizedBox(height: 6),
                 Align(
                   alignment: Alignment.centerLeft,
-                  child: Chip(
-                    avatar: const Icon(Icons.label, size: 14, color: Colors.purple),
-                    backgroundColor: Colors.purple.shade50,
-                    label: Text(
-                      word.partOfSpeech,
-                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.purple.shade900),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF8E24AA).withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.label, size: 14, color: Color(0xFF8E24AA)),
+                        const SizedBox(width: 6),
+                        Text(
+                          word.partOfSpeech,
+                          style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF8E24AA), fontSize: 12),
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -98,22 +115,26 @@ class WordMorphologyBottomSheet extends StatelessWidget {
 
               // Grammatical Analysis
               if (word.grammarDetails.isNotEmpty) ...[
-                const Text('Grammatical Analysis (I\'rab)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.grey)),
+                Text(
+                  'Grammatical Analysis (I\'rab)',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: colorScheme.primary),
+                ),
                 const SizedBox(height: 6),
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                    borderRadius: BorderRadius.circular(10),
+                    color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.6),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: colorScheme.outlineVariant),
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.menu_book, color: Colors.teal),
+                      Icon(Icons.menu_book, color: colorScheme.primary, size: 20),
                       const SizedBox(width: 12),
                       Expanded(
                         child: Text(
                           word.grammarDetails,
-                          style: const TextStyle(fontSize: 14, height: 1.4),
+                          style: TextStyle(fontSize: 14, height: 1.4, color: colorScheme.onSurface),
                         ),
                       ),
                     ],
@@ -124,14 +145,17 @@ class WordMorphologyBottomSheet extends StatelessWidget {
 
               // Arabic Root Details & Concordance
               if (root != null) ...[
-                const Text('Arabic Root', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.grey)),
+                Text(
+                  'Arabic Root',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: colorScheme.primary),
+                ),
                 const SizedBox(height: 6),
                 Container(
-                  padding: const EdgeInsets.all(12),
+                  padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
-                    color: Colors.amber.shade50,
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: Colors.amber.shade200),
+                    color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: colorScheme.outlineVariant),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -141,11 +165,18 @@ class WordMorphologyBottomSheet extends StatelessWidget {
                         children: [
                           Text(
                             'Root: ${root.rootArabic} (${root.rootTranslit})',
-                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.amber.shade900),
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: colorScheme.primary),
                           ),
-                          Chip(
-                            visualDensity: VisualDensity.compact,
-                            label: Text('${root.occurrenceCount} occurrences'),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                            decoration: BoxDecoration(
+                              color: colorScheme.secondary.withValues(alpha: 0.2),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Text(
+                              '${root.occurrenceCount} occurrences',
+                              style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: colorScheme.secondary),
+                            ),
                           ),
                         ],
                       ),
@@ -153,17 +184,13 @@ class WordMorphologyBottomSheet extends StatelessWidget {
                         const SizedBox(height: 6),
                         Text(
                           'Meaning: ${root.meaningsSummary}',
-                          style: const TextStyle(fontSize: 13, color: Colors.black87),
+                          style: TextStyle(fontSize: 13, color: colorScheme.onSurfaceVariant),
                         ),
                       ],
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 12),
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton.icon(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.amber.shade800,
-                            foregroundColor: Colors.white,
-                          ),
                           onPressed: () {
                             Navigator.pop(context);
                             Navigator.of(context).push(
@@ -184,17 +211,17 @@ class WordMorphologyBottomSheet extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.grey.shade100,
+                    color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Row(
                     children: [
-                      Icon(Icons.info_outline, color: Colors.grey.shade600),
+                      Icon(Icons.info_outline, color: colorScheme.onSurfaceVariant),
                       const SizedBox(width: 12),
-                      const Expanded(
+                      Expanded(
                         child: Text(
                           'Full morphological corpus and root analysis pack available for download in Content Packs.',
-                          style: TextStyle(fontSize: 12, color: Colors.grey),
+                          style: TextStyle(fontSize: 12, color: colorScheme.onSurfaceVariant),
                         ),
                       ),
                     ],

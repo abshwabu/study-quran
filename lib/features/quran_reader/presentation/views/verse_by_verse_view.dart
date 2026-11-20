@@ -23,7 +23,7 @@ class VerseByVerseView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final colorScheme = Theme.of(context).colorScheme;
 
     return ListView.separated(
       controller: scrollController,
@@ -33,41 +33,57 @@ class VerseByVerseView extends StatelessWidget {
       itemBuilder: (context, index) {
         if (index == 0) {
           // Surah Header & Bismillah (unless Surah 9 At-Tawbah)
-          return Card(
-            color: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.5),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                children: [
-                  Text(
-                    'سُورَةُ ${surahMeta.nameArabic}',
-                    style: TextStyle(
-                      fontFamily: prefs.selectedArabicFont,
-                      fontSize: prefs.arabicFontSize * 1.1,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Text(
-                    '${surahMeta.nameTranslit} • ${surahMeta.nameTranslation}',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Theme.of(context).colorScheme.onPrimaryContainer,
-                    ),
-                  ),
-                  if (surahMeta.number != 9) ...[
-                    const Divider(height: 24),
-                    Text(
-                      'بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ',
-                      style: TextStyle(
-                        fontFamily: prefs.selectedArabicFont,
-                        fontSize: prefs.arabicFontSize * 0.9,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                    ),
-                  ],
+          return Container(
+            margin: const EdgeInsets.only(bottom: 6),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 22),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  colorScheme.primaryContainer.withValues(alpha: 0.7),
+                  colorScheme.secondaryContainer.withValues(alpha: 0.3),
                 ],
               ),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: colorScheme.outlineVariant),
+            ),
+            child: Column(
+              children: [
+                Text(
+                  'سُورَةُ ${surahMeta.nameArabic}',
+                  style: TextStyle(
+                    fontFamily: prefs.selectedArabicFont,
+                    fontSize: prefs.arabicFontSize * 1.15,
+                    fontWeight: FontWeight.bold,
+                    color: colorScheme.primary,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  '${surahMeta.nameTranslit} • ${surahMeta.nameTranslation} • ${surahMeta.ayahCount} Verses',
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                if (surahMeta.number != 9) ...[
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    child: Divider(color: colorScheme.primary.withValues(alpha: 0.2)),
+                  ),
+                  Text(
+                    'بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ',
+                    style: TextStyle(
+                      fontFamily: prefs.selectedArabicFont,
+                      fontSize: prefs.arabicFontSize * 0.95,
+                      fontWeight: FontWeight.w600,
+                      color: colorScheme.primary,
+                    ),
+                  ),
+                ],
+              ],
             ),
           );
         }
@@ -76,8 +92,8 @@ class VerseByVerseView extends StatelessWidget {
         final baseArabicStyle = TextStyle(
           fontSize: prefs.arabicFontSize,
           fontFamily: prefs.selectedArabicFont,
-          height: 2.0,
-          color: isDark ? Colors.white : Colors.black87,
+          height: 2.1,
+          color: colorScheme.onSurface,
         );
 
         final List<TextSpan> arabicSpans = TajweedParser.parseToSpans(
@@ -87,8 +103,6 @@ class VerseByVerseView extends StatelessWidget {
         );
 
         return Card(
-          elevation: 1,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
@@ -101,22 +115,25 @@ class VerseByVerseView extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.primaryContainer,
+                        color: colorScheme.primaryContainer.withValues(alpha: 0.7),
                         borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: colorScheme.primary.withValues(alpha: 0.3)),
                       ),
                       child: Text(
                         '${item.ayah.surahNumber}:${item.ayah.ayahNumber}',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          fontSize: 13,
-                          color: Theme.of(context).colorScheme.onPrimaryContainer,
+                          fontSize: 12,
+                          color: colorScheme.primary,
                         ),
                       ),
                     ),
                     Row(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
                         IconButton(
-                          icon: const Icon(Icons.more_vert),
+                          icon: const Icon(Icons.more_horiz),
+                          tooltip: 'Ayah Options & Tools',
                           onPressed: () => AyahActionsBottomSheet.show(
                             context,
                             ayahData: item,
@@ -139,14 +156,14 @@ class VerseByVerseView extends StatelessWidget {
                 // Translation Display
                 if (prefs.showTranslation && item.translationText != null) ...[
                   const SizedBox(height: 12),
-                  const Divider(),
-                  const SizedBox(height: 6),
+                  Divider(color: colorScheme.outlineVariant),
+                  const SizedBox(height: 8),
                   Text(
                     item.translationText!,
                     style: TextStyle(
                       fontSize: prefs.translationFontSize,
-                      height: 1.5,
-                      color: isDark ? Colors.grey.shade300 : Colors.grey.shade800,
+                      height: 1.55,
+                      color: colorScheme.onSurface.withValues(alpha: 0.88),
                     ),
                   ),
                 ],

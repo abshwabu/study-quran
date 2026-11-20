@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/database/providers.dart';
-import '../../../core/database/daos/search_dao.dart';
 import '../providers/search_providers.dart';
 import '../../quran_reader/presentation/quran_reader_screen.dart';
 import 'root_concordance_screen.dart';
@@ -43,7 +42,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       context: context,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       builder: (context) => const _SearchFilterModal(),
     );
@@ -51,6 +50,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     final query = ref.watch(searchQueryStateProvider);
     final filter = ref.watch(searchFilterStateProvider);
     final resultsAsync = ref.watch(searchResultsProvider);
@@ -61,6 +61,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         ? surahsAsync.value!.firstWhere((s) => s.number == filter.surahNumber).nameTranslit
         : null;
 
+    final hasActiveFilter = filter.surahNumber != null || filter.juz != null || filter.revelationPlace != null || filter.targetScope != 'all';
+
     return Scaffold(
       appBar: AppBar(
         title: TextField(
@@ -70,6 +72,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           decoration: InputDecoration(
             hintText: 'Search Quran text or translation...',
             border: InputBorder.none,
+            enabledBorder: InputBorder.none,
+            focusedBorder: InputBorder.none,
+            filled: false,
+            contentPadding: EdgeInsets.zero,
             suffixIcon: _searchController.text.isNotEmpty
                 ? IconButton(
                     icon: const Icon(Icons.clear),
@@ -89,9 +95,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           IconButton(
             icon: Icon(
               Icons.tune,
-              color: (filter.surahNumber != null || filter.juz != null || filter.revelationPlace != null || filter.targetScope != 'all')
-                  ? Colors.teal
-                  : null,
+              color: hasActiveFilter ? colorScheme.primary : null,
             ),
             tooltip: 'Search Filters & Scope',
             onPressed: _openFilterDialog,
@@ -102,8 +106,11 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         children: [
           // Filter Scope Bar
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-            color: Theme.of(context).colorScheme.surfaceContainerHighest,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            decoration: BoxDecoration(
+              color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+              border: Border(bottom: BorderSide(color: colorScheme.outlineVariant)),
+            ),
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
@@ -149,7 +156,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           Expanded(
             child: query.isEmpty
                 ? historyAsync.when(
-                    loading: () => const Center(child: CircularProgressIndicator()),
+                    loading: () => Center(child: CircularProgressIndicator(color: colorScheme.primary)),
                     error: (_, __) => const SizedBox.shrink(),
                     data: (historyItems) {
                       final pinned = historyItems.where((i) => i.isPinned).toList();
@@ -163,26 +170,33 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Icon(Icons.search, size: 64, color: Colors.grey.shade400),
-                                  const SizedBox(height: 16),
+                                  Container(
+                                    padding: const EdgeInsets.all(20),
+                                    decoration: BoxDecoration(
+                                      color: colorScheme.primaryContainer.withValues(alpha: 0.6),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Icon(Icons.search, size: 48, color: colorScheme.primary),
+                                  ),
+                                  const SizedBox(height: 20),
                                   const Text(
-                                    'Search Free-Text & Root Concordance',
+                                    'Search Free-Text & Concordance',
                                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                                   ),
                                   const SizedBox(height: 8),
-                                  const Text(
-                                    'Search terms across Arabic text or installed translations. Try exact phrase search like "in the name" or root queries.',
+                                  Text(
+                                    'Search terms across Arabic text or translations. Try exact phrase searches or click popular root queries below.',
                                     textAlign: TextAlign.center,
-                                    style: TextStyle(color: Colors.grey),
+                                    style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 13),
                                   ),
-                                  const SizedBox(height: 20),
+                                  const SizedBox(height: 24),
                                   Wrap(
                                     spacing: 8,
                                     runSpacing: 8,
                                     alignment: WrapAlignment.center,
                                     children: [
                                       ActionChip(
-                                        avatar: const Icon(Icons.auto_awesome, size: 16),
+                                        avatar: Icon(Icons.auto_awesome, size: 16, color: colorScheme.secondary),
                                         label: const Text('Root: ر ح م (Mercy)'),
                                         onPressed: () {
                                           Navigator.of(context).push(
@@ -193,7 +207,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                                         },
                                       ),
                                       ActionChip(
-                                        avatar: const Icon(Icons.auto_awesome, size: 16),
+                                        avatar: Icon(Icons.auto_awesome, size: 16, color: colorScheme.secondary),
                                         label: const Text('Root: ك ت ب (Book)'),
                                         onPressed: () {
                                           Navigator.of(context).push(
@@ -213,36 +227,39 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                       }
 
                       return ListView(
-                        padding: const EdgeInsets.all(16),
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                         children: [
                           if (pinned.isNotEmpty) ...[
-                            const Text(
+                            Text(
                               'Pinned Searches',
-                              style: TextStyle(fontWeight: FontWeight.bold, color: Colors.teal),
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: colorScheme.primary),
                             ),
                             const SizedBox(height: 8),
-                            ...pinned.map((item) => ListTile(
-                                  leading: const Icon(Icons.push_pin, color: Colors.teal),
-                                  title: Text(item.query),
-                                  trailing: IconButton(
-                                    icon: const Icon(Icons.close),
-                                    onPressed: () {
-                                      ref.read(searchHistoryNotifierProvider.notifier).togglePin(item.query);
+                            ...pinned.map((item) => Card(
+                                  margin: const EdgeInsets.only(bottom: 6),
+                                  child: ListTile(
+                                    leading: Icon(Icons.push_pin, color: colorScheme.primary),
+                                    title: Text(item.query, style: const TextStyle(fontWeight: FontWeight.w500)),
+                                    trailing: IconButton(
+                                      icon: const Icon(Icons.close, size: 18),
+                                      onPressed: () {
+                                        ref.read(searchHistoryNotifierProvider.notifier).togglePin(item.query);
+                                      },
+                                    ),
+                                    onTap: () {
+                                      _searchController.text = item.query;
+                                      _onSearchSubmitted(item.query);
                                     },
                                   ),
-                                  onTap: () {
-                                    _searchController.text = item.query;
-                                    _onSearchSubmitted(item.query);
-                                  },
                                 )),
-                            const Divider(height: 24),
+                            const SizedBox(height: 12),
                           ],
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              const Text(
+                              Text(
                                 'Recent Searches',
-                                style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey),
+                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: colorScheme.onSurfaceVariant),
                               ),
                               TextButton(
                                 onPressed: () {
@@ -252,26 +269,29 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                               ),
                             ],
                           ),
-                          ...recent.map((item) => ListTile(
-                                leading: const Icon(Icons.history, color: Colors.grey),
-                                title: Text(item.query),
-                                trailing: IconButton(
-                                  icon: const Icon(Icons.push_pin_outlined),
-                                  onPressed: () {
-                                    ref.read(searchHistoryNotifierProvider.notifier).togglePin(item.query);
+                          ...recent.map((item) => Card(
+                                margin: const EdgeInsets.only(bottom: 6),
+                                child: ListTile(
+                                  leading: Icon(Icons.history, color: colorScheme.onSurfaceVariant),
+                                  title: Text(item.query),
+                                  trailing: IconButton(
+                                    icon: const Icon(Icons.push_pin_outlined, size: 18),
+                                    onPressed: () {
+                                      ref.read(searchHistoryNotifierProvider.notifier).togglePin(item.query);
+                                    },
+                                  ),
+                                  onTap: () {
+                                    _searchController.text = item.query;
+                                    _onSearchSubmitted(item.query);
                                   },
                                 ),
-                                onTap: () {
-                                  _searchController.text = item.query;
-                                  _onSearchSubmitted(item.query);
-                                },
                               )),
                         ],
                       );
                     },
                   )
                 : resultsAsync.when(
-                    loading: () => const Center(child: CircularProgressIndicator()),
+                    loading: () => Center(child: CircularProgressIndicator(color: colorScheme.primary)),
                     error: (err, stack) => Center(child: Text('Error executing search: $err')),
                     data: (results) {
                       if (results.isEmpty) {
@@ -281,14 +301,14 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                const Icon(Icons.search_off, size: 48, color: Colors.grey),
+                                Icon(Icons.search_off, size: 48, color: colorScheme.onSurfaceVariant),
                                 const SizedBox(height: 12),
-                                Text('No results found for "$query"'),
+                                Text('No results found for "$query"', style: const TextStyle(fontWeight: FontWeight.bold)),
                                 const SizedBox(height: 8),
-                                const Text(
+                                Text(
                                   'Try adjusting your search query or expanding search filters.',
                                   textAlign: TextAlign.center,
-                                  style: TextStyle(color: Colors.grey, fontSize: 13),
+                                  style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 13),
                                 ),
                               ],
                             ),
@@ -303,12 +323,12 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                             child: Text(
                               'Found ${results.length} matching verses',
-                              style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.grey),
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: colorScheme.primary),
                             ),
                           ),
                           Expanded(
                             child: ListView.separated(
-                              padding: const EdgeInsets.symmetric(horizontal: 16),
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                               itemCount: results.length,
                               separatorBuilder: (context, index) => const SizedBox(height: 8),
                               itemBuilder: (context, index) {
@@ -320,17 +340,22 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                                       children: [
                                         Text(
                                           '${result.surahNameTranslit} (${result.surahNumber}:${result.ayahNumber})',
-                                          style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.teal),
+                                          style: TextStyle(fontWeight: FontWeight.bold, color: colorScheme.primary),
                                         ),
-                                        Chip(
-                                          labelPadding: const EdgeInsets.symmetric(horizontal: 4),
-                                          visualDensity: VisualDensity.compact,
-                                          backgroundColor: result.sourceType == 'arabic' ? Colors.green.shade50 : Colors.blue.shade50,
-                                          label: Text(
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                          decoration: BoxDecoration(
+                                            color: result.sourceType == 'arabic'
+                                                ? colorScheme.primary.withValues(alpha: 0.15)
+                                                : colorScheme.secondary.withValues(alpha: 0.15),
+                                            borderRadius: BorderRadius.circular(6),
+                                          ),
+                                          child: Text(
                                             result.sourceType == 'arabic' ? 'Arabic' : 'Translation',
                                             style: TextStyle(
                                               fontSize: 10,
-                                              color: result.sourceType == 'arabic' ? Colors.green.shade800 : Colors.blue.shade800,
+                                              fontWeight: FontWeight.bold,
+                                              color: result.sourceType == 'arabic' ? colorScheme.primary : colorScheme.secondary,
                                             ),
                                           ),
                                         ),
@@ -370,7 +395,7 @@ class _FormattedSnippet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Parse HTML <b>...</b> highlighting tags from FTS5 snippet
+    final colorScheme = Theme.of(context).colorScheme;
     final spans = <TextSpan>[];
     final regex = RegExp(r'<b>(.*?)<\/b>');
 
@@ -381,10 +406,10 @@ class _FormattedSnippet extends StatelessWidget {
       }
       spans.add(TextSpan(
         text: match.group(1),
-        style: const TextStyle(
+        style: TextStyle(
           fontWeight: FontWeight.bold,
-          backgroundColor: Color(0xFFFFF59D),
-          color: Colors.black,
+          backgroundColor: colorScheme.secondary.withValues(alpha: 0.3),
+          color: colorScheme.primary,
         ),
       ));
       currentIndex = match.end;
@@ -395,7 +420,11 @@ class _FormattedSnippet extends StatelessWidget {
 
     return RichText(
       text: TextSpan(
-        style: const TextStyle(fontSize: 14, color: Colors.black87, height: 1.5),
+        style: TextStyle(
+          fontSize: 14,
+          color: colorScheme.onSurface,
+          height: 1.5,
+        ),
         children: spans,
       ),
     );
@@ -409,6 +438,7 @@ class _SearchFilterModal extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final filter = ref.watch(searchFilterStateProvider);
     final surahsAsync = ref.watch(surahsProvider);
+    final colorScheme = Theme.of(context).colorScheme;
 
     return SafeArea(
       child: Padding(
@@ -420,7 +450,10 @@ class _SearchFilterModal extends ConsumerWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text('Search Filters & Scope', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                Text(
+                  'Search Filters & Scope',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: colorScheme.onSurface),
+                ),
                 IconButton(icon: const Icon(Icons.close), onPressed: () => Navigator.pop(context)),
               ],
             ),
@@ -428,7 +461,7 @@ class _SearchFilterModal extends ConsumerWidget {
             const SizedBox(height: 12),
 
             // Target Scope
-            const Text('Search Scope', style: TextStyle(fontWeight: FontWeight.bold)),
+            Text('Search Scope', style: TextStyle(fontWeight: FontWeight.bold, color: colorScheme.primary)),
             const SizedBox(height: 8),
             SegmentedButton<String>(
               segments: const [
@@ -444,7 +477,7 @@ class _SearchFilterModal extends ConsumerWidget {
             const SizedBox(height: 16),
 
             // Revelation Period
-            const Text('Revelation Period', style: TextStyle(fontWeight: FontWeight.bold)),
+            Text('Revelation Period', style: TextStyle(fontWeight: FontWeight.bold, color: colorScheme.primary)),
             const SizedBox(height: 8),
             Row(
               children: [
@@ -473,7 +506,7 @@ class _SearchFilterModal extends ConsumerWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text('Filter by Surah', style: TextStyle(fontWeight: FontWeight.bold)),
+                Text('Filter by Surah', style: TextStyle(fontWeight: FontWeight.bold, color: colorScheme.primary)),
                 if (filter.surahNumber != null)
                   TextButton(
                     onPressed: () => ref.read(searchFilterStateProvider.notifier).state = filter.copyWith(surahNumber: null),

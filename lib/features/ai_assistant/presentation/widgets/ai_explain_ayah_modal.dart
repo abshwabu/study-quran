@@ -5,7 +5,6 @@ import '../../domain/gemini_api_service.dart';
 import '../ai_settings_screen.dart';
 import '../../../../core/database/providers.dart';
 
-
 class AiExplainAyahModal extends ConsumerStatefulWidget {
   final String surahNameTranslit;
   final int surahNumber;
@@ -37,7 +36,7 @@ class AiExplainAyahModal extends ConsumerStatefulWidget {
       context: context,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       builder: (ctx) => AiExplainAyahModal(
         surahNameTranslit: surahNameTranslit,
@@ -106,6 +105,7 @@ class _AiExplainAyahModalState extends ConsumerState<AiExplainAyahModal> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     final keyAsync = ref.watch(apiKeyProvider);
 
     return SafeArea(
@@ -113,7 +113,7 @@ class _AiExplainAyahModalState extends ConsumerState<AiExplainAyahModal> {
         constraints: BoxConstraints(
           maxHeight: MediaQuery.of(context).size.height * 0.85,
         ),
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.only(top: 8, left: 20, right: 20, bottom: 24),
         child: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -125,32 +125,32 @@ class _AiExplainAyahModalState extends ConsumerState<AiExplainAyahModal> {
                   Expanded(
                     child: Text(
                       'AI Research: Surah ${widget.surahNameTranslit} (${widget.surahNumber}:${widget.ayahNumber})',
-                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: colorScheme.onSurface),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
                   IconButton(icon: const Icon(Icons.close), onPressed: () => Navigator.pop(context)),
                 ],
               ),
-              const Divider(),
+              Divider(color: colorScheme.outlineVariant),
               const SizedBox(height: 8),
 
               // Persistent Mandatory AI Disclaimer Banner
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.amber.shade50,
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: Colors.amber.shade300),
+                  color: colorScheme.secondary.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: colorScheme.secondary.withValues(alpha: 0.3)),
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.warning_amber_rounded, color: Colors.amber.shade900),
-                    const SizedBox(width: 12),
+                    Icon(Icons.warning_amber_rounded, color: colorScheme.secondary),
+                    const SizedBox(width: 10),
                     Expanded(
                       child: Text(
-                        '⚠️ AI-generated analysis — not a substitute for qualified scholarly tafsir.',
-                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.amber.shade900),
+                        'AI-generated analysis — not a substitute for qualified scholarly tafsir.',
+                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: colorScheme.secondary),
                       ),
                     ),
                   ],
@@ -159,30 +159,30 @@ class _AiExplainAyahModalState extends ConsumerState<AiExplainAyahModal> {
               const SizedBox(height: 16),
 
               keyAsync.when(
-                loading: () => const Center(child: CircularProgressIndicator()),
+                loading: () => Center(child: CircularProgressIndicator(color: colorScheme.primary)),
                 error: (err, stack) => Text('Error: $err'),
                 data: (apiKey) {
                   if (apiKey == null || apiKey.isEmpty) {
                     return Container(
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
-                        color: Colors.grey.shade100,
-                        borderRadius: BorderRadius.circular(12),
+                        color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.6),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: colorScheme.outlineVariant),
                       ),
                       child: Column(
                         children: [
-                          const Icon(Icons.vpn_key_outlined, size: 48, color: Colors.grey),
+                          Icon(Icons.vpn_key_outlined, size: 48, color: colorScheme.onSurfaceVariant),
                           const SizedBox(height: 12),
                           const Text('Gemini API Key Required', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                           const SizedBox(height: 8),
-                          const Text(
+                          Text(
                             'AI analysis requires a free Gemini API key. Set it up in settings to unlock verse explanations.',
                             textAlign: TextAlign.center,
-                            style: TextStyle(color: Colors.grey, fontSize: 13),
+                            style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 13),
                           ),
                           const SizedBox(height: 16),
                           ElevatedButton.icon(
-                            style: ElevatedButton.styleFrom(backgroundColor: Colors.teal, foregroundColor: Colors.white),
                             onPressed: () {
                               Navigator.pop(context);
                               Navigator.of(context).push(
@@ -198,13 +198,13 @@ class _AiExplainAyahModalState extends ConsumerState<AiExplainAyahModal> {
                   }
 
                   if (_isLoading) {
-                    return const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 32),
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 32),
                       child: Column(
                         children: [
-                          CircularProgressIndicator(),
-                          SizedBox(height: 16),
-                          Text('Generating AI verse analysis...', style: TextStyle(color: Colors.grey)),
+                          CircularProgressIndicator(color: colorScheme.primary),
+                          const SizedBox(height: 16),
+                          Text('Generating AI verse analysis...', style: TextStyle(color: colorScheme.onSurfaceVariant)),
                         ],
                       ),
                     );
@@ -216,8 +216,12 @@ class _AiExplainAyahModalState extends ConsumerState<AiExplainAyahModal> {
                       children: [
                         Container(
                           padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(color: Colors.red.shade50, borderRadius: BorderRadius.circular(8)),
-                          child: Text(_error!, style: TextStyle(color: Colors.red.shade900, fontSize: 13)),
+                          decoration: BoxDecoration(
+                            color: colorScheme.errorContainer.withValues(alpha: 0.5),
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: colorScheme.error),
+                          ),
+                          child: Text(_error!, style: TextStyle(color: colorScheme.error, fontSize: 13)),
                         ),
                         const SizedBox(height: 12),
                         ElevatedButton.icon(
@@ -233,19 +237,22 @@ class _AiExplainAyahModalState extends ConsumerState<AiExplainAyahModal> {
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        const Text('Context to be sent to Gemini:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                        Text('Context to be sent to Gemini:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: colorScheme.primary)),
                         const SizedBox(height: 6),
                         Container(
                           padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(color: Colors.grey.shade100, borderRadius: BorderRadius.circular(8)),
+                          decoration: BoxDecoration(
+                            color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.6),
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: colorScheme.outlineVariant),
+                          ),
                           child: Text(
                             'Ayah ${widget.surahNumber}:${widget.ayahNumber} • "${widget.translationText}"',
-                            style: const TextStyle(fontSize: 12, color: Colors.black87),
+                            style: TextStyle(fontSize: 12, color: colorScheme.onSurface),
                           ),
                         ),
                         const SizedBox(height: 16),
                         ElevatedButton.icon(
-                          style: ElevatedButton.styleFrom(backgroundColor: Colors.teal, foregroundColor: Colors.white),
                           onPressed: () => _generateExplanation(apiKey),
                           icon: const Icon(Icons.auto_awesome),
                           label: const Text('Generate AI Explanation'),
@@ -257,13 +264,13 @@ class _AiExplainAyahModalState extends ConsumerState<AiExplainAyahModal> {
                   return Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Colors.blue.shade50.withValues(alpha: 0.3),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.blue.shade200),
+                      color: colorScheme.primaryContainer.withValues(alpha: 0.3),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: colorScheme.outlineVariant),
                     ),
                     child: Text(
                       _response!,
-                      style: const TextStyle(fontSize: 14, height: 1.6, color: Colors.black87),
+                      style: TextStyle(fontSize: 14, height: 1.6, color: colorScheme.onSurface),
                     ),
                   );
                 },

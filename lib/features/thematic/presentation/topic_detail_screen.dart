@@ -14,6 +14,7 @@ class TopicDetailScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colorScheme = Theme.of(context).colorScheme;
     final ayahsAsync = ref.watch(topicAyahsProvider(topic.topicId));
 
     return Scaffold(
@@ -21,19 +22,22 @@ class TopicDetailScreen extends ConsumerWidget {
         title: Text(topic.name),
       ),
       body: ayahsAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => Center(child: CircularProgressIndicator(color: colorScheme.primary)),
         error: (err, stack) => Center(child: Text('Error loading topic ayahs: $err')),
         data: (ayahs) {
           if (ayahs.isEmpty) {
-            return const Center(
+            return Center(
               child: Padding(
                 padding: const EdgeInsets.all(32),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.category, size: 48, color: Colors.grey),
-                    SizedBox(height: 12),
-                    Text('No ayahs currently mapped to this topic entry.'),
+                    Icon(Icons.category, size: 48, color: colorScheme.onSurfaceVariant),
+                    const SizedBox(height: 12),
+                    Text(
+                      'No ayahs currently mapped to this topic entry.',
+                      style: TextStyle(color: colorScheme.onSurfaceVariant),
+                    ),
                   ],
                 ),
               ),
@@ -45,24 +49,35 @@ class TopicDetailScreen extends ConsumerWidget {
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(16),
-                color: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.4),
+                decoration: BoxDecoration(
+                  color: colorScheme.primaryContainer.withValues(alpha: 0.5),
+                  border: Border(bottom: BorderSide(color: colorScheme.outlineVariant)),
+                ),
                 child: Column(
                   children: [
                     Text(
                       topic.name,
-                      style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: colorScheme.onPrimaryContainer),
                     ),
-                    const SizedBox(height: 4),
-                    Chip(
-                      visualDensity: VisualDensity.compact,
-                      label: Text('${ayahs.length} verses linked to this topic'),
+                    const SizedBox(height: 6),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: colorScheme.surface,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: colorScheme.outlineVariant),
+                      ),
+                      child: Text(
+                        '${ayahs.length} verses linked to this topic',
+                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: colorScheme.primary),
+                      ),
                     ),
                   ],
                 ),
               ),
               Expanded(
                 child: ListView.separated(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   itemCount: ayahs.length,
                   separatorBuilder: (context, index) => const SizedBox(height: 12),
                   itemBuilder: (context, index) {
@@ -77,32 +92,49 @@ class TopicDetailScreen extends ConsumerWidget {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Chip(
-                                  label: Text('${item.surahNameTranslit} (${item.surahNumber}:${item.ayahNumber})'),
-                                  visualDensity: VisualDensity.compact,
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                  decoration: BoxDecoration(
+                                    color: colorScheme.primaryContainer,
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Text(
+                                    '${item.surahNameTranslit} (${item.surahNumber}:${item.ayahNumber})',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                      color: colorScheme.primary,
+                                    ),
+                                  ),
                                 ),
                                 Text(
                                   item.surahNameArabic,
-                                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                  style: TextStyle(
+                                    fontFamily: 'Amiri',
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                    color: colorScheme.primary,
+                                  ),
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 8),
+                            const SizedBox(height: 10),
                             Text(
                               item.arabicTextUthmani,
                               textAlign: TextAlign.right,
                               textDirection: TextDirection.rtl,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontFamily: 'Uthmani',
                                 fontSize: 20,
                                 height: 1.8,
+                                color: colorScheme.onSurface,
                               ),
                             ),
                             if (item.translationText != null) ...[
-                              const Divider(height: 16),
+                              Divider(height: 16, color: colorScheme.outlineVariant),
                               Text(
                                 item.translationText!,
-                                style: const TextStyle(fontSize: 14, color: Colors.black87),
+                                style: TextStyle(fontSize: 14, color: colorScheme.onSurfaceVariant),
                               ),
                             ],
                             const SizedBox(height: 8),

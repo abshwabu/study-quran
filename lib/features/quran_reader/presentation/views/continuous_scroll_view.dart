@@ -28,12 +28,12 @@ class ContinuousScrollView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final colorScheme = Theme.of(context).colorScheme;
     final baseArabicStyle = TextStyle(
       fontSize: prefs.arabicFontSize,
       fontFamily: prefs.selectedArabicFont,
-      height: 2.2,
-      color: isDark ? Colors.white : Colors.black87,
+      height: 2.25,
+      color: colorScheme.onSurface,
     );
 
     final List<InlineSpan> continuousSpans = [];
@@ -68,7 +68,7 @@ class ContinuousScrollView extends StatelessWidget {
         TextSpan(
           text: verseEndMarker,
           style: baseArabicStyle.copyWith(
-            color: Theme.of(context).colorScheme.primary,
+            color: colorScheme.secondary,
             fontWeight: FontWeight.bold,
           ),
           recognizer: TapGestureRecognizer()
@@ -83,17 +83,24 @@ class ContinuousScrollView extends StatelessWidget {
 
     return SingleChildScrollView(
       controller: scrollController,
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           // Surah Frame Banner
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.4),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3)),
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  colorScheme.primaryContainer.withValues(alpha: 0.7),
+                  colorScheme.secondaryContainer.withValues(alpha: 0.3),
+                ],
+              ),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: colorScheme.outlineVariant),
             ),
             child: Column(
               children: [
@@ -101,39 +108,49 @@ class ContinuousScrollView extends StatelessWidget {
                   'سُورَةُ ${surahMeta.nameArabic}',
                   style: TextStyle(
                     fontFamily: prefs.selectedArabicFont,
-                    fontSize: prefs.arabicFontSize * 1.1,
+                    fontSize: prefs.arabicFontSize * 1.15,
                     fontWeight: FontWeight.bold,
+                    color: colorScheme.primary,
                   ),
                 ),
+                const SizedBox(height: 4),
                 Text(
                   '${surahMeta.nameTranslit} • ${surahMeta.ayahCount} Verses',
-                  style: const TextStyle(fontSize: 13),
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                    color: colorScheme.onSurfaceVariant,
+                  ),
                 ),
                 if (surahMeta.number != 9) ...[
-                  const Divider(height: 20),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    child: Divider(color: colorScheme.primary.withValues(alpha: 0.2)),
+                  ),
                   Text(
                     'بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ',
                     style: TextStyle(
                       fontFamily: prefs.selectedArabicFont,
-                      fontSize: prefs.arabicFontSize * 0.9,
-                      color: Theme.of(context).colorScheme.primary,
+                      fontSize: prefs.arabicFontSize * 0.95,
+                      fontWeight: FontWeight.w600,
+                      color: colorScheme.primary,
                     ),
                   ),
                 ],
               ],
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 16),
 
           // Flowing Paragraph Text Layout (Mushaf Style)
           Card(
             elevation: 0,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-              side: BorderSide(color: Colors.grey.shade300),
+              borderRadius: BorderRadius.circular(16),
+              side: BorderSide(color: colorScheme.outlineVariant),
             ),
             child: Padding(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(22),
               child: RichText(
                 textAlign: TextAlign.justify,
                 textDirection: TextDirection.rtl,

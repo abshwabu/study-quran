@@ -11,7 +11,7 @@ class ReaderSettingsModal extends ConsumerWidget {
       context: context,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       builder: (ctx) => const ReaderSettingsModal(),
     );
@@ -21,9 +21,10 @@ class ReaderSettingsModal extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final prefs = ref.watch(readerPreferencesProvider);
     final notifier = ref.read(readerPreferencesProvider.notifier);
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Container(
-      padding: const EdgeInsets.only(top: 20, left: 20, right: 20, bottom: 30),
+      padding: const EdgeInsets.only(top: 8, left: 20, right: 20, bottom: 32),
       child: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -32,20 +33,19 @@ class ReaderSettingsModal extends ConsumerWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Expanded(
-                  child: Row(
-                    children: [
-                      Icon(Icons.tune, color: Color(0xFF0F5132)),
-                      SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          'Display & Reader Settings',
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                        ),
+                Row(
+                  children: [
+                    Icon(Icons.tune, color: colorScheme.primary),
+                    const SizedBox(width: 10),
+                    Text(
+                      'Display & Reader Settings',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: colorScheme.onSurface,
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
                 IconButton(
                   icon: const Icon(Icons.close),
@@ -54,26 +54,61 @@ class ReaderSettingsModal extends ConsumerWidget {
               ],
             ),
             const Divider(),
+            const SizedBox(height: 12),
 
-            // 1. Reading Mode Selector
-            const Text('Reading Mode', style: TextStyle(fontWeight: FontWeight.bold)),
+            // 1. Theme Switcher Section
+            Text(
+              'Theme & Appearance',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: colorScheme.primary),
+            ),
+            const SizedBox(height: 8),
+            SegmentedButton<ThemeMode>(
+              segments: const [
+                ButtonSegment(
+                  value: ThemeMode.system,
+                  label: Text('Auto'),
+                  icon: Icon(Icons.brightness_auto, size: 18),
+                ),
+                ButtonSegment(
+                  value: ThemeMode.light,
+                  label: Text('Light'),
+                  icon: Icon(Icons.light_mode, size: 18),
+                ),
+                ButtonSegment(
+                  value: ThemeMode.dark,
+                  label: Text('Dark'),
+                  icon: Icon(Icons.dark_mode, size: 18),
+                ),
+              ],
+              selected: {prefs.themeMode},
+              onSelectionChanged: (selected) {
+                notifier.updateThemeMode(selected.first);
+              },
+            ),
+            const SizedBox(height: 16),
+
+            // 2. Reading Mode Selector
+            Text(
+              'Reading View Mode',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: colorScheme.primary),
+            ),
             const SizedBox(height: 8),
             SegmentedButton<ReadingMode>(
               segments: const [
                 ButtonSegment(
                   value: ReadingMode.verseByVerse,
                   label: Text('Verse'),
-                  icon: Icon(Icons.view_headline),
+                  icon: Icon(Icons.view_headline, size: 18),
                 ),
                 ButtonSegment(
                   value: ReadingMode.continuousScroll,
                   label: Text('Mushaf'),
-                  icon: Icon(Icons.menu_book),
+                  icon: Icon(Icons.menu_book, size: 18),
                 ),
                 ButtonSegment(
                   value: ReadingMode.wordByWord,
-                  label: Text('Word-by-Word'),
-                  icon: Icon(Icons.grid_view),
+                  label: Text('Word'),
+                  icon: Icon(Icons.grid_view, size: 18),
                 ),
               ],
               selected: {prefs.readingMode},
@@ -83,21 +118,22 @@ class ReaderSettingsModal extends ConsumerWidget {
             ),
             const SizedBox(height: 16),
 
-            // 2. Tajweed Coloring Toggle
+            // 3. Tajweed Coloring Toggle
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
-              title: const Text('Tajweed Color-Coding'),
-              subtitle: const Text('Highlights Ghunnah, Qalqalah, Madd, Ikhfa rules'),
+              title: const Text('Tajweed Color-Coding', style: TextStyle(fontWeight: FontWeight.w600)),
+              subtitle: const Text('Highlights Ghunnah, Qalqalah, Madd, and Ikhfa rules'),
               value: prefs.showTajweedColoring,
               onChanged: (_) => notifier.toggleTajweedColoring(),
             ),
 
             if (prefs.showTajweedColoring) ...[
               Container(
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                  color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.6),
                   borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: colorScheme.outlineVariant),
                 ),
                 child: const Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -105,28 +141,28 @@ class ReaderSettingsModal extends ConsumerWidget {
                     Row(
                       children: [
                         CircleAvatar(radius: 5, backgroundColor: Color(0xFF2196F3)),
-                        SizedBox(width: 4),
+                        SizedBox(width: 6),
                         Text('Madd', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
                       ],
                     ),
                     Row(
                       children: [
                         CircleAvatar(radius: 5, backgroundColor: Color(0xFF4CAF50)),
-                        SizedBox(width: 4),
+                        SizedBox(width: 6),
                         Text('Ghunnah', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
                       ],
                     ),
                     Row(
                       children: [
                         CircleAvatar(radius: 5, backgroundColor: Color(0xFFFF9800)),
-                        SizedBox(width: 4),
+                        SizedBox(width: 6),
                         Text('Qalqalah', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
                       ],
                     ),
                     Row(
                       children: [
-                        CircleAvatar(radius: 5, backgroundColor: Color(0xFF9C27B0)),
-                        SizedBox(width: 4),
+                        CircleAvatar(radius: 5, backgroundColor: Color(0xFFAB47BC)),
+                        SizedBox(width: 6),
                         Text('Ikhfa', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
                       ],
                     ),
@@ -136,24 +172,26 @@ class ReaderSettingsModal extends ConsumerWidget {
               const SizedBox(height: 12),
             ],
 
-
-            // 3. Translation Visibility Toggle
+            // 4. Translation Visibility Toggle
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
-              title: const Text('Show Translation'),
-              subtitle: const Text('Display English / installed translation text'),
+              title: const Text('Show Translation', style: TextStyle(fontWeight: FontWeight.w600)),
+              subtitle: const Text('Display English and installed translation commentary'),
               value: prefs.showTranslation,
               onChanged: (_) => notifier.toggleTranslation(),
             ),
 
             const SizedBox(height: 12),
 
-            // 4. Arabic Font Size Slider
+            // 5. Arabic Font Size Slider
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text('Arabic Font Size', style: TextStyle(fontWeight: FontWeight.bold)),
-                Text('${prefs.arabicFontSize.toInt()} pt', style: const TextStyle(fontWeight: FontWeight.bold)),
+                const Text('Arabic Font Size', style: TextStyle(fontWeight: FontWeight.w600)),
+                Text(
+                  '${prefs.arabicFontSize.toInt()} pt',
+                  style: TextStyle(fontWeight: FontWeight.bold, color: colorScheme.primary),
+                ),
               ],
             ),
             Slider(
@@ -164,12 +202,15 @@ class ReaderSettingsModal extends ConsumerWidget {
               onChanged: (val) => notifier.updateArabicFontSize(val),
             ),
 
-            // 5. Translation Font Size Slider
+            // 6. Translation Font Size Slider
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text('Translation Font Size', style: TextStyle(fontWeight: FontWeight.bold)),
-                Text('${prefs.translationFontSize.toInt()} pt', style: const TextStyle(fontWeight: FontWeight.bold)),
+                const Text('Translation Font Size', style: TextStyle(fontWeight: FontWeight.w600)),
+                Text(
+                  '${prefs.translationFontSize.toInt()} pt',
+                  style: TextStyle(fontWeight: FontWeight.bold, color: colorScheme.primary),
+                ),
               ],
             ),
             Slider(
@@ -182,13 +223,15 @@ class ReaderSettingsModal extends ConsumerWidget {
 
             const SizedBox(height: 8),
 
-            // 6. Font Family Selector
+            // 7. Font Family Selector
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text('Arabic Font Style', style: TextStyle(fontWeight: FontWeight.bold)),
+                const Text('Arabic Font Style', style: TextStyle(fontWeight: FontWeight.w600)),
                 DropdownButton<String>(
                   value: prefs.selectedArabicFont,
+                  borderRadius: BorderRadius.circular(12),
+                  underline: const SizedBox(),
                   items: const [
                     DropdownMenuItem(value: 'Amiri', child: Text('Amiri Uthmani')),
                     DropdownMenuItem(value: 'ScheherazadeNew', child: Text('Scheherazade New')),

@@ -21,11 +21,6 @@ import '../../ai_assistant/presentation/ai_settings_screen.dart';
 import '../../content_packs/presentation/content_pack_manager_screen.dart';
 import '../../settings/presentation/settings_screen.dart';
 
-
-
-
-
-
 class QuranReaderScreen extends ConsumerStatefulWidget {
   const QuranReaderScreen({super.key});
 
@@ -70,13 +65,37 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen> {
     ref.read(readerPreferencesProvider.notifier).saveLastReadPosition(surahNumber, ayahNumber);
   }
 
+  void _toggleTheme(ThemeMode currentMode) {
+    final nextMode = switch (currentMode) {
+      ThemeMode.system => ThemeMode.light,
+      ThemeMode.light => ThemeMode.dark,
+      ThemeMode.dark => ThemeMode.system,
+    };
+    ref.read(readerPreferencesProvider.notifier).updateThemeMode(nextMode);
+
+    final modeName = switch (nextMode) {
+      ThemeMode.system => 'Auto (System)',
+      ThemeMode.light => 'Light Mode',
+      ThemeMode.dark => 'Dark Mode',
+    };
+
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Theme switched to $modeName'),
+        duration: const Duration(milliseconds: 1400),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     final surahsAsync = ref.watch(surahsProvider);
     final ayahsAsync = ref.watch(surahDetailProvider(_currentSurahNumber));
     final prefs = ref.watch(readerPreferencesProvider);
     final dbInitStatus = ref.watch(databaseInitProvider);
-
 
     return Stack(
       children: [
@@ -104,15 +123,38 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(
-                      '${activeSurah.number}. ${activeSurah.nameTranslit}',
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Flexible(
+                          child: Text(
+                            '${activeSurah.number}. ${activeSurah.nameTranslit}',
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: colorScheme.secondary.withValues(alpha: 0.2),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            activeSurah.revelationPlace.toUpperCase(),
+                            style: TextStyle(
+                              fontSize: 9,
+                              fontWeight: FontWeight.bold,
+                              color: colorScheme.secondary,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                     Text(
                       '${activeSurah.nameTranslation} • ${activeSurah.ayahCount} Ayahs',
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurfaceVariant),
+                      style: TextStyle(fontSize: 12, color: colorScheme.onSurfaceVariant),
                     ),
                   ],
                 );
@@ -139,6 +181,19 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen> {
                   initialAyah: _currentAyahNumber,
                   onJump: _jumpToAyah,
                 ),
+              ),
+              // Theme switcher quick action
+              IconButton(
+                icon: Icon(
+                  switch (prefs.themeMode) {
+                    ThemeMode.system => Icons.brightness_auto,
+                    ThemeMode.light => Icons.light_mode,
+                    ThemeMode.dark => Icons.dark_mode,
+                  },
+                  color: colorScheme.primary,
+                ),
+                tooltip: 'Switch Theme (${prefs.themeMode.name})',
+                onPressed: () => _toggleTheme(prefs.themeMode),
               ),
               IconButton(
                 icon: const Icon(Icons.tune),
@@ -187,14 +242,14 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen> {
                       break;
                   }
                 },
-                itemBuilder: (context) => const [
+                itemBuilder: (context) => [
                   PopupMenuItem(
                     value: 'workspace',
                     child: Row(
                       children: [
-                        Icon(Icons.workspaces_outline, color: Colors.teal),
-                        SizedBox(width: 12),
-                        Text('Research Workspace'),
+                        Icon(Icons.workspaces_outline, color: colorScheme.primary),
+                        const SizedBox(width: 12),
+                        const Text('Research Workspace'),
                       ],
                     ),
                   ),
@@ -202,9 +257,9 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen> {
                     value: 'topics',
                     child: Row(
                       children: [
-                        Icon(Icons.category, color: Colors.teal),
-                        SizedBox(width: 12),
-                        Text('Thematic Topic Index'),
+                        Icon(Icons.category, color: colorScheme.primary),
+                        const SizedBox(width: 12),
+                        const Text('Thematic Topic Index'),
                       ],
                     ),
                   ),
@@ -212,9 +267,9 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen> {
                     value: 'roots',
                     child: Row(
                       children: [
-                        Icon(Icons.blur_on, color: Colors.teal),
-                        SizedBox(width: 12),
-                        Text('Root Word Browser'),
+                        Icon(Icons.blur_on, color: colorScheme.primary),
+                        const SizedBox(width: 12),
+                        const Text('Root Word Browser'),
                       ],
                     ),
                   ),
@@ -222,9 +277,9 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen> {
                     value: 'tafsir',
                     child: Row(
                       children: [
-                        Icon(Icons.library_books, color: Colors.teal),
-                        SizedBox(width: 12),
-                        Text('Tafsir Library'),
+                        Icon(Icons.library_books, color: colorScheme.primary),
+                        const SizedBox(width: 12),
+                        const Text('Tafsir Library'),
                       ],
                     ),
                   ),
@@ -233,8 +288,8 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen> {
                     child: Row(
                       children: [
                         Icon(Icons.auto_awesome, color: Colors.blue),
-                        SizedBox(width: 12),
-                        Text('AI Research Assistant'),
+                        const SizedBox(width: 12),
+                        const Text('AI Research Assistant'),
                       ],
                     ),
                   ),
@@ -242,9 +297,9 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen> {
                     value: 'downloads',
                     child: Row(
                       children: [
-                        Icon(Icons.download, color: Colors.orange),
-                        SizedBox(width: 12),
-                        Text('Content Pack Downloader'),
+                        Icon(Icons.download, color: colorScheme.secondary),
+                        const SizedBox(width: 12),
+                        const Text('Content Pack Downloader'),
                       ],
                     ),
                   ),
@@ -252,26 +307,24 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen> {
                     value: 'settings',
                     child: Row(
                       children: [
-                        Icon(Icons.settings, color: Colors.grey),
-                        SizedBox(width: 12),
-                        Text('Settings & Preferences'),
+                        Icon(Icons.settings_outlined, color: colorScheme.onSurfaceVariant),
+                        const SizedBox(width: 12),
+                        const Text('Settings & Preferences'),
                       ],
                     ),
                   ),
                 ],
               ),
             ],
-
-
           ),
           body: ayahsAsync.when(
-            loading: () => const Center(
+            loading: () => Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  CircularProgressIndicator(),
-                  SizedBox(height: 16),
-                  Text('Loading Quran Database...', style: TextStyle(color: Colors.grey)),
+                  CircularProgressIndicator(color: colorScheme.primary),
+                  const SizedBox(height: 16),
+                  Text('Loading Quran Database...', style: TextStyle(color: colorScheme.onSurfaceVariant)),
                 ],
               ),
             ),
@@ -281,7 +334,7 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.error_outline, size: 48, color: Colors.red),
+                    Icon(Icons.error_outline, size: 48, color: colorScheme.error),
                     const SizedBox(height: 16),
                     Text(
                       'Failed to load Quran text:\n$err',
@@ -359,28 +412,46 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen> {
                               ),
                   ),
 
-                  // Surah Footer Navigation Bar
+                  // Modern Surah Footer Navigation Bar
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-                    color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        TextButton.icon(
-                          onPressed: _currentSurahNumber > 1 ? () => _onSurahSelected(_currentSurahNumber - 1) : null,
-                          icon: const Icon(Icons.arrow_back, size: 16),
-                          label: const Text('Previous Surah'),
-                        ),
-                        Text(
-                          'Surah $_currentSurahNumber / 114',
-                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
-                        ),
-                        TextButton.icon(
-                          onPressed: _currentSurahNumber < 114 ? () => _onSurahSelected(_currentSurahNumber + 1) : null,
-                          icon: const Icon(Icons.arrow_forward, size: 16),
-                          label: const Text('Next Surah'),
-                        ),
-                      ],
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: colorScheme.surface,
+                      border: Border(top: BorderSide(color: colorScheme.outlineVariant)),
+                    ),
+                    child: SafeArea(
+                      top: false,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          OutlinedButton.icon(
+                            onPressed: _currentSurahNumber > 1 ? () => _onSurahSelected(_currentSurahNumber - 1) : null,
+                            icon: const Icon(Icons.arrow_back_ios_new, size: 14),
+                            label: const Text('Previous'),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: colorScheme.primaryContainer.withValues(alpha: 0.6),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Text(
+                              'Surah $_currentSurahNumber / 114',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 12,
+                                color: colorScheme.onPrimaryContainer,
+                              ),
+                            ),
+                          ),
+                          OutlinedButton.icon(
+                            onPressed: _currentSurahNumber < 114 ? () => _onSurahSelected(_currentSurahNumber + 1) : null,
+                            iconAlignment: IconAlignment.end,
+                            icon: const Icon(Icons.arrow_forward_ios, size: 14),
+                            label: const Text('Next'),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ],

@@ -4,8 +4,6 @@ import '../../../core/database/providers.dart';
 import '../../../core/content_packs/models/pack_manifest.dart';
 import '../../../core/content_packs/services/content_pack_download_service.dart';
 
-
-
 class ContentPackManagerScreen extends ConsumerStatefulWidget {
   const ContentPackManagerScreen({super.key});
 
@@ -58,7 +56,11 @@ class _ContentPackManagerScreenState extends ConsumerState<ContentPackManagerScr
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to download ${pack.name}: $e')),
+        SnackBar(
+          content: Text('Failed to download ${pack.name}: $e'),
+          backgroundColor: Theme.of(context).colorScheme.error,
+          behavior: SnackBarBehavior.floating,
+        ),
       );
     } finally {
       setState(() {
@@ -74,7 +76,10 @@ class _ContentPackManagerScreenState extends ConsumerState<ContentPackManagerScr
     ref.invalidate(availableContentPacksProvider);
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Removed ${pack.name} from local storage.')),
+      SnackBar(
+        content: Text('Removed ${pack.name} from local storage.'),
+        behavior: SnackBarBehavior.floating,
+      ),
     );
   }
 
@@ -90,6 +95,7 @@ class _ContentPackManagerScreenState extends ConsumerState<ContentPackManagerScr
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     final packsAsync = ref.watch(availableContentPacksProvider);
 
     return Scaffold(
@@ -97,7 +103,7 @@ class _ContentPackManagerScreenState extends ConsumerState<ContentPackManagerScr
         title: const Text('Content Pack Downloader'),
       ),
       body: packsAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => Center(child: CircularProgressIndicator(color: colorScheme.primary)),
         error: (err, stack) => Center(child: Text('Error loading packs: $err')),
         data: (packs) {
           final totalDownloadedBytes = packs.where((p) => p.isDownloaded).fold<int>(0, (sum, p) => sum + p.sizeBytes);
@@ -107,7 +113,10 @@ class _ContentPackManagerScreenState extends ConsumerState<ContentPackManagerScr
               // Storage Usage & Network Preference Header Card
               Container(
                 padding: const EdgeInsets.all(16),
-                color: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.3),
+                decoration: BoxDecoration(
+                  color: colorScheme.primaryContainer.withValues(alpha: 0.5),
+                  border: Border(bottom: BorderSide(color: colorScheme.outlineVariant)),
+                ),
                 child: Column(
                   children: [
                     Row(
@@ -116,18 +125,28 @@ class _ContentPackManagerScreenState extends ConsumerState<ContentPackManagerScr
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text('Local Storage Used', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                            Text(
+                              'Local Storage Used',
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: colorScheme.onPrimaryContainer),
+                            ),
                             const SizedBox(height: 4),
                             Text(
                               '${_formatBytes(totalDownloadedBytes)} used by installed content packs',
-                              style: const TextStyle(fontSize: 13, color: Colors.black87),
+                              style: TextStyle(fontSize: 13, color: colorScheme.onSurfaceVariant),
                             ),
                           ],
                         ),
-                        const Icon(Icons.sd_storage, size: 32, color: Colors.teal),
+                        Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: colorScheme.primary,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Icon(Icons.sd_storage, size: 24, color: colorScheme.onPrimary),
+                        ),
                       ],
                     ),
-                    const Divider(height: 24),
+                    Divider(height: 24, color: colorScheme.outlineVariant),
                     SwitchListTile(
                       contentPadding: EdgeInsets.zero,
                       title: const Text('Wi-Fi Only Downloads', style: TextStyle(fontWeight: FontWeight.w600)),
@@ -147,7 +166,7 @@ class _ContentPackManagerScreenState extends ConsumerState<ContentPackManagerScr
               // Content Pack List
               Expanded(
                 child: ListView.separated(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   itemCount: packs.length,
                   separatorBuilder: (context, index) => const SizedBox(height: 8),
                   itemBuilder: (context, index) {
@@ -158,7 +177,7 @@ class _ContentPackManagerScreenState extends ConsumerState<ContentPackManagerScr
 
                     return Card(
                       child: Padding(
-                        padding: const EdgeInsets.all(12),
+                        padding: const EdgeInsets.all(14),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
@@ -171,35 +190,47 @@ class _ContentPackManagerScreenState extends ConsumerState<ContentPackManagerScr
                                     children: [
                                       Text(
                                         pack.name,
-                                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                                       ),
                                       const SizedBox(height: 2),
                                       Text(
                                         '${pack.type.toUpperCase()} • ${_formatBytes(pack.sizeBytes)}',
-                                        style: const TextStyle(fontSize: 12, color: Colors.grey),
+                                        style: TextStyle(fontSize: 12, color: colorScheme.onSurfaceVariant),
                                       ),
                                     ],
                                   ),
                                 ),
                                 if (pack.isDownloaded) ...[
-                                  Chip(
-                                    backgroundColor: Colors.green.shade50,
-                                    avatar: const Icon(Icons.check_circle, color: Colors.green, size: 16),
-                                    label: const Text('Installed', style: TextStyle(color: Colors.green, fontSize: 12)),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                    decoration: BoxDecoration(
+                                      color: colorScheme.primary.withValues(alpha: 0.15),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(Icons.check_circle, color: colorScheme.primary, size: 14),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          'Installed',
+                                          style: TextStyle(color: colorScheme.primary, fontWeight: FontWeight.bold, fontSize: 11),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                   IconButton(
-                                    icon: const Icon(Icons.delete_outline, color: Colors.red),
+                                    icon: Icon(Icons.delete_outline, color: colorScheme.error),
                                     onPressed: () => _deletePack(pack),
                                   ),
                                 ] else if (isDownloading) ...[
                                   SizedBox(
                                     width: 24,
                                     height: 24,
-                                    child: CircularProgressIndicator(value: progress, strokeWidth: 3),
+                                    child: CircularProgressIndicator(value: progress, strokeWidth: 3, color: colorScheme.primary),
                                   ),
                                 ] else ...[
                                   ElevatedButton.icon(
-                                    style: ElevatedButton.styleFrom(backgroundColor: Colors.teal, foregroundColor: Colors.white),
                                     onPressed: () => _triggerDownload(pack),
                                     icon: const Icon(Icons.download, size: 16),
                                     label: const Text('Download'),
@@ -208,12 +239,12 @@ class _ContentPackManagerScreenState extends ConsumerState<ContentPackManagerScr
                               ],
                             ),
                             if (isDownloading) ...[
-                              const SizedBox(height: 8),
-                              LinearProgressIndicator(value: progress),
+                              const SizedBox(height: 10),
+                              LinearProgressIndicator(value: progress, color: colorScheme.primary),
                               const SizedBox(height: 4),
                               Text(
                                 status,
-                                style: const TextStyle(fontSize: 11, fontStyle: FontStyle.italic, color: Colors.teal),
+                                style: TextStyle(fontSize: 11, fontStyle: FontStyle.italic, color: colorScheme.primary),
                               ),
                             ],
                           ],

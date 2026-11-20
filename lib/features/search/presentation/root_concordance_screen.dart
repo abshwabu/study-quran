@@ -13,6 +13,7 @@ class RootConcordanceScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colorScheme = Theme.of(context).colorScheme;
     final concordanceAsync = ref.watch(rootConcordanceProvider(rootArabic));
 
     return Scaffold(
@@ -20,7 +21,7 @@ class RootConcordanceScreen extends ConsumerWidget {
         title: Text('Root Concordance: $rootArabic'),
       ),
       body: concordanceAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => Center(child: CircularProgressIndicator(color: colorScheme.primary)),
         error: (err, stack) => Center(
           child: Padding(
             padding: const EdgeInsets.all(16),
@@ -35,17 +36,17 @@ class RootConcordanceScreen extends ConsumerWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.blur_on, size: 56, color: Colors.teal),
+                    Icon(Icons.blur_on, size: 56, color: colorScheme.primary),
                     const SizedBox(height: 16),
                     Text(
                       'Root: $rootArabic',
                       style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 8),
-                    const Text(
+                    Text(
                       'Morphology dataset index loaded. Selected root occurrences found in indexed core text.',
                       textAlign: TextAlign.center,
-                      style: TextStyle(color: Colors.grey),
+                      style: TextStyle(color: colorScheme.onSurfaceVariant),
                     ),
                   ],
                 ),
@@ -59,24 +60,27 @@ class RootConcordanceScreen extends ConsumerWidget {
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(16),
-                color: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.4),
+                decoration: BoxDecoration(
+                  color: colorScheme.primaryContainer.withValues(alpha: 0.5),
+                  border: Border(bottom: BorderSide(color: colorScheme.outlineVariant)),
+                ),
                 child: Column(
                   children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.auto_awesome, color: Colors.teal),
+                        Icon(Icons.auto_awesome, color: colorScheme.secondary),
                         const SizedBox(width: 8),
                         Text(
                           'Root: $rootArabic',
-                          style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: colorScheme.primary),
                         ),
                       ],
                     ),
                     const SizedBox(height: 4),
                     Text(
                       'Found ${occurrences.length} occurrences in indexed Quranic morphology',
-                      style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.teal),
+                      style: TextStyle(fontWeight: FontWeight.bold, color: colorScheme.onPrimaryContainer),
                     ),
                   ],
                 ),
@@ -85,14 +89,13 @@ class RootConcordanceScreen extends ConsumerWidget {
               // Verses List
               Expanded(
                 child: ListView.separated(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   itemCount: occurrences.length,
                   separatorBuilder: (context, index) => const SizedBox(height: 12),
                   itemBuilder: (context, index) {
                     final item = occurrences[index];
 
                     return Card(
-                      elevation: 2,
                       child: Padding(
                         padding: const EdgeInsets.all(16),
                         child: Column(
@@ -101,47 +104,81 @@ class RootConcordanceScreen extends ConsumerWidget {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Chip(
-                                  label: Text('${item.surahNameTranslit} (${item.surahNumber}:${item.ayahNumber})'),
-                                  visualDensity: VisualDensity.compact,
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                  decoration: BoxDecoration(
+                                    color: colorScheme.primaryContainer,
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Text(
+                                    '${item.surahNameTranslit} (${item.surahNumber}:${item.ayahNumber})',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                      color: colorScheme.primary,
+                                    ),
+                                  ),
                                 ),
                                 Text(
                                   item.surahNameArabic,
-                                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                  style: TextStyle(
+                                    fontFamily: 'Amiri',
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                    color: colorScheme.primary,
+                                  ),
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 8),
+                            const SizedBox(height: 10),
 
                             // Arabic Uthmani Text
                             Text(
                               item.arabicTextUthmani,
                               textAlign: TextAlign.right,
                               textDirection: TextDirection.rtl,
-
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontFamily: 'Uthmani',
                                 fontSize: 20,
                                 height: 1.8,
+                                color: colorScheme.onSurface,
                               ),
                             ),
-                            const SizedBox(height: 6),
+                            const SizedBox(height: 8),
 
                             // Matched Word Badge
                             Align(
                               alignment: Alignment.centerRight,
-                              child: Chip(
-                                avatar: const Icon(Icons.find_in_page, size: 14),
-                                backgroundColor: Colors.amber.shade100,
-                                label: Text('Matched Word: ${item.matchedWord} (Position ${item.wordPosition})'),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: colorScheme.secondary.withValues(alpha: 0.15),
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(color: colorScheme.secondary.withValues(alpha: 0.3)),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(Icons.find_in_page, size: 14, color: colorScheme.secondary),
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      'Matched Word: ${item.matchedWord} (Position ${item.wordPosition})',
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.bold,
+                                        color: colorScheme.secondary,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
 
                             if (item.translationText != null) ...[
-                              const Divider(height: 16),
+                              Divider(height: 16, color: colorScheme.outlineVariant),
                               Text(
                                 item.translationText!,
-                                style: const TextStyle(fontSize: 14, color: Colors.black87),
+                                style: TextStyle(fontSize: 14, color: colorScheme.onSurfaceVariant),
                               ),
                             ],
 

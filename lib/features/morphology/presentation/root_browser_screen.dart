@@ -27,21 +27,22 @@ class _RootBrowserScreenState extends ConsumerState<RootBrowserScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     final rootsAsync = ref.watch(rootsListProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Quranic Root Index'),
+        title: const Text('Quranic Arabic Root Browser'),
       ),
       body: Column(
         children: [
-          // Search Input Bar
+          // Search Input
           Padding(
             padding: const EdgeInsets.all(16),
             child: TextField(
               controller: _searchController,
               decoration: InputDecoration(
-                hintText: 'Search root (e.g. r-h-m or ر ح م)...',
+                hintText: 'Search root (Arabic e.g. كتب or translit kataba)...',
                 prefixIcon: const Icon(Icons.search),
                 suffixIcon: _searchController.text.isNotEmpty
                     ? IconButton(
@@ -52,9 +53,6 @@ class _RootBrowserScreenState extends ConsumerState<RootBrowserScreen> {
                         },
                       )
                     : null,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
               ),
               onChanged: (val) {
                 ref.read(rootBrowserQueryProvider.notifier).state = val.trim();
@@ -65,19 +63,22 @@ class _RootBrowserScreenState extends ConsumerState<RootBrowserScreen> {
           // Roots List View
           Expanded(
             child: rootsAsync.when(
-              loading: () => const Center(child: CircularProgressIndicator()),
+              loading: () => Center(child: CircularProgressIndicator(color: colorScheme.primary)),
               error: (err, stack) => Center(child: Text('Error loading roots: $err')),
               data: (roots) {
                 if (roots.isEmpty) {
-                  return const Center(
+                  return Center(
                     child: Padding(
                       padding: const EdgeInsets.all(32),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.search_off, size: 48, color: Colors.grey),
-                          SizedBox(height: 12),
-                          Text('No roots found matching search.'),
+                          Icon(Icons.search_off, size: 48, color: colorScheme.onSurfaceVariant),
+                          const SizedBox(height: 12),
+                          Text(
+                            'No roots found matching search.',
+                            style: TextStyle(color: colorScheme.onSurfaceVariant),
+                          ),
                         ],
                       ),
                     ),
@@ -85,7 +86,7 @@ class _RootBrowserScreenState extends ConsumerState<RootBrowserScreen> {
                 }
 
                 return ListView.separated(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   itemCount: roots.length,
                   separatorBuilder: (context, index) => const SizedBox(height: 8),
                   itemBuilder: (context, index) {
@@ -93,11 +94,17 @@ class _RootBrowserScreenState extends ConsumerState<RootBrowserScreen> {
 
                     return Card(
                       child: ListTile(
-                        leading: CircleAvatar(
-                          backgroundColor: Colors.teal.shade50,
+                        leading: Container(
+                          width: 40,
+                          height: 40,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: colorScheme.primaryContainer,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
                           child: Text(
                             root.rootTranslit.split('-').first.toUpperCase(),
-                            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.teal.shade800),
+                            style: TextStyle(fontWeight: FontWeight.bold, color: colorScheme.primary),
                           ),
                         ),
                         title: Row(
@@ -107,12 +114,15 @@ class _RootBrowserScreenState extends ConsumerState<RootBrowserScreen> {
                               '${root.rootArabic} (${root.rootTranslit})',
                               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                             ),
-                            Chip(
-                              visualDensity: VisualDensity.compact,
-                              backgroundColor: Colors.amber.shade50,
-                              label: Text(
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                              decoration: BoxDecoration(
+                                color: colorScheme.secondary.withValues(alpha: 0.15),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Text(
                                 '${root.occurrenceCount}x',
-                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.amber.shade900),
+                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: colorScheme.secondary),
                               ),
                             ),
                           ],
@@ -120,11 +130,11 @@ class _RootBrowserScreenState extends ConsumerState<RootBrowserScreen> {
                         subtitle: Padding(
                           padding: const EdgeInsets.only(top: 4),
                           child: Text(
-                            root.meaningsSummary.isNotEmpty ? root.meaningsSummary : 'Quranic root index entry',
-                            style: const TextStyle(color: Colors.black87),
+                            root.meaningsSummary.isNotEmpty ? root.meaningsSummary : 'Primary Semitic Root',
+                            style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 13),
                           ),
                         ),
-                        trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                        trailing: const Icon(Icons.arrow_forward_ios, size: 14),
                         onTap: () {
                           Navigator.of(context).push(
                             MaterialPageRoute(

@@ -7,12 +7,14 @@ class DatabaseLoadingOverlay extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colorScheme = Theme.of(context).colorScheme;
     final initStatus = ref.watch(databaseInitProvider);
     final notifier = ref.read(databaseInitProvider.notifier);
 
     final percentage = (initStatus.progress * 100).clamp(0, 100).toInt();
 
     return Scaffold(
+      backgroundColor: colorScheme.surface,
       body: Center(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 32),
@@ -21,15 +23,23 @@ class DatabaseLoadingOverlay extends ConsumerWidget {
             children: [
               // Header App Icon & Title
               Container(
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.all(22),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primaryContainer,
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      colorScheme.primaryContainer,
+                      colorScheme.secondaryContainer.withValues(alpha: 0.5),
+                    ],
+                  ),
                   shape: BoxShape.circle,
+                  border: Border.all(color: colorScheme.outlineVariant),
                 ),
                 child: Icon(
                   Icons.auto_stories,
-                  size: 56,
-                  color: Theme.of(context).colorScheme.primary,
+                  size: 52,
+                  color: colorScheme.primary,
                 ),
               ),
               const SizedBox(height: 24),
@@ -38,24 +48,25 @@ class DatabaseLoadingOverlay extends ConsumerWidget {
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  color: Theme.of(context).colorScheme.onSurface,
+                  color: colorScheme.onSurface,
+                  letterSpacing: -0.3,
                 ),
               ),
               const SizedBox(height: 8),
-              const Text(
+              Text(
                 'Offline-First Quran, Tafsir & Concordance',
-                style: TextStyle(fontSize: 14, color: Colors.grey),
+                style: TextStyle(fontSize: 14, color: colorScheme.onSurfaceVariant),
               ),
-              const SizedBox(height: 40),
+              const SizedBox(height: 36),
 
               if (initStatus.error != null) ...[
                 // Error Display
-                const Icon(Icons.error_outline, size: 48, color: Colors.red),
+                Icon(Icons.error_outline, size: 48, color: colorScheme.error),
                 const SizedBox(height: 16),
                 Text(
                   initStatus.message,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(color: Colors.red, fontSize: 13),
+                  style: TextStyle(color: colorScheme.error, fontSize: 13),
                 ),
                 const SizedBox(height: 20),
                 ElevatedButton.icon(
@@ -68,18 +79,18 @@ class DatabaseLoadingOverlay extends ConsumerWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text('Loading Database', style: TextStyle(fontWeight: FontWeight.bold)),
-                    Text('$percentage%', style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.primary)),
+                    Text('Loading Database', style: TextStyle(fontWeight: FontWeight.bold, color: colorScheme.onSurface)),
+                    Text('$percentage%', style: TextStyle(fontWeight: FontWeight.bold, color: colorScheme.primary)),
                   ],
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 10),
                 ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(10),
                   child: LinearProgressIndicator(
                     value: initStatus.progress,
                     minHeight: 10,
-                    backgroundColor: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.5),
-                    valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).colorScheme.primary),
+                    backgroundColor: colorScheme.primaryContainer.withValues(alpha: 0.5),
+                    valueColor: AlwaysStoppedAnimation<Color>(colorScheme.primary),
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -88,7 +99,7 @@ class DatabaseLoadingOverlay extends ConsumerWidget {
                 Text(
                   initStatus.message,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(fontSize: 13, color: Colors.grey),
+                  style: TextStyle(fontSize: 13, color: colorScheme.onSurfaceVariant),
                 ),
               ],
             ],

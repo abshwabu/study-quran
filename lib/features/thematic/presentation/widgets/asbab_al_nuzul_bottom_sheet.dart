@@ -17,7 +17,7 @@ class AsbabAlNuzulBottomSheet extends ConsumerWidget {
       context: context,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       builder: (ctx) => AsbabAlNuzulBottomSheet(surahNumber: surahNumber, ayahNumber: ayahNumber),
     );
@@ -25,6 +25,7 @@ class AsbabAlNuzulBottomSheet extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colorScheme = Theme.of(context).colorScheme;
     final asbabAsync = ref.watch(asbabAlNuzulForAyahProvider((
       surahNumber: surahNumber,
       ayahNumber: ayahNumber,
@@ -33,7 +34,7 @@ class AsbabAlNuzulBottomSheet extends ConsumerWidget {
     return SafeArea(
       child: SingleChildScrollView(
         child: Container(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.only(top: 8, left: 16, right: 16, bottom: 24),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -43,7 +44,7 @@ class AsbabAlNuzulBottomSheet extends ConsumerWidget {
                 children: [
                   Text(
                     'Asbab al-Nuzul ($surahNumber:$ayahNumber)',
-                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: colorScheme.onSurface),
                   ),
                   IconButton(
                     icon: const Icon(Icons.close),
@@ -51,33 +52,34 @@ class AsbabAlNuzulBottomSheet extends ConsumerWidget {
                   ),
                 ],
               ),
-              const Divider(),
+              Divider(color: colorScheme.outlineVariant),
               const SizedBox(height: 8),
 
               asbabAsync.when(
-                loading: () => const Center(child: CircularProgressIndicator()),
+                loading: () => Center(child: CircularProgressIndicator(color: colorScheme.primary)),
                 error: (err, stack) => Center(child: Text('Error loading Asbab al-Nuzul: $err')),
                 data: (entry) {
                   if (entry == null) {
                     return Container(
                       padding: const EdgeInsets.all(24),
                       decoration: BoxDecoration(
-                        color: Colors.grey.shade100,
-                        borderRadius: BorderRadius.circular(12),
+                        color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: colorScheme.outlineVariant),
                       ),
-                      child: const Column(
+                      child: Column(
                         children: [
-                          Icon(Icons.history_edu, size: 48, color: Colors.grey),
-                          SizedBox(height: 12),
-                          Text(
+                          Icon(Icons.history_edu, size: 48, color: colorScheme.onSurfaceVariant),
+                          const SizedBox(height: 12),
+                          const Text(
                             'No Specific Occasion of Revelation Recorded',
                             style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                           ),
-                          SizedBox(height: 8),
+                          const SizedBox(height: 8),
                           Text(
                             'Not every Quranic verse was revealed in response to a specific historical event. Many verses convey general guidance, laws, or universal truths.',
                             textAlign: TextAlign.center,
-                            style: TextStyle(color: Colors.grey, fontSize: 13),
+                            style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 13),
                           ),
                         ],
                       ),
@@ -87,9 +89,9 @@ class AsbabAlNuzulBottomSheet extends ConsumerWidget {
                   return Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.3),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3)),
+                      color: colorScheme.primaryContainer.withValues(alpha: 0.4),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: colorScheme.primary.withValues(alpha: 0.3)),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -97,27 +99,41 @@ class AsbabAlNuzulBottomSheet extends ConsumerWidget {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Chip(
-                              avatar: const Icon(Icons.menu_book, size: 14),
-                              label: Text('Range: Ayahs ${entry.startAyah}–${entry.endAyah}'),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: colorScheme.primaryContainer,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.menu_book, size: 14, color: colorScheme.primary),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    'Range: Ayahs ${entry.startAyah}–${entry.endAyah}',
+                                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: colorScheme.primary),
+                                  ),
+                                ],
+                              ),
                             ),
                           ],
                         ),
                         const SizedBox(height: 12),
                         Text(
                           entry.textContent,
-                          style: const TextStyle(fontSize: 15, height: 1.6, color: Colors.black87),
+                          style: TextStyle(fontSize: 15, height: 1.6, color: colorScheme.onSurface),
                         ),
                         const SizedBox(height: 16),
-                        const Divider(),
+                        Divider(color: colorScheme.outlineVariant),
                         Row(
                           children: [
-                            const Icon(Icons.source, size: 16, color: Colors.teal),
+                            Icon(Icons.source, size: 16, color: colorScheme.primary),
                             const SizedBox(width: 6),
                             Expanded(
                               child: Text(
                                 'Source: ${entry.sourceNote}',
-                                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.teal),
+                                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: colorScheme.primary),
                               ),
                             ),
                           ],

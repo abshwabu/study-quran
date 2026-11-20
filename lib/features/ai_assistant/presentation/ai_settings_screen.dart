@@ -67,6 +67,7 @@ class _AiSettingsScreenState extends ConsumerState<AiSettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     final keyState = ref.watch(apiKeyProvider);
 
     return Scaffold(
@@ -74,7 +75,7 @@ class _AiSettingsScreenState extends ConsumerState<AiSettingsScreen> {
         title: const Text('AI Research Assistant Settings'),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -82,40 +83,40 @@ class _AiSettingsScreenState extends ConsumerState<AiSettingsScreen> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.blue.shade50,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.blue.shade200),
+                color: Colors.blue.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: Colors.blue.withValues(alpha: 0.3)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
+                  const Row(
                     children: [
-                      Icon(Icons.auto_awesome, color: Colors.blue.shade800),
-                      const SizedBox(width: 8),
+                      Icon(Icons.auto_awesome, color: Colors.blue),
+                      SizedBox(width: 8),
                       Text(
                         'Gemini AI Key Setup',
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.blue.shade900),
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.blue),
                       ),
                     ],
                   ),
                   const SizedBox(height: 8),
-                  const Text(
+                  Text(
                     'Provide your personal Google Gemini API key to enable AI-assisted verse explanations, tafsir comparisons, and workspace summaries.',
-                    style: TextStyle(fontSize: 13, height: 1.4),
+                    style: TextStyle(fontSize: 13, height: 1.4, color: colorScheme.onSurface),
                   ),
                   const SizedBox(height: 8),
-                  const Text(
+                  Text(
                     '🔒 Security Guarantee: Your key is stored ONLY locally on device in system secure storage (Keystore/Keychain). It is never sent to any server except directly to Google API endpoints.',
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.black87),
+                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: colorScheme.onSurfaceVariant),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 20),
 
             keyState.when(
-              loading: () => const Center(child: CircularProgressIndicator()),
+              loading: () => Center(child: CircularProgressIndicator(color: colorScheme.primary)),
               error: (err, stack) => Text('Error loading key: $err'),
               data: (existingKey) {
                 if (_keyController.text.isEmpty && existingKey != null) {
@@ -133,27 +134,28 @@ class _AiSettingsScreenState extends ConsumerState<AiSettingsScreen> {
                       decoration: InputDecoration(
                         labelText: 'Gemini API Key',
                         hintText: 'AIzaSy...',
-                        border: const OutlineInputBorder(),
                         suffixIcon: IconButton(
                           icon: Icon(_obscureText ? Icons.visibility : Icons.visibility_off),
                           onPressed: () => setState(() => _obscureText = !_obscureText),
                         ),
                       ),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 14),
 
                     Row(
                       children: [
                         Expanded(
                           child: ElevatedButton.icon(
-                            style: ElevatedButton.styleFrom(backgroundColor: Colors.teal, foregroundColor: Colors.white),
                             onPressed: () async {
                               final key = _keyController.text.trim();
                               if (key.isNotEmpty) {
                                 await ref.read(apiKeyProvider.notifier).setKey(key);
                                 if (!context.mounted) return;
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text('API Key saved securely!')),
+                                  const SnackBar(
+                                    content: Text('API Key saved securely!'),
+                                    behavior: SnackBarBehavior.floating,
+                                  ),
                                 );
                               }
                             },
@@ -177,18 +179,29 @@ class _AiSettingsScreenState extends ConsumerState<AiSettingsScreen> {
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: _testSuccess ? Colors.green.shade50 : Colors.red.shade50,
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: _testSuccess ? Colors.green.shade300 : Colors.red.shade300),
+                          color: _testSuccess
+                              ? colorScheme.primaryContainer.withValues(alpha: 0.5)
+                              : colorScheme.errorContainer.withValues(alpha: 0.5),
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                            color: _testSuccess ? colorScheme.primary : colorScheme.error,
+                          ),
                         ),
                         child: Row(
                           children: [
-                            Icon(_testSuccess ? Icons.check_circle : Icons.error, color: _testSuccess ? Colors.green : Colors.red),
+                            Icon(
+                              _testSuccess ? Icons.check_circle : Icons.error,
+                              color: _testSuccess ? colorScheme.primary : colorScheme.error,
+                            ),
                             const SizedBox(width: 12),
                             Expanded(
                               child: Text(
                                 _testMessage!,
-                                style: TextStyle(color: _testSuccess ? Colors.green.shade900 : Colors.red.shade900, fontSize: 13),
+                                style: TextStyle(
+                                  color: _testSuccess ? colorScheme.primary : colorScheme.error,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
                             ),
                           ],
@@ -198,9 +211,12 @@ class _AiSettingsScreenState extends ConsumerState<AiSettingsScreen> {
                     ],
 
                     if (hasKey) ...[
-                      const Divider(height: 32),
+                      Divider(height: 32, color: colorScheme.outlineVariant),
                       OutlinedButton.icon(
-                        style: OutlinedButton.styleFrom(foregroundColor: Colors.red, side: const BorderSide(color: Colors.red)),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: colorScheme.error,
+                          side: BorderSide(color: colorScheme.error),
+                        ),
                         onPressed: () async {
                           await ref.read(apiKeyProvider.notifier).clearKey();
                           await ref.read(aiHistoryDaoProvider).clearAiHistory();
@@ -210,7 +226,10 @@ class _AiSettingsScreenState extends ConsumerState<AiSettingsScreen> {
                           });
                           if (!context.mounted) return;
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('API key and local AI history cleared!')),
+                            const SnackBar(
+                              content: Text('API key and local AI history cleared!'),
+                              behavior: SnackBarBehavior.floating,
+                            ),
                           );
                         },
                         icon: const Icon(Icons.delete_forever),

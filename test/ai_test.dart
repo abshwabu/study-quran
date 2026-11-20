@@ -1,9 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:drift/drift.dart' hide isNotNull, isNull;
 import 'package:drift/native.dart';
 import 'package:studyquran/core/database/app_database.dart';
 import 'package:studyquran/core/database/daos/ai_history_dao.dart';
-import 'package:studyquran/features/ai_assistant/domain/secure_key_storage.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();

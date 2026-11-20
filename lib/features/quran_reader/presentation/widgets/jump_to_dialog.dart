@@ -55,23 +55,25 @@ class _JumpToDialogState extends ConsumerState<JumpToDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     final surahsAsync = ref.watch(surahsProvider);
 
     return AlertDialog(
-      title: const Row(
+      title: Row(
         children: [
-          Icon(Icons.explore, color: Color(0xFF0F5132)),
-          SizedBox(width: 8),
-          Expanded(
+          Icon(Icons.explore, color: colorScheme.primary),
+          const SizedBox(width: 10),
+          const Expanded(
             child: Text(
               'Jump to Surah & Ayah',
               overflow: TextOverflow.ellipsis,
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ),
         ],
       ),
       content: surahsAsync.when(
-        loading: () => const SizedBox(height: 100, child: Center(child: CircularProgressIndicator())),
+        loading: () => SizedBox(height: 100, child: Center(child: CircularProgressIndicator(color: colorScheme.primary))),
         error: (err, stack) => Text('Error: $err'),
         data: (surahs) {
           final activeSurahMeta = surahs.firstWhere(
@@ -83,15 +85,14 @@ class _JumpToDialogState extends ConsumerState<JumpToDialog> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const Text('Select Surah:', style: TextStyle(fontWeight: FontWeight.bold)),
-              const SizedBox(height: 4),
+              Text(
+                'Select Surah:',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: colorScheme.primary),
+              ),
+              const SizedBox(height: 6),
               DropdownButtonFormField<int>(
-                value: _selectedSurah,
+                initialValue: _selectedSurah,
                 isExpanded: true,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                ),
                 items: surahs.map((s) {
                   return DropdownMenuItem<int>(
                     value: s.number,
@@ -115,26 +116,21 @@ class _JumpToDialogState extends ConsumerState<JumpToDialog> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Expanded(
-                    child: Text(
-                      'Enter Ayah Number:',
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
+                  Text(
+                    'Enter Ayah Number:',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: colorScheme.primary),
                   ),
-                  const SizedBox(width: 8),
                   Text(
                     'Max: ${activeSurahMeta.ayahCount}',
-                    style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
+                    style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 12),
                   ),
                 ],
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: 6),
               TextField(
                 controller: _ayahController,
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(
-                  border: const OutlineInputBorder(),
                   hintText: '1 - ${activeSurahMeta.ayahCount}',
                 ),
                 onChanged: (val) {
@@ -154,10 +150,6 @@ class _JumpToDialogState extends ConsumerState<JumpToDialog> {
           child: const Text('Cancel'),
         ),
         ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF0F5132),
-            foregroundColor: Colors.white,
-          ),
           onPressed: () {
             final parsed = int.tryParse(_ayahController.text) ?? 1;
             final validAyah = parsed.clamp(1, 286);

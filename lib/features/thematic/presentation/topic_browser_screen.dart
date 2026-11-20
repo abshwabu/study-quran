@@ -27,6 +27,7 @@ class _TopicBrowserScreenState extends ConsumerState<TopicBrowserScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     final query = ref.watch(topicSearchQueryProvider);
     final topicsAsync = ref.watch(searchedTopicsProvider);
 
@@ -53,9 +54,6 @@ class _TopicBrowserScreenState extends ConsumerState<TopicBrowserScreen> {
                         },
                       )
                     : null,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
               ),
               onChanged: (val) {
                 ref.read(topicSearchQueryProvider.notifier).state = val.trim();
@@ -66,14 +64,17 @@ class _TopicBrowserScreenState extends ConsumerState<TopicBrowserScreen> {
           // Main Tree List or Filtered List
           Expanded(
             child: topicsAsync.when(
-              loading: () => const Center(child: CircularProgressIndicator()),
+              loading: () => Center(child: CircularProgressIndicator(color: colorScheme.primary)),
               error: (err, stack) => Center(child: Text('Error loading topics: $err')),
               data: (topics) {
                 if (topics.isEmpty) {
-                  return const Center(
+                  return Center(
                     child: Padding(
                       padding: const EdgeInsets.all(32),
-                      child: Text('No topics found matching your query.'),
+                      child: Text(
+                        'No topics found matching your query.',
+                        style: TextStyle(color: colorScheme.onSurfaceVariant),
+                      ),
                     ),
                   );
                 }
@@ -88,13 +89,18 @@ class _TopicBrowserScreenState extends ConsumerState<TopicBrowserScreen> {
                       final topic = topics[index];
                       return Card(
                         child: ListTile(
-                          leading: const CircleAvatar(
-                            backgroundColor: Color(0xFFE8F5E9),
-                            child: Icon(Icons.category, color: Color(0xFF2E7D32)),
+                          leading: Container(
+                            width: 38,
+                            height: 38,
+                            decoration: BoxDecoration(
+                              color: colorScheme.primary.withValues(alpha: 0.15),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Icon(Icons.category, color: colorScheme.primary, size: 20),
                           ),
                           title: Text(topic.name, style: const TextStyle(fontWeight: FontWeight.bold)),
-                          subtitle: Text('Category: ${topic.category}'),
-                          trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                          subtitle: Text('Category: ${topic.category}', style: TextStyle(color: colorScheme.onSurfaceVariant)),
+                          trailing: const Icon(Icons.arrow_forward_ios, size: 14),
                           onTap: () {
                             Navigator.of(context).push(
                               MaterialPageRoute(
@@ -112,7 +118,7 @@ class _TopicBrowserScreenState extends ConsumerState<TopicBrowserScreen> {
                 final rootTopics = topics.where((t) => t.parentTopicId == null).toList();
 
                 return ListView.builder(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   itemCount: rootTopics.length,
                   itemBuilder: (context, index) {
                     final parent = rootTopics[index];
@@ -122,9 +128,10 @@ class _TopicBrowserScreenState extends ConsumerState<TopicBrowserScreen> {
                       return Card(
                         margin: const EdgeInsets.only(bottom: 8),
                         child: ListTile(
-                          leading: const Icon(Icons.folder_special, color: Colors.teal),
+                          leading: Icon(Icons.folder_special, color: colorScheme.primary),
                           title: Text(parent.name, style: const TextStyle(fontWeight: FontWeight.bold)),
-                          subtitle: Text(parent.category),
+                          subtitle: Text(parent.category, style: TextStyle(color: colorScheme.onSurfaceVariant)),
+                          trailing: const Icon(Icons.arrow_forward_ios, size: 14),
                           onTap: () {
                             Navigator.of(context).push(
                               MaterialPageRoute(
@@ -139,13 +146,13 @@ class _TopicBrowserScreenState extends ConsumerState<TopicBrowserScreen> {
                     return Card(
                       margin: const EdgeInsets.only(bottom: 12),
                       child: ExpansionTile(
-                        leading: const Icon(Icons.folder, color: Colors.teal),
+                        leading: Icon(Icons.folder, color: colorScheme.primary),
                         title: Text(parent.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                        subtitle: Text('${children.length} subtopics'),
+                        subtitle: Text('${children.length} subtopics', style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 12)),
                         children: children.map((child) {
                           return ListTile(
                             contentPadding: const EdgeInsets.only(left: 32, right: 16),
-                            leading: const Icon(Icons.subdirectory_arrow_right, size: 18, color: Colors.teal),
+                            leading: Icon(Icons.subdirectory_arrow_right, size: 18, color: colorScheme.primary),
                             title: Text(child.name, style: const TextStyle(fontWeight: FontWeight.w600)),
                             trailing: const Icon(Icons.arrow_forward_ios, size: 14),
                             onTap: () {
