@@ -333,43 +333,66 @@ class _TafsirComparisonScreenState extends ConsumerState<TafsirComparisonScreen>
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  OutlinedButton.icon(
+                  OutlinedButton(
                     onPressed: _currentAyah > 1 ? () => _navigateAyah(-1, maxAyahs) : null,
-                    icon: const Icon(Icons.arrow_back_ios_new, size: 14),
-                    label: const Text('Prev Ayah'),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    ),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.chevron_left, size: 18),
+                        Text('Prev', style: TextStyle(fontSize: 12)),
+                      ],
+                    ),
                   ),
-                  InkWell(
-                    onTap: _openJumpDialog,
-                    borderRadius: BorderRadius.circular(20),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: colorScheme.primaryContainer.withValues(alpha: 0.6),
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: colorScheme.primary.withValues(alpha: 0.3)),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.unfold_more, size: 16, color: colorScheme.primary),
-                          const SizedBox(width: 4),
-                          Text(
-                            'Ayah $_currentAyah of $maxAyahs',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 13,
-                              color: colorScheme.primary,
+                  const SizedBox(width: 4),
+                  Flexible(
+                    child: InkWell(
+                      onTap: _openJumpDialog,
+                      borderRadius: BorderRadius.circular(20),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: colorScheme.primaryContainer.withValues(alpha: 0.6),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: colorScheme.primary.withValues(alpha: 0.3)),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.unfold_more, size: 14, color: colorScheme.primary),
+                            const SizedBox(width: 4),
+                            Flexible(
+                              child: Text(
+                                'Ayah $_currentAyah/$maxAyahs',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 12,
+                                  color: colorScheme.primary,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
-                  OutlinedButton.icon(
+                  const SizedBox(width: 4),
+                  OutlinedButton(
                     onPressed: _currentAyah < maxAyahs ? () => _navigateAyah(1, maxAyahs) : null,
-                    iconAlignment: IconAlignment.end,
-                    icon: const Icon(Icons.arrow_forward_ios, size: 14),
-                    label: const Text('Next Ayah'),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    ),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text('Next', style: TextStyle(fontSize: 12)),
+                        Icon(Icons.chevron_right, size: 18),
+                      ],
+                    ),
                   ),
                 ],
               ),
