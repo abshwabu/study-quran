@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/database/providers.dart';
 import '../../content_packs/presentation/content_pack_manager_screen.dart';
+import '../../../core/content_packs/services/content_pack_download_service.dart';
 import '../../quran_reader/presentation/widgets/jump_to_dialog.dart';
 import '../providers/tafsir_providers.dart';
 
@@ -142,12 +143,15 @@ class _TafsirComparisonScreenState extends ConsumerState<TafsirComparisonScreen>
           IconButton(
             icon: const Icon(Icons.download_outlined),
             tooltip: 'Content Packs',
-            onPressed: () {
-              Navigator.of(context).push(
+            onPressed: () async {
+              await Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (ctx) => const ContentPackManagerScreen(),
                 ),
               );
+              ref.invalidate(downloadedTafsirIdsProvider);
+              ref.invalidate(comparisonTafsirsProvider);
+              ref.invalidate(availableContentPacksProvider);
             },
           ),
         ],
@@ -377,13 +381,79 @@ class _TafsirComparisonScreenState extends ConsumerState<TafsirComparisonScreen>
   }
 }
 
-class _TafsirComparisonCardContent extends StatelessWidget {
+class _TafsirComparisonCardContent extends ConsumerStatefulWidget {
   final TafsirComparisonItem item;
 
   const _TafsirComparisonCardContent({required this.item});
 
   @override
+  ConsumerState<_TafsirComparisonCardContent> createState() => _TafsirComparisonCardContentState();
+}
+
+class _TafsirComparisonCardContentState extends ConsumerState<_TafsirComparisonCardContent> {
+  bool _isDownloading = false;
+
+  void _downloadDirectly() async {
+    setState(() {
+      _isDownloading = true;
+    });
+
+    final db = ref.read(databaseProvider);
+    try {
+      await ContentPackDownloadService.downloadAndImportPack(
+        db: db,
+        packId: widget.item.tafsirId,
+        packType: 'tafsir',
+        downloadUrl: '',
+        totalSizeBytes: 12000000,
+        onProgress: (_) {},
+      );
+
+      ref.invalidate(downloadedTafsirIdsProvider);
+      ref.invalidate(comparisonTafsirsProvider);
+      ref.invalidate(availableContentPacksProvider);
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${widget.item.meta.name} installed successfully!'),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to download: $e'),
+            backgroundColor: Theme.of(context).colorScheme.error,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isDownloading = false;
+        });
+      }
+    }
+  }
+
+  void _openPackManager() async {
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (ctx) => const ContentPackManagerScreen(),
+      ),
+    );
+    ref.invalidate(downloadedTafsirIdsProvider);
+    ref.invalidate(comparisonTafsirsProvider);
+    ref.invalidate(availableContentPacksProvider);
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final item = widget.item;
     final colorScheme = Theme.of(context).colorScheme;
     final isArabic = item.meta.language == 'ar';
     final content = item.content;
@@ -465,17 +535,40 @@ class _TafsirComparisonCardContent extends StatelessWidget {
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 12),
-                FilledButton.tonalIcon(
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (ctx) => const ContentPackManagerScreen(),
+                if (_isDownloading) ...[
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 8),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(strokeWidth: 2.5),
+                        ),
+                        SizedBox(width: 12),
+                        Text('Downloading & installing...', style: TextStyle(fontSize: 13)),
+                      ],
+                    ),
+                  ),
+                ] else ...[
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    alignment: WrapAlignment.center,
+                    children: [
+                      FilledButton.icon(
+                        onPressed: _downloadDirectly,
+                        icon: const Icon(Icons.download, size: 16),
+                        label: const Text('Download Now'),
                       ),
-                    );
-                  },
-                  icon: const Icon(Icons.download, size: 16),
-                  label: const Text('Download Pack'),
-                ),
+                      OutlinedButton(
+                        onPressed: _openPackManager,
+                        child: const Text('Manage Packs'),
+                      ),
+                    ],
+                  ),
+                ],
               ],
             ),
           ),

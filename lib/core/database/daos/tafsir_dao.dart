@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart';
 import '../app_database.dart';
 import '../tables/tafsir.dart';
+import '../../content_packs/services/content_pack_download_service.dart';
 
 part 'tafsir_dao.g.dart';
 
@@ -94,6 +95,28 @@ class TafsirDao extends DatabaseAccessor<AppDatabase> with _$TafsirDaoMixin {
     final query = selectOnly(tafsirContent, distinct: true)
       ..addColumns([tafsirContent.tafsirId]);
     final rows = await query.get();
-    return rows.map((r) => r.read(tafsirContent.tafsirId)!).toList();
+    final idsInContent = rows.map((r) => r.read(tafsirContent.tafsirId)!).toSet();
+
+    // Check content_packs table for any packs marked as downloaded
+    final packsQuery = select(attachedDatabase.contentPacks)
+      ..where((p) => p.type.equals('tafsir') & p.downloaded.equals(true));
+    final downloadedPacks = await packsQuery.get();
+
+    for (final pack in downloadedPacks) {
+      if (!idsInContent.contains(pack.packId)) {
+        // Auto-install commentary records if marked downloaded in content_packs
+        // but commentary records haven't been populated yet
+        await ContentPackDownloadService.installTafsirPackContent(attachedDatabase, pack.packId);
+        idsInContent.add(pack.packId);
+      } else {
+        idsInContent.add(pack.packId);
+      }
+    }
+
+    // Pre-bundled core tafsirs
+    idsInContent.add('ar.muyassar');
+    idsInContent.add('en.jalalayn');
+
+    return idsInContent.toList();
   }
 }

@@ -77,7 +77,7 @@ class ContentPackDownloadService {
     ));
 
     if (packType == 'tafsir') {
-      await _installTafsirPack(db, packId);
+      await installTafsirPackContent(db, packId);
     } else if (packType == 'audio') {
       final sampleManifest = File('${packDir.path}/reciter_info.json');
       await sampleManifest.writeAsString('{"reciterId": "$packId", "status": "ready"}');
@@ -94,7 +94,7 @@ class ContentPackDownloadService {
     ));
   }
 
-  static Future<void> _installTafsirPack(AppDatabase db, String packId) async {
+  static Future<void> installTafsirPackContent(AppDatabase db, String packId) async {
     // 1. Ensure tafsirs_meta has the metadata row
     final meta = await db.tafsirDao.getTafsirMetaById(packId);
     if (meta == null) {
@@ -228,9 +228,18 @@ class ContentPackDownloadService {
       }
     }
 
-    // Fast batch insert
-    await db.batch((batch) {
-      batch.insertAll(db.tafsirContent, entries);
+    // Chunked batch insert inside transaction for SQLite variable limit safety
+    await db.transaction(() async {
+      const chunkSize = 100;
+      for (var i = 0; i < entries.length; i += chunkSize) {
+        final chunk = entries.sublist(
+          i,
+          i + chunkSize > entries.length ? entries.length : i + chunkSize,
+        );
+        await db.batch((batch) {
+          batch.insertAll(db.tafsirContent, chunk);
+        });
+      }
     });
   }
 
