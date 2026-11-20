@@ -28,6 +28,20 @@ class ContentPackRepositoryImpl implements ContentPackRepository {
   @override
   Future<List<PackManifestItem>> fetchAvailablePacks() async {
     try {
+      final dbPacks = await packDao.getAllPacks();
+      if (dbPacks.isNotEmpty) {
+        return dbPacks.map((p) => PackManifestItem(
+          packId: p.packId,
+          type: p.type,
+          name: p.name,
+          version: p.version,
+          downloadUrl: p.downloadUrl,
+          sizeBytes: p.sizeBytes,
+          licenseNote: p.licenseNote,
+          isDownloaded: p.downloaded,
+        )).toList();
+      }
+
       final jsonString = await rootBundle.loadString('assets/quran/mock_manifest.json');
       final Map<String, dynamic> jsonMap = json.decode(jsonString);
       final manifest = PackManifest.fromJson(jsonMap);

@@ -11,6 +11,7 @@ class TafsirLibraryScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
     final metaAsync = ref.watch(availableTafsirsMetaProvider);
+    final downloadedIdsAsync = ref.watch(downloadedTafsirIdsProvider);
     final packsAsync = ref.watch(availableContentPacksProvider);
     final defaultId = ref.watch(defaultTafsirIdProvider);
 
@@ -42,6 +43,8 @@ class TafsirLibraryScreen extends ConsumerWidget {
           for (final meta in tafsirMetas) {
             grouped.putIfAbsent(meta.language.toUpperCase(), () => []).add(meta);
           }
+
+          final downloadedIds = downloadedIdsAsync.value ?? const ['ar.muyassar', 'en.jalalayn'];
 
           return ListView(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -98,7 +101,7 @@ class TafsirLibraryScreen extends ConsumerWidget {
                         orElse: () => packs.first,
                       );
 
-                      final isDownloaded = meta.tafsirId == 'ar.muyassar' || meta.tafsirId == 'en.jalalayn';
+                      final isDownloaded = downloadedIds.contains(meta.tafsirId);
 
                       return Card(
                         margin: const EdgeInsets.only(bottom: 8),
@@ -156,16 +159,28 @@ class TafsirLibraryScreen extends ConsumerWidget {
                               ),
                             ],
                           ),
-                          trailing: IconButton(
-                            icon: Icon(
-                              isDefault ? Icons.check_circle : Icons.radio_button_unchecked,
-                              color: isDefault ? colorScheme.primary : colorScheme.onSurfaceVariant,
-                            ),
-                            tooltip: 'Set as Default Tafsir',
-                            onPressed: () {
-                              ref.read(defaultTafsirIdProvider.notifier).setDefaultTafsir(meta.tafsirId);
-                            },
-                          ),
+                          trailing: isDownloaded
+                              ? IconButton(
+                                  icon: Icon(
+                                    isDefault ? Icons.check_circle : Icons.radio_button_unchecked,
+                                    color: isDefault ? colorScheme.primary : colorScheme.onSurfaceVariant,
+                                  ),
+                                  tooltip: 'Set as Default Tafsir',
+                                  onPressed: () {
+                                    ref.read(defaultTafsirIdProvider.notifier).setDefaultTafsir(meta.tafsirId);
+                                  },
+                                )
+                              : OutlinedButton.icon(
+                                  icon: const Icon(Icons.download, size: 14),
+                                  label: const Text('Download'),
+                                  onPressed: () {
+                                    Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                        builder: (ctx) => const ContentPackManagerScreen(),
+                                      ),
+                                    );
+                                  },
+                                ),
                         ),
                       );
                     }),

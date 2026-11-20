@@ -29,6 +29,7 @@ class PackManifestItem {
       downloadUrl: json['download_url'] as String,
       sizeBytes: json['size_bytes'] as int,
       licenseNote: json['license_note'] as String,
+      isDownloaded: json['is_downloaded'] as bool? ?? false,
     );
   }
 
@@ -41,6 +42,7 @@ class PackManifestItem {
       'download_url': downloadUrl,
       'size_bytes': sizeBytes,
       'license_note': licenseNote,
+      'is_downloaded': isDownloaded,
     };
   }
 }

@@ -27,9 +27,25 @@ class ContentPackDao extends DatabaseAccessor<AppDatabase> with _$ContentPackDao
   }
 
   /// Mark pack as downloaded
-  Future<void> markAsDownloaded(String packId) {
-    return (update(contentPacks)..where((p) => p.packId.equals(packId)))
-        .write(const ContentPacksCompanion(downloaded: Value(true)));
+  Future<void> markAsDownloaded(String packId) async {
+    final existing = await getPackById(packId);
+    if (existing != null) {
+      await (update(contentPacks)..where((p) => p.packId.equals(packId)))
+          .write(const ContentPacksCompanion(downloaded: Value(true)));
+    } else {
+      await into(contentPacks).insertOnConflictUpdate(
+        ContentPacksCompanion.insert(
+          packId: packId,
+          type: packId.contains('audio') ? 'audio' : 'tafsir',
+          name: packId,
+          version: '1.0.0',
+          downloaded: const Value(true),
+          downloadUrl: '',
+          sizeBytes: 10000000,
+          licenseNote: 'Downloaded',
+        ),
+      );
+    }
   }
 
   /// Delete/uninstall pack status

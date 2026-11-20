@@ -9,7 +9,8 @@
       "version": "1.0.0",
       "download_url": "https://cdn.quran.com/translations/en.saheeh.json",
       "size_bytes": 1200000,
-      "license_note": "Public redistribution permitted with attribution"
+      "license_note": "Public redistribution permitted with attribution",
+      "is_downloaded": true
     },
     {
       "pack_id": "ar.muyassar",
@@ -18,7 +19,8 @@
       "version": "1.0.0",
       "download_url": "https://cdn.quran.com/tafsir/ar.muyassar.json",
       "size_bytes": 4500000,
-      "license_note": "Public domain (Bundled)"
+      "license_note": "Public domain (Bundled)",
+      "is_downloaded": true
     },
     {
       "pack_id": "en.jalalayn",
@@ -27,7 +29,38 @@
       "version": "1.0.0",
       "download_url": "https://cdn.quran.com/tafsir/en.jalalayn.json",
       "size_bytes": 3800000,
-      "license_note": "Public domain (Bundled)"
+      "license_note": "Public domain (Bundled)",
+      "is_downloaded": true
+    },
+    {
+      "pack_id": "en.ibnkathir",
+      "type": "tafsir",
+      "name": "Tafsir Ibn Kathir (English)",
+      "version": "1.0.0",
+      "download_url": "https://cdn.quran.com/tafsir/en.ibnkathir.json",
+      "size_bytes": 12000000,
+      "license_note": "Downloadable pack",
+      "is_downloaded": false
+    },
+    {
+      "pack_id": "ar.tabari",
+      "type": "tafsir",
+      "name": "Tafsir Tabari (Arabic)",
+      "version": "1.0.0",
+      "download_url": "https://cdn.quran.com/tafsir/ar.tabari.json",
+      "size_bytes": 18000000,
+      "license_note": "Downloadable pack",
+      "is_downloaded": false
+    },
+    {
+      "pack_id": "audio.alafasy",
+      "type": "audio",
+      "name": "Mishary Rashid Alafasy 128kbps",
+      "version": "1.0.0",
+      "download_url": "https://everyayah.com/data/Alafasy_128kbps/",
+      "size_bytes": 650000000,
+      "license_note": "EveryAyah.com permissive",
+      "is_downloaded": false
     },
     {
       "pack_id": "morphology.corpus",
@@ -36,7 +69,18 @@
       "version": "1.0.0",
       "download_url": "https://corpus.quran.com/data/morphology.json",
       "size_bytes": 3200000,
-      "license_note": "CC BY-NC 3.0 (Bundled Core)"
+      "license_note": "CC BY-NC 3.0 (Bundled Core)",
+      "is_downloaded": true
+    },
+    {
+      "pack_id": "thematic.index",
+      "type": "thematic",
+      "name": "Thematic Index & Asbab al-Nuzul",
+      "version": "1.0.0",
+      "download_url": "https://cdn.quran.com/thematic/index.json",
+      "size_bytes": 2500000,
+      "license_note": "Public Domain (Bundled Core)",
+      "is_downloaded": true
     }
   ]
 }
